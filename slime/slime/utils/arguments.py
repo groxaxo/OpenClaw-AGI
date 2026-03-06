@@ -38,7 +38,10 @@ def get_slime_extra_args_provider(add_custom_arguments=None):
         def add_cluster_arguments(parser):
             parser.add_argument("--actor-num-nodes", type=int, default=1, help="Number of nodes for training actor")
             parser.add_argument(
-                "--actor-num-gpus-per-node", type=int, default=8, help="Number of gpus per node for training actor"
+                "--actor-num-gpus-per-node",
+                type=int,
+                default=1,
+                help="Number of GPUs per node for training actor. Set this to the actual number available on your node.",
             )
             parser.add_argument(
                 "--critic-num-nodes", type=int, default=None, help="Number of nodes for training actor"
@@ -66,11 +69,8 @@ def get_slime_extra_args_provider(add_custom_arguments=None):
             parser.add_argument(
                 "--num-gpus-per-node",
                 type=int,
-                default=8,
-                help=(
-                    "Number of gpus per node for rollout."
-                    "Notice: If you are going to use less than 8 gpus per node under colocate mode, you should set this number."
-                ),
+                default=1,
+                help="Number of GPUs per node for rollout. Set this to the real GPU count when colocating training and inference.",
             )
             parser.add_argument(
                 "--colocate",
@@ -190,7 +190,7 @@ def get_slime_extra_args_provider(add_custom_arguments=None):
                             --only-train-params-name-list self_attention.wq_b self_attention.wk self_attention.k_norm self_attention.weights_proj
 
                         3. Train ONLY Layer 20 to 23:
-                            --only-train-params-name-list layers\.2[0-3]\.
+                            --only-train-params-name-list layers\\.2[0-3]\\.
                         """,
             )
 

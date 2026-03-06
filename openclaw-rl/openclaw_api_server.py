@@ -15,7 +15,13 @@ import uvicorn
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from slime.utils.processing_utils import load_tokenizer
+from slime.utils.processing_utils import (
+    flatten_openclaw_message_content,
+    load_processor,
+    load_tokenizer,
+    normalize_openclaw_messages_for_template,
+    prepare_openclaw_chat_template_inputs,
+)
 from slime.utils.types import Sample
 
 _GREEN = "\033[32m"
@@ -32,34 +38,19 @@ _NON_STANDARD_BODY_KEYS = {"session_id", "session_done", "turn_type"}
 
 def _flatten_message_content(content):
     """Extract plain text from multimodal content lists."""
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        parts = []
-        for item in content:
-            if isinstance(item, dict):
-                if item.get("type") == "text":
-                    parts.append(item.get("text", ""))
-        return " ".join(parts) if parts else ""
-    return str(content) if content is not None else ""
+    return flatten_openclaw_message_content(content)
 
 
-def _normalize_messages_for_template(messages: list[dict]) -> list[dict]:
+def _normalize_messages_for_template(messages: list[dict], keep_multimodal: bool = False) -> list[dict]:
     """Make messages compatible with the chat template.
 
     - developer → system (templates only know 'system')
-    - multimodal content lists → plain text strings
+    - optionally preserve image blocks for vision tokenisation
     """
-    out = []
-    for msg in messages:
-        m = dict(msg)
-        if m.get("role") == "developer":
-            m["role"] = "system"
-        raw = m.get("content")
-        if not isinstance(raw, str) and raw is not None:
-            m["content"] = _flatten_message_content(raw)
-        out.append(m)
-    return out
+    return normalize_openclaw_messages_for_template(
+        messages,
+        preserve_multimodal=keep_multimodal,
+    )
 
 
 def _extract_logprobs_from_chat_response(choice: dict[str, Any]) -> list[float]:
@@ -141,13 +132,22 @@ async def reward_func(args, sample_or_samples, **kwargs):
 
 async def generate(args, sample: Sample, sampling_params, evaluation: bool = False) -> Sample:
     tokenizer = load_tokenizer(args.hf_checkpoint, trust_remote_code=True)
+    processor = load_processor(args.hf_checkpoint, trust_remote_code=True)
     messages = sample.prompt if isinstance(sample.prompt, list) else [{"role": "user", "content": str(sample.prompt)}]
-    input_ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)
+    rendered_messages = _normalize_messages_for_template(messages, keep_multimodal=True)
+    _, input_ids, _, _, image_data = prepare_openclaw_chat_template_inputs(
+        tokenizer,
+        processor,
+        rendered_messages,
+        add_generation_prompt=True,
+    )
     payload = {
         "input_ids": input_ids,
         "sampling_params": sampling_params,
         "return_logprob": True,
     }
+    if image_data:
+        payload["image_data"] = image_data
     url = f"http://{args.sglang_router_ip}:{args.sglang_router_port}/generate"
     async with httpx.AsyncClient(timeout=None) as client:
         response = await client.post(url, json=payload)
@@ -186,12 +186,13 @@ class OpenClawAPIServer:
         self.output_queue = output_queue
         self.submission_enabled = submission_enabled
         self.tokenizer = load_tokenizer(args.hf_checkpoint, trust_remote_code=True)
+        self.processor = load_processor(args.hf_checkpoint, trust_remote_code=True)
         self.sglang_chat_url = f"http://{args.sglang_router_ip}:{args.sglang_router_port}/v1/chat/completions"
         self.sglang_health_url = f"http://{args.sglang_router_ip}:{args.sglang_router_port}/health"
         self.expected_api_key = os.getenv("SGLANG_API_KEY", "")
         self.host = os.getenv("HOST", "0.0.0.0")
         self.port = int(os.getenv("PORT", "30000"))
-        self.served_model_name = os.getenv("SERVED_MODEL_NAME", "qwen3-8b")
+        self.served_model_name = os.getenv("SERVED_MODEL_NAME", "qwen3.5-4b")
 
         self._index_counter = count(0)
         self._group_counter = count(0)
@@ -486,15 +487,23 @@ class OpenClawAPIServer:
             if response_msg.get("content") is None:
                 response_msg["content"] = ""
 
-            norm_msgs = _normalize_messages_for_template(messages)
-            norm_resp = _normalize_messages_for_template([response_msg])[0]
+            norm_msgs = _normalize_messages_for_template(messages, keep_multimodal=True)
+            norm_resp = _normalize_messages_for_template([response_msg], keep_multimodal=True)[0]
             full_norm = norm_msgs + [norm_resp]
 
-            prompt_text = self.tokenizer.apply_chat_template(
-                norm_msgs, tools=tools, tokenize=False, add_generation_prompt=True,
+            prompt_text, prompt_ids, _, multimodal_train_inputs, _ = prepare_openclaw_chat_template_inputs(
+                self.tokenizer,
+                self.processor,
+                norm_msgs,
+                tools=tools,
+                add_generation_prompt=True,
             )
-            full_text = self.tokenizer.apply_chat_template(
-                full_norm, tools=tools, tokenize=False, add_generation_prompt=False,
+            full_text, full_ids, _, _, _ = prepare_openclaw_chat_template_inputs(
+                self.tokenizer,
+                self.processor,
+                full_norm,
+                tools=tools,
+                add_generation_prompt=False,
             )
 
             if full_text.startswith(prompt_text):
@@ -503,8 +512,9 @@ class OpenClawAPIServer:
                 logger.warning("[OpenClaw] prompt_text is not a prefix of full_text, using full_text as response")
                 response_text = full_text
 
-            prompt_ids = self.tokenizer(prompt_text, add_special_tokens=False)["input_ids"]
-            response_ids = self.tokenizer(response_text, add_special_tokens=False)["input_ids"]
+            response_ids = full_ids[len(prompt_ids):] if len(full_ids) >= len(prompt_ids) else []
+            if not response_ids:
+                response_ids = self.tokenizer(response_text, add_special_tokens=False)["input_ids"]
 
             if not response_ids and not response_text.strip():
                 logger.info("[OpenClaw] MAIN session=%s → empty response, skipping", session_id)
@@ -518,11 +528,13 @@ class OpenClawAPIServer:
                 response_logprobs = response_logprobs + [0.0] * (len(response_ids) - len(response_logprobs))
 
             turn_data = {
+                "messages": norm_msgs,
                 "prompt_ids": prompt_ids,
                 "response_ids": response_ids,
                 "response_logprobs": response_logprobs,
                 "prompt_text": prompt_text,
                 "response_text": response_text,
+                "multimodal_train_inputs": multimodal_train_inputs,
             }
 
             self._turn_counts[session_id] = self._turn_counts.get(session_id, 0) + 1
@@ -604,6 +616,7 @@ class OpenClawAPIServer:
         sample.response_length = len(response_ids)
         sample.loss_mask = [0] * len(response_ids) if exclude else [1] * len(response_ids)
         sample.rollout_log_probs = turn_data["response_logprobs"]
+        sample.multimodal_train_inputs = turn_data.get("multimodal_train_inputs")
         sample.status = Sample.Status.COMPLETED
         sample.index = next(self._index_counter)
         sample.group_index = next(self._group_counter)

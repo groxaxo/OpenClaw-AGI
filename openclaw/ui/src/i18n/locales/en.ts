@@ -13,6 +13,7 @@ export const en: TranslationMap = {
     na: "n/a",
     docs: "Docs",
     resources: "Resources",
+    brandSubtitle: "Qwen 3.5 Control Hub",
   },
   nav: {
     chat: "Chat",
@@ -53,6 +54,28 @@ export const en: TranslationMap = {
     logs: "Live tail of the gateway file logs.",
   },
   overview: {
+    hero: {
+      eyebrow: "Default pipeline",
+      title: "Unsloth Qwen 3.5 (4B) Vision is live",
+      subtitle:
+        "The default OpenClaw pipeline now runs on the latest Unsloth-optimized Qwen 3.5 4B vision stack, preserves multimodal turns, and is tuned for efficient 2x/3x RTX 3090 training.",
+      chips: {
+        model: "Qwen 3.5 4B Vision",
+        pipeline: "Unsloth optimized",
+        hardware: "2x/3x RTX 3090",
+        legacy: "Legacy 8x GPU path deprecated",
+      },
+      stats: {
+        modelLabel: "Default model",
+        modelValue: "unsloth/Qwen3.5-4B",
+        modeLabel: "Pipeline",
+        modeValue: "Vision-ready RL + OPD",
+        hardwareLabel: "Target hardware",
+        hardwareValue: "2x-3x RTX 3090",
+        inputLabel: "Accepted inputs",
+        inputValue: "Text + image turns",
+      },
+    },
     access: {
       title: "Gateway Access",
       subtitle: "Where the dashboard connects and how it authenticates.",

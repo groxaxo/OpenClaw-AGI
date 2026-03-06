@@ -25,7 +25,7 @@ Training uses PPO-style clipped policy loss with the above token-level advantage
 
 $$\mathcal{L}=\mathcal{L}_{pg}+\beta_{KL}\mathcal{L}_{KL}$$
 
-Default script:
+Deprecated legacy script:
 
 ```bash
 cd slime
@@ -47,7 +47,7 @@ pip install -r requirements-qlora.txt    # from repo root
 #### 2x RTX 3090 — Token-level OPD (default)
 
 ```bash
-export HF_CKPT=/path/to/Qwen3-4B
+export HF_CKPT=unsloth/Qwen3.5-4B
 export SAVE_CKPT=/path/to/openclaw-qlora-opd/ckpt
 bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
 ```
@@ -55,18 +55,16 @@ bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
 #### 3x RTX 3090 — Token-level OPD (DDP)
 
 ```bash
-export HF_CKPT=/path/to/Qwen3-4B
+export HF_CKPT=unsloth/Qwen3.5-4B
 export SAVE_CKPT=/path/to/openclaw-qlora-opd/ckpt
 bash openclaw-opd/run_qwen3_4b_opd_3090_3x.sh
 ```
 
-#### Top-K distillation (option B) on 2x 3090
+> The lightweight Unsloth QLoRA path supports token-level OPD only. Top-K logits
+> distillation remains available only through the deprecated full-scale
+> SLIME/Megatron launcher below.
 
-```bash
-DISTILL_TOPK=50 bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
-```
-
-## Option B: Top-K Logits Distillation (SDFT/SDPO-style)
+## Option B: Legacy Top-K Logits Distillation (SDFT/SDPO-style)
 
 Following [SDFT](https://arxiv.org/abs/2601.19897) and [SDPO](https://arxiv.org/abs/2601.20802), instead of single-token teacher targets, distill teacher top-K distribution per position.
 
@@ -90,7 +88,7 @@ Top-K is implemented as an additive extension:
 - Top-K loss is external custom loss (not a built-in core loss switch).
 - Top-K teacher query is off by default (`--distill-topk 0`).
 
-### How to Run Top-K
+### How to Run Legacy Top-K
 
 ```bash
 cd slime

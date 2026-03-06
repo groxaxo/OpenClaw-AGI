@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Deprecated legacy SLIME/Megatron launcher for large 8x-GPU research runs.
+# The default path is the lightweight Unsloth Qwen 3.5 Vision pipeline in
+# openclaw-opd/run_qwen3_4b_opd_3090_2x.sh and run_qwen3_4b_opd_3090_3x.sh.
 
 pkill -9 sglang
 sleep 3
@@ -34,10 +38,10 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 SLIME_ROOT="$(cd -- "${SCRIPT_DIR}/../slime" &>/dev/null && pwd)"
 source "${SLIME_ROOT}/scripts/models/qwen3-4B.sh"
 
-HF_CKPT=${HF_CKPT:-/absolute/path/to/Qwen3-4B-Thinking-2507}
+HF_CKPT=${HF_CKPT:-/absolute/path/to/Qwen3-4B}
 REF_LOAD=${REF_LOAD:-${HF_CKPT}}
 SAVE_CKPT=${SAVE_CKPT:-/absolute/path/to/OpenClaw-RL/ckpt/qwen3-4b-openclaw-opd}
-PRM_MODEL_PATH=${PRM_MODEL_PATH:-/absolute/path/to/Qwen3-4B-Thinking-2507}
+PRM_MODEL_PATH=${PRM_MODEL_PATH:-/absolute/path/to/Qwen3-4B}
 
 export SGLANG_API_KEY="${SGLANG_API_KEY}"
 export SERVED_MODEL_NAME="qwen3-4b"

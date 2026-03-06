@@ -1,5 +1,5 @@
 
-### Slime Env Setup
+### Deprecated Slime / Megatron Env Setup
 
 ```bash
 # cuda 12.9 (nvcc -V, nvidia-smi)
@@ -11,7 +11,7 @@ pip install \
   torchaudio==2.9.1+cu129 \
   --index-url https://download.pytorch.org/whl/cu129
 
-pip install -r /absolute/path/to/OpenClaw-RL/requirements.txt
+pip install -r /absolute/path/to/OpenClaw-RL/requirements-legacy.txt
 
 # DeepEP source is from: https://github.com/deepseek-ai/DeepEP
 pip install -e /absolute/path/to/sgl-workspace/DeepEP --no-build-isolation

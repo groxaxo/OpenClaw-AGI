@@ -194,6 +194,40 @@ export function renderOverview(props: OverviewProps) {
   const currentLocale = i18n.getLocale();
 
   return html`
+    <section class="overview-hero">
+      <div class="overview-hero__content">
+        <div class="overview-hero__eyebrow">${t("overview.hero.eyebrow")}</div>
+        <div class="overview-hero__title">${t("overview.hero.title")}</div>
+        <div class="overview-hero__subtitle">${t("overview.hero.subtitle")}</div>
+        <div class="overview-hero__chips">
+          <span class="overview-hero__chip">${t("overview.hero.chips.model")}</span>
+          <span class="overview-hero__chip">${t("overview.hero.chips.pipeline")}</span>
+          <span class="overview-hero__chip">${t("overview.hero.chips.hardware")}</span>
+          <span class="overview-hero__chip overview-hero__chip--muted">
+            ${t("overview.hero.chips.legacy")}
+          </span>
+        </div>
+      </div>
+      <div class="overview-hero__stats">
+        <div class="overview-hero__stat">
+          <div class="overview-hero__stat-label">${t("overview.hero.stats.modelLabel")}</div>
+          <div class="overview-hero__stat-value">${t("overview.hero.stats.modelValue")}</div>
+        </div>
+        <div class="overview-hero__stat">
+          <div class="overview-hero__stat-label">${t("overview.hero.stats.modeLabel")}</div>
+          <div class="overview-hero__stat-value">${t("overview.hero.stats.modeValue")}</div>
+        </div>
+        <div class="overview-hero__stat">
+          <div class="overview-hero__stat-label">${t("overview.hero.stats.hardwareLabel")}</div>
+          <div class="overview-hero__stat-value">${t("overview.hero.stats.hardwareValue")}</div>
+        </div>
+        <div class="overview-hero__stat">
+          <div class="overview-hero__stat-label">${t("overview.hero.stats.inputLabel")}</div>
+          <div class="overview-hero__stat-value">${t("overview.hero.stats.inputValue")}</div>
+        </div>
+      </div>
+    </section>
+
     <section class="grid grid-cols-2">
       <div class="card">
         <div class="card-title">${t("overview.access.title")}</div>

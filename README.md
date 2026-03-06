@@ -122,7 +122,7 @@ docker build -t openclaw-rl:latest -f Dockerfile .
 
 # Run with both 3090s exposed
 docker run --gpus '"device=0,1"' \
-  -e HF_CKPT=/models/Qwen3-4B \
+  -e HF_CKPT=/models/Qwen3.5-4B \
   -e SAVE_CKPT=/checkpoints/openclaw-qlora-rl \
   -v /path/to/models:/models \
   -v /path/to/checkpoints:/checkpoints \
@@ -177,7 +177,7 @@ pip install -r requirements-qlora.txt
 - **Software:** CUDA 12.x, Python 3.10–3.12
 - **Key libraries:** [Unsloth](https://github.com/unslothai/unsloth), [SGLang](https://github.com/sgl-project/sglang), PEFT, bitsandbytes
 
-For the legacy full-scale setup (8+ GPUs, Megatron-LM), see [`./instructions/README.md`](./instructions/README.md).
+For the deprecated legacy full-scale setup (8+ GPUs, Megatron-LM), see [`./instructions/README.md`](./instructions/README.md).
 
 
 
@@ -201,7 +201,7 @@ Choose your optimization method:
 <summary><b>Option A: Binary RL — 2× RTX 3090 (Recommended)</b></summary>
 
 ```bash
-export HF_CKPT=/path/to/Qwen3-4B
+export HF_CKPT=unsloth/Qwen3.5-4B
 export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
 bash openclaw-rl/run_qwen3_4b_3090_2x.sh
 ```
@@ -219,7 +219,7 @@ See [`./openclaw-rl/README.md`](./openclaw-rl/README.md) for details.
 <summary><b>Option B: On-Policy Distillation (OPD) — 2× RTX 3090</b></summary>
 
 ```bash
-export HF_CKPT=/path/to/Qwen3-4B
+export HF_CKPT=unsloth/Qwen3.5-4B
 export SAVE_CKPT=/path/to/openclaw-qlora-opd/ckpt
 bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
 ```
@@ -230,9 +230,9 @@ See [`./openclaw-opd/README.md`](./openclaw-opd/README.md) for algorithm details
 </details>
 
 <details>
-<summary><b>Option C: Full-scale setup (8+ GPUs, Megatron-LM)</b></summary>
+<summary><b>Option C: Legacy research path (deprecated 8+ GPUs, Megatron-LM)</b></summary>
 
-For users with large multi-GPU clusters:
+Deprecated research path for large multi-GPU clusters:
 
 ```bash
 # Binary RL
@@ -272,10 +272,10 @@ Then configure OpenClaw to route requests to your RL server. Open your `openclaw
         "api": "openai-completions",
         "models": [
           {
-            "id": "qwen3-4b",
-            "name": "Qwen3 4B",
+            "id": "qwen3.5-4b",
+            "name": "Qwen 3.5 4B Vision",
             "reasoning": true,
-            "input": ["text"],
+            "input": ["text", "image"],
             "cost": {
               "input": 0,
               "output": 0,
@@ -303,24 +303,24 @@ Before launching, set these important environment variables as needed:
 
 | Variable | Default | Description |
 |---|---|---|
-| `HF_CKPT` | *(required)* | Path to the base HuggingFace checkpoint |
+| `HF_CKPT` | `unsloth/Qwen3.5-4B` | Base HuggingFace checkpoint (default vision model) |
 | `SAVE_CKPT` | *(required)* | Checkpoint output directory |
 | `TRAINING_GPU` | `0` | GPU index for QLoRA training |
 | `ROLLOUT_GPU` | `1` | GPU index for sglang rollout inference |
-| `LORA_R` | `64` | LoRA rank |
-| `LORA_ALPHA` | `128` | LoRA alpha scaling factor |
+| `LORA_R` | `16` | LoRA rank |
+| `LORA_ALPHA` | `16` | LoRA alpha scaling factor |
 | `ROLLOUT_BATCH_SIZE` | `16` | Samples collected before each training step |
 | `LR` | `1e-6` | Learning rate |
 | `PRM_ENABLE` | `0` | Set to `1` to enable PRM scoring |
 | `PORT` | `30000` | Port for the OpenAI-compatible proxy endpoint |
 | `SGLANG_API_KEY` | — | Optional API key for the SGLang endpoint |
 
-**VRAM breakdown for Qwen3-4B (default settings, 2× RTX 3090):**
+**VRAM breakdown for Qwen 3.5 4B Vision (default settings, 2× RTX 3090):**
 
 | Component | VRAM |
 |---|---|
 | Base model weights (4-bit NF4 QLoRA) | ~2.5 GB |
-| LoRA adapter (r=64) | ~0.5 GB |
+| LoRA adapter (r=16) | ~0.2 GB |
 | Gradients + optimizer states | ~3 GB |
 | Activation checkpointing | ~2 GB |
 | **Total (training GPU 0)** | **~8 GB** |
@@ -369,7 +369,6 @@ We sincerely thank these projects for their valuable insights and high-quality i
 
 
 ---
-
 
 
 

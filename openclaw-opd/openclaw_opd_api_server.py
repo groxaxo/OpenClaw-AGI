@@ -16,7 +16,14 @@ import uvicorn
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from slime.utils.processing_utils import load_tokenizer
+from slime.utils.processing_utils import (
+    flatten_openclaw_message_content,
+    load_processor,
+    load_tokenizer,
+    normalize_openclaw_content_for_template,
+    normalize_openclaw_messages_for_template,
+    prepare_openclaw_chat_template_inputs,
+)
 from slime.utils.types import Sample
 
 _GREEN = "\033[32m"
@@ -33,28 +40,14 @@ _NON_STANDARD_BODY_KEYS = {"session_id", "session_done", "turn_type"}
 
 
 def _flatten_message_content(content):
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        parts = []
-        for item in content:
-            if isinstance(item, dict) and item.get("type") == "text":
-                parts.append(item.get("text", ""))
-        return " ".join(parts) if parts else ""
-    return str(content) if content is not None else ""
+    return flatten_openclaw_message_content(content)
 
 
-def _normalize_messages_for_template(messages: list[dict]) -> list[dict]:
-    out = []
-    for msg in messages:
-        m = dict(msg)
-        if m.get("role") == "developer":
-            m["role"] = "system"
-        raw = m.get("content")
-        if not isinstance(raw, str) and raw is not None:
-            m["content"] = _flatten_message_content(raw)
-        out.append(m)
-    return out
+def _normalize_messages_for_template(messages: list[dict], keep_multimodal: bool = False) -> list[dict]:
+    return normalize_openclaw_messages_for_template(
+        messages,
+        preserve_multimodal=keep_multimodal,
+    )
 
 
 def _extract_logprobs_from_chat_response(choice: dict[str, Any]) -> list[float]:
@@ -123,9 +116,22 @@ def _append_hint_to_messages(messages: list[dict], hint: str) -> list[dict]:
     if target_idx is None:
         target_idx = len(cloned) - 1
 
-    content = _flatten_message_content(cloned[target_idx].get("content"))
-    suffix = f"\n\n[user's hint / instruction]\n{hint.strip()}"
-    cloned[target_idx]["content"] = (content + suffix).strip()
+    raw_content = cloned[target_idx].get("content")
+    hint_block = {
+        "type": "text",
+        "text": f"[user's hint / instruction]\n{hint.strip()}",
+    }
+    if isinstance(raw_content, list):
+        normalized = normalize_openclaw_content_for_template(raw_content, preserve_multimodal=True)
+        if isinstance(normalized, list):
+            cloned[target_idx]["content"] = [*normalized, hint_block]
+        else:
+            suffix = f"\n\n[user's hint / instruction]\n{hint.strip()}"
+            cloned[target_idx]["content"] = (str(normalized) + suffix).strip()
+    else:
+        content = _flatten_message_content(raw_content)
+        suffix = f"\n\n[user's hint / instruction]\n{hint.strip()}"
+        cloned[target_idx]["content"] = (content + suffix).strip()
     return cloned
 
 
@@ -138,13 +144,22 @@ async def reward_func(args, sample_or_samples, **kwargs):
 
 async def generate(args, sample: Sample, sampling_params, evaluation: bool = False) -> Sample:
     tokenizer = load_tokenizer(args.hf_checkpoint, trust_remote_code=True)
+    processor = load_processor(args.hf_checkpoint, trust_remote_code=True)
     messages = sample.prompt if isinstance(sample.prompt, list) else [{"role": "user", "content": str(sample.prompt)}]
-    input_ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)
+    normalized_messages = _normalize_messages_for_template(messages, keep_multimodal=True)
+    _, input_ids, _, _, image_data = prepare_openclaw_chat_template_inputs(
+        tokenizer,
+        processor,
+        normalized_messages,
+        add_generation_prompt=True,
+    )
     payload = {
         "input_ids": input_ids,
         "sampling_params": sampling_params,
         "return_logprob": True,
     }
+    if image_data:
+        payload["image_data"] = image_data
     url = f"http://{args.sglang_router_ip}:{args.sglang_router_port}/generate"
     async with httpx.AsyncClient(timeout=None) as client:
         response = await client.post(url, json=payload)
@@ -174,12 +189,13 @@ class OpenClawOPDAPIServer:
         self.output_queue = output_queue
         self.submission_enabled = submission_enabled
         self.tokenizer = load_tokenizer(args.hf_checkpoint, trust_remote_code=True)
+        self.processor = load_processor(args.hf_checkpoint, trust_remote_code=True)
         self.sglang_chat_url = f"http://{args.sglang_router_ip}:{args.sglang_router_port}/v1/chat/completions"
         self.sglang_health_url = f"http://{args.sglang_router_ip}:{args.sglang_router_port}/health"
         self.expected_api_key = os.getenv("SGLANG_API_KEY", "")
         self.host = os.getenv("HOST", "0.0.0.0")
         self.port = int(os.getenv("PORT", "30000"))
-        self.served_model_name = os.getenv("SERVED_MODEL_NAME", "qwen3-4b")
+        self.served_model_name = os.getenv("SERVED_MODEL_NAME", "qwen3.5-4b")
 
         self._index_counter = count(0)
         self._group_counter = count(0)
@@ -345,7 +361,12 @@ class OpenClawOPDAPIServer:
             logger.warning("[OpenClaw-OPD] judge query failed (vote %d): %s", vote_id, e)
             return {"vote_id": vote_id, "score": None, "hint": "", "raw": ""}
 
-    async def _compute_teacher_log_probs(self, input_ids: list[int], response_len: int) -> list[float]:
+    async def _compute_teacher_log_probs(
+        self,
+        input_ids: list[int],
+        response_len: int,
+        image_data: list[str] | None = None,
+    ) -> list[float]:
         start_len = max(0, len(input_ids) - response_len)
         payload = {
             "input_ids": input_ids,
@@ -357,6 +378,8 @@ class OpenClawOPDAPIServer:
             "return_logprob": True,
             "logprob_start_len": start_len,
         }
+        if image_data:
+            payload["image_data"] = image_data
         async with self._teacher_lp_semaphore:
             async with httpx.AsyncClient(timeout=None) as client:
                 resp = await client.post(self._prm_url, json=payload)
@@ -385,7 +408,10 @@ class OpenClawOPDAPIServer:
         return [0.0] * (response_len - len(all_lp)) + all_lp
 
     async def _compute_teacher_topk_logprobs(
-        self, input_ids: list[int], response_len: int
+        self,
+        input_ids: list[int],
+        response_len: int,
+        image_data: list[str] | None = None,
     ) -> tuple[list[list[float]], list[list[int]]]:
         """Compute teacher's top-K log-probs and token indices for response tokens.
 
@@ -406,6 +432,8 @@ class OpenClawOPDAPIServer:
             "logprob_start_len": start_len,
             "top_logprobs_num": K,
         }
+        if image_data:
+            payload["image_data"] = image_data
         async with self._teacher_lp_semaphore:
             async with httpx.AsyncClient(timeout=None) as client:
                 resp = await client.post(self._prm_url, json=payload)
@@ -489,18 +517,25 @@ class OpenClawOPDAPIServer:
 
         hint = selected["hint"].strip()
         enhanced_messages = _append_hint_to_messages(turn_data["messages"], hint)
-        norm_enhanced = _normalize_messages_for_template(enhanced_messages)
-        enhanced_prompt_text = self.tokenizer.apply_chat_template(
-            norm_enhanced,
-            tools=turn_data.get("tools"),
-            tokenize=False,
-            add_generation_prompt=True,
+        norm_enhanced = _normalize_messages_for_template(enhanced_messages, keep_multimodal=True)
+        enhanced_prompt_text, enhanced_prompt_ids, _, _, enhanced_image_data = (
+            prepare_openclaw_chat_template_inputs(
+                self.tokenizer,
+                self.processor,
+                norm_enhanced,
+                tools=turn_data.get("tools"),
+                add_generation_prompt=True,
+            )
         )
 
         enhanced_full_text = enhanced_prompt_text + turn_data["response_text"]
-        enhanced_ids = self.tokenizer(enhanced_full_text, add_special_tokens=False)["input_ids"]
+        enhanced_ids = enhanced_prompt_ids + turn_data["response_ids"]
         response_len = len(turn_data["response_ids"])
-        teacher_log_probs = await self._compute_teacher_log_probs(enhanced_ids, response_len)
+        teacher_log_probs = await self._compute_teacher_log_probs(
+            enhanced_ids,
+            response_len,
+            image_data=enhanced_image_data,
+        )
 
         result: dict[str, Any] = {
             "accepted": True,
@@ -510,7 +545,11 @@ class OpenClawOPDAPIServer:
         }
 
         if self._use_topk_distillation:
-            topk_lp, topk_idx = await self._compute_teacher_topk_logprobs(enhanced_ids, response_len)
+            topk_lp, topk_idx = await self._compute_teacher_topk_logprobs(
+                enhanced_ids,
+                response_len,
+                image_data=enhanced_image_data,
+            )
             result["teacher_topk_log_probs"] = topk_lp
             result["teacher_topk_indices"] = topk_idx
 
@@ -608,19 +647,28 @@ class OpenClawOPDAPIServer:
             response_msg = dict(assistant_msg)
             if response_msg.get("content") is None:
                 response_msg["content"] = ""
-            norm_msgs = _normalize_messages_for_template(messages)
-            norm_resp = _normalize_messages_for_template([response_msg])[0]
+            norm_msgs = _normalize_messages_for_template(messages, keep_multimodal=True)
+            norm_resp = _normalize_messages_for_template([response_msg], keep_multimodal=True)[0]
             full_norm = norm_msgs + [norm_resp]
 
-            prompt_text = self.tokenizer.apply_chat_template(
-                norm_msgs, tools=tools, tokenize=False, add_generation_prompt=True
+            prompt_text, prompt_ids, _, multimodal_train_inputs, _ = prepare_openclaw_chat_template_inputs(
+                self.tokenizer,
+                self.processor,
+                norm_msgs,
+                tools=tools,
+                add_generation_prompt=True,
             )
-            full_text = self.tokenizer.apply_chat_template(
-                full_norm, tools=tools, tokenize=False, add_generation_prompt=False
+            full_text, full_ids, _, _, _ = prepare_openclaw_chat_template_inputs(
+                self.tokenizer,
+                self.processor,
+                full_norm,
+                tools=tools,
+                add_generation_prompt=False,
             )
             response_text = full_text[len(prompt_text):] if full_text.startswith(prompt_text) else full_text
-            prompt_ids = self.tokenizer(prompt_text, add_special_tokens=False)["input_ids"]
-            response_ids = self.tokenizer(response_text, add_special_tokens=False)["input_ids"]
+            response_ids = full_ids[len(prompt_ids):] if len(full_ids) >= len(prompt_ids) else []
+            if not response_ids:
+                response_ids = self.tokenizer(response_text, add_special_tokens=False)["input_ids"]
 
             if not response_ids and not response_text.strip():
                 logger.info("[OpenClaw-OPD] MAIN session=%s -> empty response, skipping", session_id)
@@ -641,8 +689,9 @@ class OpenClawOPDAPIServer:
                 "response_logprobs": response_logprobs,
                 "prompt_text": prompt_text,
                 "response_text": response_text,
-                "messages": messages,
+                "messages": norm_msgs,
                 "tools": tools,
+                "multimodal_train_inputs": multimodal_train_inputs,
                 "has_next_state": False,
             }
             self._pending_turn_data.setdefault(session_id, {})[turn_num] = turn_data
@@ -716,6 +765,7 @@ class OpenClawOPDAPIServer:
         sample.loss_mask = [1] * len(response_ids)
         sample.rollout_log_probs = turn_data["response_logprobs"]
         sample.teacher_log_probs = torch.tensor(teacher_log_probs, dtype=torch.float32)
+        sample.multimodal_train_inputs = turn_data.get("multimodal_train_inputs")
 
         if self._use_topk_distillation:
             K = self.distill_topk

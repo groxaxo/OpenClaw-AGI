@@ -1,8 +1,8 @@
-# OpenClaw-RL / OpenClaw-OPD — Unsloth QLoRA requirements
-# ============================================================
-# Install these packages to use the 2x / 3x RTX 3090 QLoRA training path.
+# OpenClaw-RL / OpenClaw-OPD — Unsloth Qwen 3.5 (4B) Vision requirements
+# =====================================================================
+# Install these packages to use the default 2x / 3x RTX 3090 QLoRA path.
 #
-# Step 1 – install Unsloth (choose the variant that matches your CUDA + PyTorch):
+# Step 1 – install Unsloth (pick the variant that matches your CUDA + PyTorch):
 #
 #   CUDA 12.4 + PyTorch 2.5.x:
 #     pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
@@ -14,25 +14,24 @@
 #
 # Step 2 – install the packages below:
 #   pip install -r requirements-qlora.txt
+#
+# Note: The deprecated 8x-GPU Slime/Megatron stack now lives in
+# requirements-legacy.txt so the default install stays hardware efficient.
 
-# ── core dependencies ──────────────────────────────────────────────────────
-# bitsandbytes: 4-bit NF4 quantization (QLoRA base model loading)
 bitsandbytes>=0.43.0
-
-# peft: LoRA adapter implementation used by Unsloth
 peft>=0.12.0
-
-# accelerate: multi-GPU DDP (required for 3x 3090 DDP mode)
 accelerate>=0.27.0
-
-# trl: optional – provides reference GRPO / PPO components
 trl>=0.9.6
-
-# ── inference server ───────────────────────────────────────────────────────
-# sglang must already be installed (see main requirements.txt).
-# The trainer spawns an sglang subprocess automatically.
-
-# ── utilities ─────────────────────────────────────────────────────────────
 requests>=2.32.0
-transformers>=4.40.0
+transformers>=4.57.0
 torch>=2.0.0
+fastapi>=0.100.0
+uvicorn>=0.27.0
+httpx>=0.27.0
+huggingface-hub>=0.20.0
+safetensors>=0.4.0
+sentencepiece>=0.1.99
+tokenizers>=0.19.0
+pillow>=10.0.0
+qwen-vl-utils>=0.0.14
+sglang[all] @ git+https://github.com/sgl-project/sglang.git@dce8b0606c06d3a191a24c7b8cbe8e238ab316c9#egg=sglang&subdirectory=python

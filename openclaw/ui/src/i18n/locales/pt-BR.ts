@@ -13,6 +13,7 @@ export const pt_BR: TranslationMap = {
     na: "n/a",
     docs: "Docs",
     resources: "Recursos",
+    brandSubtitle: "Central Qwen 3.5",
   },
   nav: {
     chat: "Chat",
@@ -53,6 +54,28 @@ export const pt_BR: TranslationMap = {
     logs: "Acompanhamento ao vivo dos logs de arquivo do gateway.",
   },
   overview: {
+    hero: {
+      eyebrow: "Pipeline padrão",
+      title: "Unsloth Qwen 3.5 (4B) Vision está ativo",
+      subtitle:
+        "A pipeline padrão do OpenClaw agora usa a pilha vision mais recente otimizada pela Unsloth para o Qwen 3.5 4B, preserva turnos multimodais e continua ajustada para treino eficiente em 2x/3x RTX 3090.",
+      chips: {
+        model: "Qwen 3.5 4B Vision",
+        pipeline: "Otimizado com Unsloth",
+        hardware: "2x/3x RTX 3090",
+        legacy: "Caminho legado de 8 GPUs depreciado",
+      },
+      stats: {
+        modelLabel: "Modelo padrão",
+        modelValue: "unsloth/Qwen3.5-4B",
+        modeLabel: "Pipeline",
+        modeValue: "RL + OPD com visão",
+        hardwareLabel: "Hardware alvo",
+        hardwareValue: "2x-3x RTX 3090",
+        inputLabel: "Entradas aceitas",
+        inputValue: "Turnos com texto + imagem",
+      },
+    },
     access: {
       title: "Acesso ao Gateway",
       subtitle: "Onde o dashboard se conecta e como ele se autentica.",

@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenClaw-RL QLoRA launcher — 3x RTX 3090 (72 GB total)
+# OpenClaw-RL Qwen 3.5 Vision launcher — 3x RTX 3090 (72 GB total)
 #
 # GPU layout:
 #   GPUs 0,1 (TRAINING_GPUS) : Unsloth QLoRA actor — DDP via accelerate
@@ -9,14 +9,14 @@
 # GLOBAL_BATCH_SIZE / MINI_BATCH_SIZE to taste.
 #
 # Usage:
-#   export HF_CKPT=/path/to/Qwen3-4B
+#   export HF_CKPT=unsloth/Qwen3.5-4B
 #   export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
 #   bash run_qwen3_4b_3090_3x.sh
 
 set -euo pipefail
 
 # ── user-configurable paths ────────────────────────────────────────────────
-HF_CKPT="${HF_CKPT:-/absolute/path/to/Qwen3-4B}"
+HF_CKPT="${HF_CKPT:-unsloth/Qwen3.5-4B}"
 SAVE_CKPT="${SAVE_CKPT:-/absolute/path/to/openclaw-qlora-rl/ckpt}"
 PRM_MODEL_PATH="${PRM_MODEL_PATH:-${HF_CKPT}}"
 
@@ -29,10 +29,10 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # ── API server / proxy ─────────────────────────────────────────────────────
 export HOST="${HOST:-0.0.0.0}"
 export PORT="${PORT:-30000}"
-export SERVED_MODEL_NAME="${SERVED_MODEL_NAME:-qwen3-4b}"
+export SERVED_MODEL_NAME="${SERVED_MODEL_NAME:-qwen3.5-4b}"
 export SGLANG_API_KEY="${SGLANG_API_KEY:-}"
 export OPENCLAW_RECORD_ENABLED="${OPENCLAW_RECORD_ENABLED:-1}"
-export OPENCLAW_RECORD_FILE="${OPENCLAW_RECORD_FILE:-${SCRIPT_DIR}/results/qwen3_4b_3090_3x_record.jsonl}"
+export OPENCLAW_RECORD_FILE="${OPENCLAW_RECORD_FILE:-${SCRIPT_DIR}/results/qwen3_5_4b_vision_3090_3x_record.jsonl}"
 
 mkdir -p "$(dirname "${OPENCLAW_RECORD_FILE}")"
 
@@ -41,10 +41,11 @@ SGLANG_HOST="${SGLANG_HOST:-127.0.0.1}"
 SGLANG_PORT="${SGLANG_PORT:-30001}"
 SGLANG_TP="${SGLANG_TP:-1}"
 SGLANG_MEM_FRACTION="${SGLANG_MEM_FRACTION:-0.85}"
+SGLANG_TOOL_CALL_PARSER="${SGLANG_TOOL_CALL_PARSER:-qwen3_coder}"
 
 # ── QLoRA hyper-parameters ─────────────────────────────────────────────────
-LORA_R="${LORA_R:-64}"
-LORA_ALPHA="${LORA_ALPHA:-128}"
+LORA_R="${LORA_R:-16}"
+LORA_ALPHA="${LORA_ALPHA:-16}"
 MAX_SEQ_LEN="${MAX_SEQ_LEN:-32768}"
 CONTEXT_LEN="${CONTEXT_LEN:-32768}"
 
@@ -67,7 +68,7 @@ PRM_PORT="${PRM_PORT:-30002}"
 PRM_M="${PRM_M:-3}"
 
 echo "========================================================"
-echo "  OpenClaw-RL  |  Unsloth QLoRA  |  3x RTX 3090"
+echo "  OpenClaw-RL  |  Unsloth Qwen 3.5 Vision  |  3x RTX 3090"
 echo "  Training GPUs: ${TRAINING_GPUS}"
 echo "  Rollout  GPU : ${ROLLOUT_GPU}"
 echo "  Model        : ${HF_CKPT}"
@@ -124,6 +125,7 @@ accelerate launch \
         --sglang-mem-fraction "${SGLANG_MEM_FRACTION}" \
         --sglang-context-length "${CONTEXT_LEN}" \
         --sglang-reasoning-parser qwen3 \
+        --sglang-tool-call-parser "${SGLANG_TOOL_CALL_PARSER}" \
         --served-model-name "${SERVED_MODEL_NAME}" \
         --update-weights-interval "${UPDATE_WEIGHTS_INTERVAL}" \
         --proxy-host "${HOST}" \

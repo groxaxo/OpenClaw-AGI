@@ -1,5 +1,5 @@
-"""OpenClaw-OPD Unsloth QLoRA Trainer (On-Policy Distillation)
-=================================================================
+"""OpenClaw-OPD Unsloth Qwen 3.5 Vision Trainer
+================================================
 
 Lightweight OPD trainer using Unsloth + QLoRA for reduced GPU VRAM.
 Designed to run on 2x or 3x RTX 3090 (24 GB) GPUs.
@@ -27,7 +27,7 @@ Usage
 -----
   # 2x RTX 3090:
   CUDA_VISIBLE_DEVICES=0 python unsloth_qlora_opd_trainer.py \\
-      --hf-checkpoint /path/to/Qwen3-4B \\
+      --hf-checkpoint unsloth/Qwen3.5-4B \\
       --save /path/to/qlora-opd-ckpt \\
       --sglang-host 0.0.0.0 --sglang-port 30001 \\
       --proxy-host 0.0.0.0 --proxy-port 30000
@@ -35,7 +35,7 @@ Usage
   # 3x RTX 3090 (DDP):
   CUDA_VISIBLE_DEVICES=0,1 accelerate launch --num_processes 2 \\
       unsloth_qlora_opd_trainer.py \\
-      --hf-checkpoint /path/to/Qwen3-4B \\
+      --hf-checkpoint unsloth/Qwen3.5-4B \\
       --save /path/to/qlora-opd-ckpt \\
       --sglang-host 0.0.0.0 --sglang-port 30001 \\
       --proxy-host 0.0.0.0 --proxy-port 30000
@@ -60,6 +60,7 @@ from unsloth_qlora_trainer import (
     collate_samples,
     drain_output_queue,
     get_token_log_probs,
+    iter_homogeneous_mini_batches,
     push_lora_weights_to_sglang,
     start_sglang_server,
     wait_for_sglang_ready,
@@ -77,12 +78,12 @@ logging.basicConfig(
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="OpenClaw-OPD Unsloth QLoRA Trainer (2-3x RTX 3090)",
+        description="OpenClaw-OPD Unsloth Qwen 3.5 Vision Trainer (2-3x RTX 3090)",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     # ── model / checkpoint ──────────────────────────────────────────────────
-    p.add_argument("--hf-checkpoint", required=True)
+    p.add_argument("--hf-checkpoint", default="unsloth/Qwen3.5-4B")
     p.add_argument("--save", required=True)
     p.add_argument("--save-interval", type=int, default=1)
     p.add_argument("--max-seq-length", type=int, default=32768)
@@ -90,12 +91,39 @@ def parse_args() -> argparse.Namespace:
     # ── QLoRA / LoRA ─────────────────────────────────────────────────────────
     p.add_argument("--load-in-4bit", action="store_true", default=True)
     p.add_argument("--no-4bit", dest="load_in_4bit", action="store_false")
-    p.add_argument("--lora-r", type=int, default=64)
-    p.add_argument("--lora-alpha", type=int, default=128)
+    p.add_argument("--lora-r", type=int, default=16)
+    p.add_argument("--lora-alpha", type=int, default=16)
     p.add_argument("--lora-dropout", type=float, default=0.0)
-    p.add_argument("--lora-target-modules", nargs="+",
-                   default=["q_proj", "k_proj", "v_proj", "o_proj",
-                            "gate_proj", "up_proj", "down_proj"])
+    p.add_argument(
+        "--lora-target-modules",
+        nargs="+",
+        default=None,
+        help="Optional explicit LoRA target modules. Leave unset to use Unsloth's Qwen 3.5 vision defaults.",
+    )
+    p.add_argument(
+        "--finetune-vision-layers",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable LoRA on the vision encoder blocks.",
+    )
+    p.add_argument(
+        "--finetune-language-layers",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable LoRA on the language-model blocks.",
+    )
+    p.add_argument(
+        "--finetune-attention-modules",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable LoRA on attention projections.",
+    )
+    p.add_argument(
+        "--finetune-mlp-modules",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable LoRA on MLP projections.",
+    )
 
     # ── OPD training ─────────────────────────────────────────────────────────
     p.add_argument("--rollout-batch-size", type=int, default=16)
@@ -127,7 +155,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--sglang-mem-fraction", type=float, default=0.85)
     p.add_argument("--sglang-context-length", type=int, default=32768)
     p.add_argument("--sglang-reasoning-parser", default="qwen3")
-    p.add_argument("--served-model-name", default="qwen3-4b")
+    p.add_argument("--sglang-tool-call-parser", default="qwen3_coder")
+    p.add_argument("--served-model-name", default="qwen3.5-4b")
     p.add_argument("--update-weights-interval", type=int, default=1)
 
     # ── proxy server ─────────────────────────────────────────────────────────
@@ -149,7 +178,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--wandb-project", default=None)
     p.add_argument("--wandb-run-name", default=None)
 
-    return p.parse_args()
+    args = p.parse_args()
+    if args.distill_topk > 0:
+        raise ValueError(
+            "Top-K distillation is only supported by the deprecated SLIME/Megatron path. "
+            "Use run_qwen3_4b_openclaw_opd_topk.sh for legacy experiments or keep "
+            "--distill-topk 0 for the default Unsloth Qwen 3.5 pipeline."
+        )
+    return args
 
 
 # ---------------------------------------------------------------------------
@@ -244,7 +280,12 @@ def get_teacher_log_probs_for_sample(
     attn_mask = torch.ones_like(input_ids)
 
     with torch.no_grad():
-        lp_full = get_token_log_probs(model, input_ids, attn_mask)
+        lp_full = get_token_log_probs(
+            model,
+            input_ids,
+            attn_mask,
+            multimodal_train_inputs=getattr(sample, "multimodal_train_inputs", None),
+        )
 
     # Extract only response token positions
     prompt_len_teacher = len(teacher_prompt_ids)
@@ -274,10 +315,15 @@ def collate_opd_samples(
 
     Returns the standard batch dict plus ``teacher_log_probs`` [B, T].
     """
-    # Compute teacher log-probs per sample (no grad)
     teacher_lps_per_sample: list[list[float]] = []
     for s in samples:
-        lp = get_teacher_log_probs_for_sample(model, s, tokenizer, max_seq_len, device)
+        teacher_lp = getattr(s, "teacher_log_probs", None)
+        if teacher_lp is None:
+            lp = get_teacher_log_probs_for_sample(model, s, tokenizer, max_seq_len, device)
+        elif isinstance(teacher_lp, torch.Tensor):
+            lp = teacher_lp.detach().cpu().tolist()
+        else:
+            lp = list(teacher_lp)
         teacher_lps_per_sample.append(lp)
 
     # Now build the standard batch
@@ -325,7 +371,7 @@ def train(args: argparse.Namespace) -> None:
 
     # ── 1. Load model with Unsloth QLoRA ──────────────────────────────────────
     try:
-        from unsloth import FastLanguageModel
+        from unsloth import FastVisionModel
     except ImportError:
         raise SystemExit(
             "[unsloth_qlora_opd_trainer] unsloth is not installed.\n"
@@ -333,30 +379,40 @@ def train(args: argparse.Namespace) -> None:
         )
 
     logger.info("[opd_train] Loading %s (4bit=%s) …", args.hf_checkpoint, args.load_in_4bit)
-    base_model, tokenizer = FastLanguageModel.from_pretrained(
+    base_model, processor = FastVisionModel.from_pretrained(
         model_name=args.hf_checkpoint,
         max_seq_length=args.max_seq_length,
         dtype=None,
         load_in_4bit=args.load_in_4bit,
+        use_gradient_checkpointing="unsloth",
     )
+    tokenizer = getattr(processor, "tokenizer", processor)
 
     logger.info("[opd_train] Applying LoRA (r=%d, alpha=%d) …", args.lora_r, args.lora_alpha)
-    model = FastLanguageModel.get_peft_model(
+    peft_kwargs = {}
+    if args.lora_target_modules:
+        peft_kwargs["target_modules"] = args.lora_target_modules
+    model = FastVisionModel.get_peft_model(
         base_model,
+        finetune_vision_layers=args.finetune_vision_layers,
+        finetune_language_layers=args.finetune_language_layers,
+        finetune_attention_modules=args.finetune_attention_modules,
+        finetune_mlp_modules=args.finetune_mlp_modules,
         r=args.lora_r,
         lora_alpha=args.lora_alpha,
         lora_dropout=args.lora_dropout,
-        target_modules=args.lora_target_modules,
         bias="none",
         use_gradient_checkpointing="unsloth",
         random_state=args.seed,
         use_rslora=False,
+        **peft_kwargs,
     )
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     pad_id = tokenizer.pad_token_id
 
+    FastVisionModel.for_training(model)
     model.train()
 
     # ── 2. Optimizer ──────────────────────────────────────────────────────────
@@ -383,6 +439,7 @@ def train(args: argparse.Namespace) -> None:
             mem_fraction=args.sglang_mem_fraction,
             context_length=args.sglang_context_length,
             reasoning_parser=args.sglang_reasoning_parser,
+            tool_call_parser=args.sglang_tool_call_parser,
             served_model_name=args.served_model_name,
         )
         if not wait_for_sglang_ready(args.sglang_host, args.sglang_port):
@@ -483,8 +540,7 @@ def train(args: argparse.Namespace) -> None:
         all_metrics: list[dict] = []
         step_count = 0
 
-        for mb_start in range(0, len(samples), args.mini_batch_size):
-            mb_samples = samples[mb_start: mb_start + args.mini_batch_size]
+        for mb_samples in iter_homogeneous_mini_batches(samples, args.mini_batch_size):
             unwrapped = accelerator.unwrap_model(model) if accelerator else model
             batch = collate_opd_samples(
                 mb_samples, unwrapped, tokenizer,
@@ -496,19 +552,30 @@ def train(args: argparse.Namespace) -> None:
             loss_mask = batch["loss_mask"]
             old_lp = batch["old_log_probs"]
             teacher_lp = batch["teacher_log_probs"]
+            multimodal_train_inputs = batch["multimodal_train_inputs"]
 
             # Reference (base model, no LoRA)
             with torch.no_grad():
                 try:
                     from peft import disable_adapter_layers, enable_adapter_layers
                     disable_adapter_layers(unwrapped)
-                    ref_lp = get_token_log_probs(unwrapped, input_ids, attention_mask)
+                    ref_lp = get_token_log_probs(
+                        unwrapped,
+                        input_ids,
+                        attention_mask,
+                        multimodal_train_inputs=multimodal_train_inputs,
+                    )
                     enable_adapter_layers(unwrapped)
                 except ImportError:
                     ref_lp = old_lp  # fallback: KL → 0
 
             # Current student log-probs
-            cur_lp = get_token_log_probs(model, input_ids, attention_mask)
+            cur_lp = get_token_log_probs(
+                model,
+                input_ids,
+                attention_mask,
+                multimodal_train_inputs=multimodal_train_inputs,
+            )
 
             loss, metrics = compute_opd_loss(
                 student_log_probs=cur_lp,

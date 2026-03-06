@@ -40,7 +40,7 @@ where $\beta_{\text{KL}} = 0.02$. Entropy bonus is disabled ($\beta_{\text{ent}}
 
 ## How to Run
 
-### Full setup (8+ GPUs, Megatron-LM)
+### Legacy setup (deprecated 8+ GPUs, Megatron-LM)
 
 ```bash
 cd slime
@@ -71,7 +71,7 @@ GPU 1  →  sglang rollout server (base model BF16,   ~8 GB)
 ```
 
 ```bash
-export HF_CKPT=/path/to/Qwen3-4B
+export HF_CKPT=unsloth/Qwen3.5-4B
 export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
 bash openclaw-rl/run_qwen3_4b_3090_2x.sh
 ```
@@ -84,7 +84,7 @@ GPU 2     →  sglang rollout server  (~8 GB)
 ```
 
 ```bash
-export HF_CKPT=/path/to/Qwen3-4B
+export HF_CKPT=unsloth/Qwen3.5-4B
 export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
 bash openclaw-rl/run_qwen3_4b_3090_3x.sh
 ```
@@ -96,23 +96,23 @@ Key environment variables (both scripts):
 
 | Variable | Default | Description |
 |---|---|---|
-| `HF_CKPT` | *(required)* | Path to the base model |
+| `HF_CKPT` | `unsloth/Qwen3.5-4B` | Base model path or HF hub ID |
 | `SAVE_CKPT` | *(required)* | Checkpoint output directory |
 | `TRAINING_GPU` | `0` | GPU index for training (2x script) |
 | `ROLLOUT_GPU` | `1` / `2` | GPU index for sglang |
 | `TRAINING_GPUS` | `0,1` | GPU indices for DDP training (3x script) |
-| `LORA_R` | `64` | LoRA rank |
-| `LORA_ALPHA` | `128` | LoRA alpha |
+| `LORA_R` | `16` | LoRA rank |
+| `LORA_ALPHA` | `16` | LoRA alpha |
 | `ROLLOUT_BATCH_SIZE` | `16` / `32` | Samples per training step |
 | `LR` | `1e-6` | Learning rate |
 | `PRM_ENABLE` | `0` | Set to `1` to enable PRM scoring |
 
-VRAM breakdown for Qwen3-4B with default settings:
+VRAM breakdown for Qwen 3.5 4B Vision with default settings:
 
 | Component | VRAM |
 |---|---|
 | Base model weights (4-bit NF4) | ~2.5 GB |
-| LoRA adapter (r=64) | ~0.5 GB |
+| LoRA adapter (r=16) | ~0.2 GB |
 | Gradient + optimizer states | ~3 GB |
 | Activation checkpointing | ~2 GB |
 | **Total (training GPU)** | **~8 GB** |

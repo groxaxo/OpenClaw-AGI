@@ -30,6 +30,129 @@
 }
 
 /* ===========================================
+   Overview Hero Banner
+   =========================================== */
+
+.overview-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+  gap: 18px;
+  padding: 26px;
+  border-radius: calc(var(--radius-lg) + 4px);
+  border: 1px solid rgba(96, 165, 250, 0.24);
+  background:
+    radial-gradient(circle at top left, rgba(96, 165, 250, 0.2), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 46%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(17, 24, 39, 0.98));
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  margin-bottom: 18px;
+}
+
+.overview-hero__content,
+.overview-hero__stats {
+  position: relative;
+  z-index: 1;
+}
+
+.overview-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  color: #bfdbfe;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.overview-hero__title {
+  margin-top: 14px;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  color: #f8fafc;
+}
+
+.overview-hero__subtitle {
+  margin-top: 12px;
+  max-width: 58ch;
+  color: rgba(226, 232, 240, 0.86);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.overview-hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.overview-hero__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(15, 23, 42, 0.36);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.overview-hero__chip--muted {
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.26);
+}
+
+.overview-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.overview-hero__stat {
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.overview-hero__stat-label {
+  color: rgba(191, 219, 254, 0.8);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.overview-hero__stat-value {
+  margin-top: 8px;
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 1024px) {
+  .overview-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===========================================
    Cards - Refined with depth
    =========================================== */
 

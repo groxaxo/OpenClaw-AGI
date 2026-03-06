@@ -13,6 +13,7 @@ export const zh_CN: TranslationMap = {
     na: "不适用",
     docs: "文档",
     resources: "资源",
+    brandSubtitle: "Qwen 3.5 控制中心",
   },
   nav: {
     chat: "聊天",
@@ -53,6 +54,28 @@ export const zh_CN: TranslationMap = {
     logs: "网关文件日志的实时追踪。",
   },
   overview: {
+    hero: {
+      eyebrow: "默认管线",
+      title: "Unsloth Qwen 3.5（4B）Vision 已上线",
+      subtitle:
+        "OpenClaw 默认管线现已切换到最新的 Unsloth 优化版 Qwen 3.5 4B Vision，完整保留多模态回合，并继续针对 2x/3x RTX 3090 的高效训练进行调优。",
+      chips: {
+        model: "Qwen 3.5 4B Vision",
+        pipeline: "Unsloth 优化",
+        hardware: "2x/3x RTX 3090",
+        legacy: "传统 8x GPU 路径已弃用",
+      },
+      stats: {
+        modelLabel: "默认模型",
+        modelValue: "unsloth/Qwen3.5-4B",
+        modeLabel: "管线",
+        modeValue: "支持视觉的 RL + OPD",
+        hardwareLabel: "目标硬件",
+        hardwareValue: "2x-3x RTX 3090",
+        inputLabel: "支持输入",
+        inputValue: "文本 + 图像回合",
+      },
+    },
     access: {
       title: "网关访问",
       subtitle: "仪表板连接的位置及其身份验证方式。",

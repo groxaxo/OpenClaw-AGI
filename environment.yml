@@ -1,4 +1,4 @@
-# OpenClaw-RL — Conda environment for Unsloth QLoRA (2× RTX 3090)
+# OpenClaw-RL — Conda environment for Unsloth Qwen 3.5 Vision (2× RTX 3090)
 # ============================================================
 # Usage:
 #   conda env create -f environment.yml
@@ -14,7 +14,7 @@
 #   pip install -r requirements-qlora.txt
 #
 #   # Start training (2× RTX 3090 — Binary RL):
-#   export HF_CKPT=/path/to/Qwen3-4B
+#   export HF_CKPT=unsloth/Qwen3.5-4B
 #   export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
 #   bash openclaw-rl/run_qwen3_4b_3090_2x.sh
 # ============================================================
@@ -55,6 +55,8 @@ dependencies:
     - httpx>=0.27.0
 
     # Utilities
+    - pillow>=10.0.0
+    - qwen-vl-utils>=0.0.14
     - datasets>=2.14.0
     - huggingface-hub>=0.20.0
     - safetensors>=0.4.0

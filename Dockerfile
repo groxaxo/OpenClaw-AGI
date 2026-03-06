@@ -1,5 +1,5 @@
 # ============================================================
-# OpenClaw-RL — Unsloth QLoRA Dockerfile
+# OpenClaw-RL — Unsloth Qwen 3.5 Vision Dockerfile
 # ============================================================
 # Designed for 2× RTX 3090 (48 GB total VRAM).
 #
@@ -8,7 +8,7 @@
 #
 # Run (Binary RL, 2× 3090):
 #   docker run --gpus '"device=0,1"' \
-#     -e HF_CKPT=/models/Qwen3-4B \
+#     -e HF_CKPT=/models/Qwen3.5-4B \
 #     -e SAVE_CKPT=/checkpoints/openclaw-qlora-rl \
 #     -v /path/to/models:/models \
 #     -v /path/to/checkpoints:/checkpoints \
@@ -18,7 +18,7 @@
 #
 # Run (OPD, 2× 3090):
 #   docker run --gpus '"device=0,1"' \
-#     -e HF_CKPT=/models/Qwen3-4B \
+#     -e HF_CKPT=/models/Qwen3.5-4B \
 #     -e SAVE_CKPT=/checkpoints/openclaw-qlora-opd \
 #     -v /path/to/models:/models \
 #     -v /path/to/checkpoints:/checkpoints \
@@ -70,16 +70,12 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 ARG UNSLOTH_VARIANT=cu124-torch250
 RUN pip install "unsloth[${UNSLOTH_VARIANT}] @ git+https://github.com/unslothai/unsloth.git"
 
-# ── QLoRA + serving dependencies ─────────────────────────────────────────────
+# ── Qwen 3.5 vision + serving dependencies ─────────────────────────────────────────────
 WORKDIR /workspace
 COPY requirements-qlora.txt /workspace/requirements-qlora.txt
 RUN pip install -r requirements-qlora.txt
 
-# ── SGLang (rollout inference server) ────────────────────────────────────────
-# Pin the same commit used in requirements.txt for reproducibility.
-RUN pip install \
-    "sglang[all] @ git+https://github.com/sgl-project/sglang.git@dce8b0606c06d3a191a24c7b8cbe8e238ab316c9#egg=sglang&subdirectory=python" \
-    || pip install "sglang[all]"
+# requirements-qlora.txt now carries the pinned SGLang dependency.
 
 # ── Copy project source ───────────────────────────────────────────────────────
 COPY . /workspace
@@ -95,7 +91,7 @@ EXPOSE 30000
 CMD ["bash", "-c", "\
 echo ''; \
 echo '========================================================'; \
-echo '  OpenClaw-RL  |  Unsloth QLoRA  |  2x RTX 3090'; \
+echo '  OpenClaw-RL  |  Unsloth Qwen 3.5 Vision  |  2x RTX 3090'; \
 echo '========================================================'; \
 echo ''; \
 echo 'Set HF_CKPT and SAVE_CKPT, then run one of:'; \
@@ -108,7 +104,7 @@ echo '    bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh'; \
 echo ''; \
 echo 'Example (docker run):'; \
 echo '  docker run --gpus '\''"device=0,1'\'' \\'; \
-echo '    -e HF_CKPT=/models/Qwen3-4B \\'; \
+echo '    -e HF_CKPT=/models/Qwen3.5-4B \\'; \
 echo '    -e SAVE_CKPT=/checkpoints/openclaw-qlora-rl \\'; \
 echo '    -v /path/to/models:/models \\'; \
 echo '    -v /path/to/checkpoints:/checkpoints \\'; \
