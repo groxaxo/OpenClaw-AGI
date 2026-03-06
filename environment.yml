@@ -1,0 +1,77 @@
+# OpenClaw-RL — Conda environment for Unsloth QLoRA (2× RTX 3090)
+# ============================================================
+# Usage:
+#   conda env create -f environment.yml
+#   conda activate openclaw-rl
+#
+#   # Then install Unsloth (pick the variant matching your CUDA + PyTorch):
+#   # CUDA 12.4 + PyTorch 2.5:
+#   pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+#   # CUDA 12.1 + PyTorch 2.2:
+#   # pip install "unsloth[cu121-torch220] @ git+https://github.com/unslothai/unsloth.git"
+#
+#   # Install remaining QLoRA dependencies:
+#   pip install -r requirements-qlora.txt
+#
+#   # Start training (2× RTX 3090 — Binary RL):
+#   export HF_CKPT=/path/to/Qwen3-4B
+#   export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
+#   bash openclaw-rl/run_qwen3_4b_3090_2x.sh
+# ============================================================
+
+name: openclaw-rl
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - pip
+  - git
+  - git-lfs
+  - ninja
+  - cmake
+  # CUDA toolkit — match your driver; 12.4 is the default
+  - pytorch::pytorch=2.5.*
+  - pytorch::torchvision
+  - pytorch::torchaudio
+  - pytorch::pytorch-cuda=12.4
+
+  - pip:
+    # Core QLoRA dependencies (also in requirements-qlora.txt)
+    - bitsandbytes>=0.43.0
+    - peft>=0.12.0
+    - accelerate>=0.27.0
+    - trl>=0.9.6
+    - transformers>=4.40.0
+    - requests>=2.32.0
+
+    # Async web serving
+    - fastapi>=0.100.0
+    - uvicorn>=0.27.0
+    - httpx>=0.27.0
+
+    # Utilities
+    - datasets>=2.14.0
+    - huggingface-hub>=0.20.0
+    - safetensors>=0.4.0
+    - sentencepiece>=0.1.99
+    - tokenizers>=0.19.0
+    - tqdm>=4.66.0
+    - packaging>=23.0
+    - numpy>=1.24.0,<2.0
+    - psutil>=5.9.0
+    - rich>=13.0.0
+    - loguru>=0.7.0
+    - pydantic>=2.0.0
+    - python-dotenv>=1.0.0
+
+    # NOTE: Install Unsloth separately after activating the environment.
+    # The correct variant depends on your CUDA version and PyTorch version.
+    # See https://github.com/unslothai/unsloth#installation for details.
+    #
+    # Example (CUDA 12.4 + PyTorch 2.5):
+    # pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"

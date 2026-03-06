@@ -7,7 +7,7 @@
     <sup>
   </h1>
 
-  <p><b>Empowering OpenClaw with RL — Train a personalized agent simply by talking to it.</b></p>
+  <p><b>Empowering OpenClaw with RL — Train a personalized agent simply by talking to it.<br>Runs on as few as <u>2× RTX 3090</u> GPUs using Unsloth QLoRA.</b></p>
 </div>
 
 
@@ -17,10 +17,12 @@
   <img src="https://img.shields.io/badge/🤖_Personalized-success?style=for-the-badge" alt="Personalized" />
   <img src="https://img.shields.io/badge/🛠️_Auto_Optimization-orange?style=for-the-badge" alt="Auto" />
   <img src="https://img.shields.io/badge/💬_Language_Feedback-purple?style=for-the-badge" alt="Language Feedback" />
+  <img src="https://img.shields.io/badge/🦥_Unsloth_QLoRA-red?style=for-the-badge" alt="Unsloth QLoRA" />
   <br><br>
   <a href="https://yinjjiew.github.io/projects/openclawrl"><img src="https://img.shields.io/badge/Blog-Page-blue?style=flat-square" alt="OpenClaw-RL Blog" /></a>
   <a href="https://openclaw.ai"><img src="https://img.shields.io/badge/OpenClaw-Plugin-orange?style=flat-square" alt="OpenClaw Plugin" /></a>
   <a href="https://github.com/THUDM/slime"><img src="https://img.shields.io/badge/Slime-Based-purple?style=flat-square" alt="Slime Based" /></a>
+  <a href="https://github.com/unslothai/unsloth"><img src="https://img.shields.io/badge/Unsloth-Powered-green?style=flat-square" alt="Unsloth Powered" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License MIT" /></a>
 </p>
 
@@ -38,6 +40,7 @@
 
 ## 📰 News
 
+- **[2026/3/6]** 🦥 **Unsloth QLoRA is now the default training method** — train on just 2× RTX 3090 (48 GB), no Megatron-LM or Ray cluster required. Docker and conda setup included.
 - **[2026/3/3]** 🙌 Working with the authors of [SDFT](https://arxiv.org/abs/2601.19897) and [SDPO](https://arxiv.org/abs/2601.20802), we have integrated their methods into [openclaw-opd](./openclaw-opd). We welcome the integration of novel and effective methods!
 - **[2026/3/3]** 📺 Check out these community tutorial videos on OpenClaw-RL: [**Video 1**](https://www.youtube.com/watch?v=5xnm1vB7G64) | [**Video 2**](https://www.youtube.com/watch?v=ZtN6Gg_bdJE)
 - **[2026/2/26]** 🔥 We release **OpenClaw-RL v1** — a fully asynchronous RL framework for training personalized AI agents from natural conversation feedback. 
@@ -105,16 +108,76 @@ Our long-term goal is to **advance personalized, practically useful agents with 
 
 ## 🔧 Quick Start
 
-### 1. RL Server Environment
+> **OpenClaw-RL now uses [Unsloth](https://github.com/unslothai/unsloth) + QLoRA as the standard training method.**  
+> No Megatron-LM, no Ray cluster — just 2× RTX 3090 (48 GB total VRAM).
+
+### 1. RL Server Environment — Choose Your Setup Path
+
+<details open>
+<summary><b>🐳 Option A: Docker (Recommended)</b></summary>
+
+```bash
+# Build the image (CUDA 12.4 + PyTorch 2.5 + Unsloth)
+docker build -t openclaw-rl:latest -f Dockerfile .
+
+# Run with both 3090s exposed
+docker run --gpus '"device=0,1"' \
+  -e HF_CKPT=/models/Qwen3-4B \
+  -e SAVE_CKPT=/checkpoints/openclaw-qlora-rl \
+  -v /path/to/models:/models \
+  -v /path/to/checkpoints:/checkpoints \
+  -p 30000:30000 \
+  openclaw-rl:latest \
+  bash openclaw-rl/run_qwen3_4b_3090_2x.sh
+```
+
+</details>
+
+<details>
+<summary><b>🐍 Option B: Conda</b></summary>
+
+```bash
+# Create and activate the environment
+conda env create -f environment.yml
+conda activate openclaw-rl
+
+# Install Unsloth (pick the variant matching your CUDA + PyTorch):
+# CUDA 12.4 + PyTorch 2.5:
+pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+# CUDA 12.1 + PyTorch 2.2:
+# pip install "unsloth[cu121-torch220] @ git+https://github.com/unslothai/unsloth.git"
+
+# Install remaining QLoRA dependencies
+pip install -r requirements-qlora.txt
+```
+
+See the full matrix at <https://github.com/unslothai/unsloth#installation>.
+
+</details>
+
+<details>
+<summary><b>🔩 Option C: Manual pip install</b></summary>
+
+```bash
+# Python 3.10–3.12, CUDA 12.x
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+# Unsloth (adjust cu124-torch250 to match your environment)
+pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+
+# QLoRA + serving dependencies
+pip install -r requirements-qlora.txt
+```
+
+</details>
 
 ### Prerequisites
 
-- **Hardware:** 8× GPUs (default; configurable via `NUM_GPUS`, `ACTOR_GPUS`, `ROLLOUT_GPUS`, `PRM_GPUS`)
-- **Software:** CUDA 12.9, Python 3.12
-- **Framework:** [Slime](https://github.com/THUDM/slime) (our base RL framework)
+- **Hardware:** 2× RTX 3090 (24 GB each, 48 GB total) — minimum recommended
+- **Software:** CUDA 12.x, Python 3.10–3.12
+- **Key libraries:** [Unsloth](https://github.com/unslothai/unsloth), [SGLang](https://github.com/sgl-project/sglang), PEFT, bitsandbytes
 
-For detailed environment setup, see [Slime](https://github.com/THUDM/slime) or [`./instructions/README.md`](./instructions/README.md).
-
+For the legacy full-scale setup (8+ GPUs, Megatron-LM), see [`./instructions/README.md`](./instructions/README.md).
 
 
 
@@ -124,7 +187,7 @@ For detailed environment setup, see [Slime](https://github.com/THUDM/slime) or [
 
 ### 2. Start the RL Server
 
-We provide two methods (RL servers):
+We provide two learning methods, both running via Unsloth QLoRA on 2× RTX 3090:
 
 | Method | Signal Type | How It Works | When to Use |
 |---|---|---|---|
@@ -134,30 +197,52 @@ We provide two methods (RL servers):
 
 Choose your optimization method:
 
-<details>
-<summary><b>Option A: Binary RL</b> — Best for implicit feedback (likes/dislikes, env success/failure)</summary>
+<details open>
+<summary><b>Option A: Binary RL — 2× RTX 3090 (Recommended)</b></summary>
 
 ```bash
-cd slime
-bash ../openclaw-rl/run_qwen3_4b_openclaw_rl.sh
+export HF_CKPT=/path/to/Qwen3-4B
+export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
+bash openclaw-rl/run_qwen3_4b_3090_2x.sh
 ```
 
-The PRM will automatically judge response quality from next-state feedback. We recommend providing frequent feedback (e.g., 👍/👎) to help the model optimize effectively.
+GPU layout:
+```
+GPU 0  →  QLoRA actor training  (Unsloth 4-bit NF4, ~8 GB)
+GPU 1  →  sglang rollout server (base model BF16,   ~8 GB)
+```
 
-See [`./openclaw-rl/README.md`](./openclaw-rl/README.md) for algorithm details.
+See [`./openclaw-rl/README.md`](./openclaw-rl/README.md) for details.
 </details>
 
 <details>
-<summary><b>Option B: On-Policy Distillation (OPD)</b> — Best for rich textual feedback</summary>
+<summary><b>Option B: On-Policy Distillation (OPD) — 2× RTX 3090</b></summary>
 
 ```bash
-cd slime
-bash ../openclaw-opd/run_qwen3_4b_openclaw_opd.sh
+export HF_CKPT=/path/to/Qwen3-4B
+export SAVE_CKPT=/path/to/openclaw-qlora-opd/ckpt
+bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
 ```
 
-The system extracts hindsight hints from your feedback and distills them into the policy at the token level. We recommend providing concrete feedback (e.g., "you should have checked the file first" or "don't use that library").
+The system extracts hindsight hints from your feedback and distills them into the policy at the token level.
 
 See [`./openclaw-opd/README.md`](./openclaw-opd/README.md) for algorithm details.
+</details>
+
+<details>
+<summary><b>Option C: Full-scale setup (8+ GPUs, Megatron-LM)</b></summary>
+
+For users with large multi-GPU clusters:
+
+```bash
+# Binary RL
+cd slime && bash ../openclaw-rl/run_qwen3_4b_openclaw_rl.sh
+
+# OPD
+cd slime && bash ../openclaw-opd/run_qwen3_4b_openclaw_opd.sh
+```
+
+See [`./instructions/README.md`](./instructions/README.md) for full cluster setup instructions.
 </details>
 
 Once running, the model is served as an OpenAI-compatible API at:
@@ -218,16 +303,30 @@ Before launching, set these important environment variables as needed:
 
 | Variable | Default | Description |
 |---|---|---|
-| `NUM_GPUS` | `8` | Total GPUs available on the machine |
-| `ACTOR_GPUS` | `4` | GPUs allocated to the training actor |
-| `ROLLOUT_GPUS` | `2` | GPUs allocated to rollout generation |
-| `PRM_GPUS` | `2` | GPUs allocated to the Process Reward Model |
-| `HF_CKPT` | (see script) | Path to the base HuggingFace checkpoint |
-| `PRM_MODEL_PATH` | (see script) | Path to the reward model HuggingFace checkpoint |
-| `SAVE_CKPT` | (see script) | Path to the saved HuggingFace checkpoint |
-| `SGLANG_API_KEY` | — | API key for the SGLang serving endpoint |
+| `HF_CKPT` | *(required)* | Path to the base HuggingFace checkpoint |
+| `SAVE_CKPT` | *(required)* | Checkpoint output directory |
+| `TRAINING_GPU` | `0` | GPU index for QLoRA training |
+| `ROLLOUT_GPU` | `1` | GPU index for sglang rollout inference |
+| `LORA_R` | `64` | LoRA rank |
+| `LORA_ALPHA` | `128` | LoRA alpha scaling factor |
+| `ROLLOUT_BATCH_SIZE` | `16` | Samples collected before each training step |
+| `LR` | `1e-6` | Learning rate |
+| `PRM_ENABLE` | `0` | Set to `1` to enable PRM scoring |
+| `PORT` | `30000` | Port for the OpenAI-compatible proxy endpoint |
+| `SGLANG_API_KEY` | — | Optional API key for the SGLang endpoint |
 
-You can check more details about configurations in [`./instructions`](./instructions) .
+**VRAM breakdown for Qwen3-4B (default settings, 2× RTX 3090):**
+
+| Component | VRAM |
+|---|---|
+| Base model weights (4-bit NF4 QLoRA) | ~2.5 GB |
+| LoRA adapter (r=64) | ~0.5 GB |
+| Gradients + optimizer states | ~3 GB |
+| Activation checkpointing | ~2 GB |
+| **Total (training GPU 0)** | **~8 GB** |
+| sglang rollout server (BF16) | ~8 GB (GPU 1) |
+
+You can check more details about configurations in [`./instructions`](./instructions).
 
 
 ## 📖 Citation
@@ -258,7 +357,14 @@ You can check more details about configurations in [`./instructions`](./instruct
 
 ## 🙏 Acknowledgements
 
-This work aims to explore more effective paradigms for Agentic RL. Our implementation builds upon the excellent codebases of [slime](https://github.com/THUDM/slime), [OpenClaw](https://github.com/openclaw/openclaw) and [Open-AgentRL](https://github.com/Gen-Verse/Open-AgentRL). We sincerely thank these projects for their valuable insights and high-quality implementations, which have greatly facilitated our research.
+This work aims to explore more effective paradigms for Agentic RL. Our implementation builds upon the excellent codebases of:
+
+- **[Unsloth](https://github.com/unslothai/unsloth)** — by Daniel Han & Michael Han. Unsloth makes QLoRA fine-tuning 2× faster with 70% less VRAM; it is the engine that makes 2× RTX 3090 training possible. We are deeply grateful to the Unsloth team.
+- **[slime](https://github.com/THUDM/slime)** — by THUDM. The scalable async RL framework underpinning the full multi-GPU path.
+- **[OpenClaw](https://github.com/openclaw/openclaw)** — The AI-native browser extension that provides the conversational interface and feedback loop.
+- **[Open-AgentRL](https://github.com/Gen-Verse/Open-AgentRL)** — Pioneering open-source agentic RL research that inspired this project.
+
+We sincerely thank these projects for their valuable insights and high-quality implementations, which have greatly facilitated our research.
 
 
 
