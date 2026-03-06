@@ -1,3 +1,15 @@
+# ── Unsloth QLoRA dependencies (2x / 3x RTX 3090 support) ─────────────────
+# Install Unsloth from GitHub to match your CUDA version.
+# Examples:
+#   CUDA 12.4 + PyTorch 2.5:
+#     pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+#   CUDA 12.1 + PyTorch 2.2:
+#     pip install "unsloth[cu121-torch220] @ git+https://github.com/unslothai/unsloth.git"
+# See https://github.com/unslothai/unsloth for the full install matrix.
+bitsandbytes>=0.43.0
+peft>=0.12.0
+trl>=0.9.6
+# ── end Unsloth QLoRA dependencies ─────────────────────────────────────────
 absl-py==2.4.0
 accelerate==1.12.0
 aiohappyeyeballs==2.6.1

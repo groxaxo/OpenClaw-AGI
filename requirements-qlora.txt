@@ -1,0 +1,38 @@
+# OpenClaw-RL / OpenClaw-OPD — Unsloth QLoRA requirements
+# ============================================================
+# Install these packages to use the 2x / 3x RTX 3090 QLoRA training path.
+#
+# Step 1 – install Unsloth (choose the variant that matches your CUDA + PyTorch):
+#
+#   CUDA 12.4 + PyTorch 2.5.x:
+#     pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+#
+#   CUDA 12.1 + PyTorch 2.2.x:
+#     pip install "unsloth[cu121-torch220] @ git+https://github.com/unslothai/unsloth.git"
+#
+#   See https://github.com/unslothai/unsloth#installation for all options.
+#
+# Step 2 – install the packages below:
+#   pip install -r requirements-qlora.txt
+
+# ── core dependencies ──────────────────────────────────────────────────────
+# bitsandbytes: 4-bit NF4 quantization (QLoRA base model loading)
+bitsandbytes>=0.43.0
+
+# peft: LoRA adapter implementation used by Unsloth
+peft>=0.12.0
+
+# accelerate: multi-GPU DDP (required for 3x 3090 DDP mode)
+accelerate>=0.27.0
+
+# trl: optional – provides reference GRPO / PPO components
+trl>=0.9.6
+
+# ── inference server ───────────────────────────────────────────────────────
+# sglang must already be installed (see main requirements.txt).
+# The trainer spawns an sglang subprocess automatically.
+
+# ── utilities ─────────────────────────────────────────────────────────────
+requests>=2.32.0
+transformers>=4.40.0
+torch>=2.0.0

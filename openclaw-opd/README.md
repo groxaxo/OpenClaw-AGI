@@ -32,6 +32,40 @@ cd slime
 bash ../openclaw-opd/run_qwen3_4b_openclaw_opd.sh
 ```
 
+### Lightweight setup — Unsloth QLoRA (2x or 3x RTX 3090)
+
+Uses [Unsloth](https://github.com/unslothai/unsloth) with 4-bit NF4 quantisation
+and LoRA adapters to reduce VRAM requirements.  No Megatron-LM or Ray required.
+
+#### Prerequisites
+
+```bash
+pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+pip install -r requirements-qlora.txt    # from repo root
+```
+
+#### 2x RTX 3090 — Token-level OPD (default)
+
+```bash
+export HF_CKPT=/path/to/Qwen3-4B
+export SAVE_CKPT=/path/to/openclaw-qlora-opd/ckpt
+bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
+```
+
+#### 3x RTX 3090 — Token-level OPD (DDP)
+
+```bash
+export HF_CKPT=/path/to/Qwen3-4B
+export SAVE_CKPT=/path/to/openclaw-qlora-opd/ckpt
+bash openclaw-opd/run_qwen3_4b_opd_3090_3x.sh
+```
+
+#### Top-K distillation (option B) on 2x 3090
+
+```bash
+DISTILL_TOPK=50 bash openclaw-opd/run_qwen3_4b_opd_3090_2x.sh
+```
+
 ## Option B: Top-K Logits Distillation (SDFT/SDPO-style)
 
 Following [SDFT](https://arxiv.org/abs/2601.19897) and [SDPO](https://arxiv.org/abs/2601.20802), instead of single-token teacher targets, distill teacher top-K distribution per position.
@@ -78,8 +112,11 @@ Equivalent key args:
 ```text
 openclaw-opd/
 ├── README.md
-├── run_qwen3_4b_openclaw_opd.sh            # Token-level OPD (default)
-├── run_qwen3_4b_openclaw_opd_topk.sh       # Top-K custom-loss path
+├── run_qwen3_4b_openclaw_opd.sh            # Token-level OPD (full, 8+ GPUs)
+├── run_qwen3_4b_openclaw_opd_topk.sh       # Top-K custom-loss path (full)
+├── run_qwen3_4b_opd_3090_2x.sh             # QLoRA OPD for 2x RTX 3090
+├── run_qwen3_4b_opd_3090_3x.sh             # QLoRA OPD for 3x RTX 3090
+├── unsloth_qlora_opd_trainer.py             # Unsloth QLoRA OPD trainer
 ├── topk_distillation_loss.py               # Reverse-KL top-K loss (external custom loss)
 ├── openclaw_opd_api_server.py              # Async judge + teacher query + sample submission
 ├── openclaw_opd_rollout.py                 # Rollout bridge to SLIME trainer
