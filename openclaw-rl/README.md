@@ -40,19 +40,93 @@ where $\beta_{\text{KL}} = 0.02$. Entropy bonus is disabled ($\beta_{\text{ent}}
 
 ## How to Run
 
+### Full setup (8+ GPUs, Megatron-LM)
+
 ```bash
 cd slime
 bash ../openclaw-rl/run_qwen3_4b_openclaw_rl.sh
 ```
 
+### Lightweight setup — Unsloth QLoRA (2x or 3x RTX 3090)
 
+Uses [Unsloth](https://github.com/unslothai/unsloth) with 4-bit NF4 quantisation
+and LoRA adapters to dramatically reduce VRAM requirements.  No Megatron-LM or
+Ray cluster required.
+
+#### Prerequisites
+
+```bash
+# 1. Install Unsloth for your CUDA version (see https://github.com/unslothai/unsloth):
+pip install "unsloth[cu124-torch250] @ git+https://github.com/unslothai/unsloth.git"
+
+# 2. Install QLoRA dependencies:
+pip install -r requirements-qlora.txt    # from repo root
+```
+
+#### 2x RTX 3090 (48 GB total)
+
+```
+GPU 0  →  QLoRA actor training  (Unsloth + PEFT LoRA, ~8 GB)
+GPU 1  →  sglang rollout server (base model BF16,   ~8 GB)
+```
+
+```bash
+export HF_CKPT=/path/to/Qwen3-4B
+export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
+bash openclaw-rl/run_qwen3_4b_3090_2x.sh
+```
+
+#### 3x RTX 3090 (72 GB total)
+
+```
+GPUs 0,1  →  QLoRA actor training  (DDP via accelerate, ~8 GB each)
+GPU 2     →  sglang rollout server  (~8 GB)
+```
+
+```bash
+export HF_CKPT=/path/to/Qwen3-4B
+export SAVE_CKPT=/path/to/openclaw-qlora-rl/ckpt
+bash openclaw-rl/run_qwen3_4b_3090_3x.sh
+```
+
+Both scripts expose the same OpenAI-compatible proxy on port `30000` (override
+with `PORT=…`).  Point your OpenClaw agent to `http://<host>:30000`.
+
+Key environment variables (both scripts):
+
+| Variable | Default | Description |
+|---|---|---|
+| `HF_CKPT` | *(required)* | Path to the base model |
+| `SAVE_CKPT` | *(required)* | Checkpoint output directory |
+| `TRAINING_GPU` | `0` | GPU index for training (2x script) |
+| `ROLLOUT_GPU` | `1` / `2` | GPU index for sglang |
+| `TRAINING_GPUS` | `0,1` | GPU indices for DDP training (3x script) |
+| `LORA_R` | `64` | LoRA rank |
+| `LORA_ALPHA` | `128` | LoRA alpha |
+| `ROLLOUT_BATCH_SIZE` | `16` / `32` | Samples per training step |
+| `LR` | `1e-6` | Learning rate |
+| `PRM_ENABLE` | `0` | Set to `1` to enable PRM scoring |
+
+VRAM breakdown for Qwen3-4B with default settings:
+
+| Component | VRAM |
+|---|---|
+| Base model weights (4-bit NF4) | ~2.5 GB |
+| LoRA adapter (r=64) | ~0.5 GB |
+| Gradient + optimizer states | ~3 GB |
+| Activation checkpointing | ~2 GB |
+| **Total (training GPU)** | **~8 GB** |
+| sglang (BF16 base model) | ~8 GB |
 
 ## File Structure
 
 ```
 openclaw-rl/
 ├── README.md
-├── run_qwen3_4b_openclaw_rl.sh     # Launch script
+├── run_qwen3_4b_openclaw_rl.sh     # Full launch script (8+ GPUs, Megatron-LM)
+├── run_qwen3_4b_3090_2x.sh         # QLoRA launch script for 2x RTX 3090
+├── run_qwen3_4b_3090_3x.sh         # QLoRA launch script for 3x RTX 3090
+├── unsloth_qlora_trainer.py         # Unsloth QLoRA GRPO trainer
 ├── openclaw_api_server.py           # FastAPI proxy + PRM scoring + sample submission
 ├── openclaw_rollout.py              # Async rollout worker (bridges API server ↔ SLIME trainer)
 └── results/                         # Runtime records (auto-created)
