@@ -1,0 +1,58 @@
+# ── Git / version control ────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.mailmap
+.github
+
+# ── Python build artifacts ────────────────────────────────
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+*.egg
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────
+.venv
+venv
+env
+.env
+.conda
+
+# ── Editor / OS ───────────────────────────────────────────
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Node / frontend (openclaw plugin source) ─────────────
+node_modules
+npm-debug.log*
+yarn-debug.log*
+pnpm-lock.yaml
+
+# ── Checkpoints & large model files ──────────────────────
+# (mount these as volumes at runtime)
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+
+# ── Runtime outputs ───────────────────────────────────────
+openclaw-rl/results/
+openclaw-opd/results/
+*.jsonl
+
+# ── Slime & Megatron submodules (not needed for QLoRA path)
+slime/
+Megatron-LM/
+
+# ── The openclaw app source (large; not needed for training)
+openclaw/
