@@ -15,7 +15,7 @@ ERROR='\033[38;2;230;57;70m'        # coral-mid     #e63946
 MUTED='\033[38;2;90;100;128m'       # text-muted    #5a6480
 NC='\033[0m' # No Color
 
-DEFAULT_TAGLINE="All your chats, one OpenClaw."
+DEFAULT_TAGLINE="Openclaw AGI Plugin — latest docs, wizardry, and terminal claws."
 NODE_MIN_MAJOR=22
 NODE_MIN_MINOR=12
 NODE_MIN_VERSION="${NODE_MIN_MAJOR}.${NODE_MIN_MINOR}"
@@ -232,21 +232,47 @@ print_gum_status() {
     esac
 }
 
+print_installer_vortex() {
+    if [[ -n "$GUM" ]]; then
+        printf '%s\n' \
+            "$("$GUM" style --foreground "#a855f7" "              ✦      🌀      ✦")" \
+            "$("$GUM" style --foreground "#22d3ee" "         .·´     ╭──────╮     `·.")" \
+            "$("$GUM" style --foreground "#ff4d4d" "      .·´      ╭─╯      ╰─╮      `·.")" \
+            "$("$GUM" style --foreground "#f59e0b" "    ⟡        ╭─╯  vortex  ╰─╮        ⟡")" \
+            "$("$GUM" style --foreground "#00e5cc" "      `·.    ╰─╮        ╭─╯    .·´")" \
+            "$("$GUM" style --foreground "#8892b0" "          `·.   ╰──────╯   .·´")"
+        return
+    fi
+
+    printf '%b\n' \
+        "${ACCENT_BRIGHT}              ✦      🌀      ✦${NC}" \
+        "\033[38;2;34;211;238m         .·´     ╭──────╮     \`·.${NC}" \
+        "${ACCENT}      .·´      ╭─╯      ╰─╮      \`·.${NC}" \
+        "\033[38;2;245;158;11m    ⟡        ╭─╯  vortex  ╰─╮        ⟡${NC}" \
+        "${SUCCESS}      \`·.    ╰─╮        ╭─╯    .·\`${NC}" \
+        "${INFO}          \`·.   ╰──────╯   .·\`${NC}"
+}
+
 print_installer_banner() {
     if [[ -n "$GUM" ]]; then
-        local title tagline hint card
-        title="$("$GUM" style --foreground "#ff4d4d" --bold "🦞 OpenClaw Installer")"
+        local title tagline hint credit card
+        print_installer_vortex
+        title="$("$GUM" style --foreground "#ff4d4d" --bold "🌀 Openclaw AGI Plugin Installer")"
         tagline="$("$GUM" style --foreground "#8892b0" "$TAGLINE")"
-        hint="$("$GUM" style --foreground "#5a6480" "modern installer mode")"
-        card="$(printf '%s\n%s\n%s' "$title" "$tagline" "$hint")"
-        "$GUM" style --border rounded --border-foreground "#ff4d4d" --padding "1 2" "$card"
+        hint="$("$GUM" style --foreground "#a855f7" "psychedelic vortex mode engaged")"
+        credit="$("$GUM" style --foreground "#5a6480" "with thanks to Peter Steinberger for the original OpenClaw")"
+        card="$(printf '%s\n%s\n%s\n%s' "$title" "$tagline" "$hint" "$credit")"
+        "$GUM" style --border double --border-foreground "#ff4d4d" --padding "1 2" "$card"
         echo ""
         return
     fi
 
+    print_installer_vortex
     echo -e "${ACCENT}${BOLD}"
-    echo "  🦞 OpenClaw Installer"
+    echo "  🌀 Openclaw AGI Plugin Installer"
     echo -e "${NC}${INFO}  ${TAGLINE}${NC}"
+    echo -e "\033[38;2;168;85;247m  psychedelic vortex mode engaged${NC}"
+    echo -e "${MUTED}  with thanks to Peter Steinberger for the original OpenClaw${NC}"
     echo ""
 }
 
@@ -1000,7 +1026,7 @@ HELP=0
 
 print_usage() {
     cat <<EOF
-OpenClaw installer (macOS + Linux)
+Openclaw AGI Plugin installer (macOS + Linux)
 
 Usage:
   curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- [options]
@@ -2306,9 +2332,9 @@ main() {
 
     echo ""
     if [[ -n "$installed_version" ]]; then
-        ui_celebrate "🦞 OpenClaw installed successfully (${installed_version})!"
+        ui_celebrate "🌀 Openclaw AGI Plugin installed successfully (${installed_version})!"
     else
-        ui_celebrate "🦞 OpenClaw installed successfully!"
+        ui_celebrate "🌀 Openclaw AGI Plugin installed successfully!"
     fi
     if [[ "$is_upgrade" == "true" ]]; then
         local update_messages=(
