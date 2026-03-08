@@ -1,26 +1,28 @@
 <div align="center">
   <h1 align="center">
     <img src="assets/spacer.png" alt="" width="23" height="40" align="absmiddle" />
-    OpenClaw-RL<!--
+    Openclaw AGI Plugin<!--
 --><sup>
     <img src="assets/clawistool.png" alt="Claw-RL logo" width="23" height="40" align="absmiddle" />
     <sup>
   </h1>
 
-  <p><b>Empowering OpenClaw with RL — Train a personalized agent simply by talking to it.<br>Runs on as few as <u>2× RTX 3090</u> GPUs using Unsloth QLoRA.</b></p>
+  <p><b>Openclaw AGI Plugin with the latest OpenClaw docs, onboarding flow, and bundled RL research stack.<br>Install the plugin fast, then optionally connect it to the async training stack on as few as <u>2× RTX 3090</u> GPUs.</b></p>
 </div>
 
 
 <p align="center">
+  <img src="https://img.shields.io/badge/🦞_Openclaw_AGI-Plugin-orange?style=for-the-badge" alt="Openclaw AGI Plugin" />
+  <img src="https://img.shields.io/badge/📚_Latest-Docs-blue?style=for-the-badge" alt="Latest Docs" />
   <img src="https://img.shields.io/badge/⚡_Fully_Async-yellow?style=for-the-badge" alt="Fully Async" />
-  <img src="https://img.shields.io/badge/💰_Zero_API_Keys-blue?style=for-the-badge" alt="Zero API Keys" />
-  <img src="https://img.shields.io/badge/🤖_Personalized-success?style=for-the-badge" alt="Personalized" />
-  <img src="https://img.shields.io/badge/🛠️_Auto_Optimization-orange?style=for-the-badge" alt="Auto" />
-  <img src="https://img.shields.io/badge/💬_Language_Feedback-purple?style=for-the-badge" alt="Language Feedback" />
+  <img src="https://img.shields.io/badge/🤖_Self_Hosted-success?style=for-the-badge" alt="Self Hosted" />
+  <img src="https://img.shields.io/badge/🛠️_CLI_Onboarding-purple?style=for-the-badge" alt="CLI Onboarding" />
   <img src="https://img.shields.io/badge/🦥_Unsloth_QLoRA-red?style=for-the-badge" alt="Unsloth QLoRA" />
   <br><br>
-  <a href="https://yinjjiew.github.io/projects/openclawrl"><img src="https://img.shields.io/badge/Blog-Page-blue?style=flat-square" alt="OpenClaw-RL Blog" /></a>
-  <a href="https://openclaw.ai"><img src="https://img.shields.io/badge/OpenClaw-Plugin-orange?style=flat-square" alt="OpenClaw Plugin" /></a>
+  <a href="https://docs.openclaw.ai/start/getting-started"><img src="https://img.shields.io/badge/Getting_Started-Docs-blue?style=flat-square" alt="Getting Started Docs" /></a>
+  <a href="https://docs.openclaw.ai/start/wizard"><img src="https://img.shields.io/badge/Onboarding-Wizard-purple?style=flat-square" alt="Onboarding Wizard" /></a>
+  <a href="https://docs.openclaw.ai/install/updating"><img src="https://img.shields.io/badge/Install-Updating-orange?style=flat-square" alt="Install Updating" /></a>
+  <a href="https://openclaw.ai"><img src="https://img.shields.io/badge/OpenClaw-Upstream-black?style=flat-square" alt="OpenClaw Upstream" /></a>
   <a href="https://github.com/THUDM/slime"><img src="https://img.shields.io/badge/Slime-Based-purple?style=flat-square" alt="Slime Based" /></a>
   <a href="https://github.com/unslothai/unsloth"><img src="https://img.shields.io/badge/Unsloth-Powered-green?style=flat-square" alt="Unsloth Powered" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License MIT" /></a>
@@ -38,7 +40,37 @@
 
 
 
-## 📰 News
+## 🦞 Openclaw AGI Plugin at a glance
+
+This repository now presents itself as the **Openclaw AGI Plugin**: a self-hosted OpenClaw-based assistant setup with the latest upstream docs links, onboarding commands, and the optional async RL training stack that lives in this monorepo.
+
+Huge thanks to **[Peter Steinberger](https://steipete.me)**, the original creator of OpenClaw, and to the upstream OpenClaw community for building the plugin experience this repository extends.
+
+### Install the plugin
+
+```bash
+npm install -g openclaw@latest
+openclaw onboard --install-daemon
+```
+
+### Latest docs
+
+- **Docs portal:** <https://docs.openclaw.ai>
+- **Getting started:** <https://docs.openclaw.ai/start/getting-started>
+- **Onboarding wizard:** <https://docs.openclaw.ai/start/wizard>
+- **Updating guide:** <https://docs.openclaw.ai/install/updating>
+- **Docker install:** <https://docs.openclaw.ai/install/docker>
+- **Security defaults:** <https://docs.openclaw.ai/gateway/security>
+
+### Repository layout
+
+- [`openclaw/`](./openclaw/) — the upstream OpenClaw plugin/runtime and its current docs
+- [`openclaw-rl/`](./openclaw-rl/) — binary RL training stack
+- [`openclaw-opd/`](./openclaw-opd/) — on-policy distillation stack
+- [`slime/`](./slime/) — async RL framework dependency
+- [`instructions/`](./instructions/) — legacy large-cluster setup notes
+
+## 📰 Research stack news
 
 - **[2026/3/6]** 🦥 **Unsloth QLoRA is now the default training method** — train on just 2× RTX 3090 (48 GB), no Megatron-LM or Ray cluster required. Docker and conda setup included.
 - **[2026/3/3]** 🙌 Working with the authors of [SDFT](https://arxiv.org/abs/2601.19897) and [SDPO](https://arxiv.org/abs/2601.20802), we have integrated their methods into [openclaw-opd](./openclaw-opd). We welcome the integration of novel and effective methods!
@@ -49,9 +81,9 @@
 
 ## 💡 TL;DR
 
-> **OpenClaw-RL** is a fully asynchronous reinforcement learning framework that turns everyday conversations into training signals for personalized AI agents.
+> **Openclaw AGI Plugin** gives you the latest OpenClaw install/docs experience on the front page, while this repository also packages an async reinforcement learning framework that turns everyday conversations into training signals for personalized AI agents.
 
-Most RL-for-LLM systems assume centralized, batch-mode training with pre-collected datasets. **OpenClaw-RL** takes a fundamentally different approach: it wraps your self-hosted model in [OpenClaw](https://openclaw.ai) as an OpenAI-compatible API, intercepts live multi-turn conversations, and continuously optimizes the policy in the background — all without interrupting your usage.
+Most RL-for-LLM systems assume centralized, batch-mode training with pre-collected datasets. The training stack in this repo takes a fundamentally different approach: it wraps your self-hosted model in [OpenClaw](https://openclaw.ai) as an OpenAI-compatible API, intercepts live multi-turn conversations, and continuously optimizes the policy in the background — all without interrupting your usage.
 
 
 <p align="center">
@@ -107,6 +139,21 @@ Our long-term goal is to **advance personalized, practically useful agents with 
 ---
 
 ## 🔧 Quick Start
+
+### 0. Install Openclaw AGI Plugin first
+
+If you are here for the plugin itself, start with the current upstream install path:
+
+```bash
+npm install -g openclaw@latest
+openclaw onboard --install-daemon
+```
+
+Then use the latest docs for platform-specific setup:
+
+- <https://docs.openclaw.ai/start/getting-started>
+- <https://docs.openclaw.ai/start/wizard>
+- <https://docs.openclaw.ai/install/updating>
 
 > **OpenClaw-RL now uses [Unsloth](https://github.com/unslothai/unsloth) + QLoRA as the standard training method.**  
 > No Megatron-LM, no Ray cluster — just 2× RTX 3090 (48 GB total VRAM).
@@ -256,9 +303,9 @@ where `<HOST_IP>` is the **IP address** of the machine running the RL server (e.
 
 
 
-### 3. OpenClaw Setup
+### 3. Openclaw AGI Plugin setup
 
-Install OpenClaw from the version bundled in this repository (we will update it regularly):
+Install OpenClaw from the version bundled in this repository (we will update it regularly), or follow the latest upstream docs linked above if you want the standard plugin onboarding flow first.
 
 Then configure OpenClaw to route requests to your RL server. Open your `openclaw.json` (or the equivalent settings file) and add a provider entry under `"models"` → `"providers"`:
 
@@ -369,6 +416,5 @@ We sincerely thank these projects for their valuable insights and high-quality i
 
 
 ---
-
 
 
