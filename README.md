@@ -418,3 +418,16 @@ We sincerely thank these projects for their valuable insights and high-quality i
 ---
 
 
+
+
+---
+
+## Experimental replay-guided curriculum controller
+
+This fork includes a default-off, Dream-RSI-inspired **curriculum-selection experiment** for the OpenClaw-RL training path. It is not Google's implementation and does not implement prefix-only online discovery-tree replay.
+
+The controller selects training samples from already PRM-scored pools, searches bounded policy parameters offline, and uses session-disjoint retrospective holdouts before changing the sampler. A better replay score does not establish model improvement or inference-cost savings; that requires separate live evaluation.
+
+The sampler is enabled only with `--dream-rsi-enable` and requires `--prm-enable` plus a reachable PRM server. The API also preserves sample metadata and fixes PRM next-state pairing when disk conversation logging is disabled.
+
+Usage, state layout, CPU-only tests and limitations are documented in [`openclaw-rl/dream_rsi/README.md`](./openclaw-rl/dream_rsi/README.md). Executed checks are recorded in [`VALIDATION.md`](./openclaw-rl/dream_rsi/VALIDATION.md).

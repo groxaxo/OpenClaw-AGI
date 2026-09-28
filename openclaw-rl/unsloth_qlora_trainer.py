@@ -208,12 +208,38 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--prm-temperature", type=float, default=0.6)
     p.add_argument("--prm-max-new-tokens", type=int, default=4096)
 
+    # ── Dream-RSI meta-controller (experimental, default-off) ────────────────
+    p.add_argument("--dream-rsi-enable", action="store_true",
+                   help="Enable frozen-replay curriculum controller")
+    p.add_argument("--dream-rsi-pool-factor", type=float, default=2.0,
+                   help="Candidate pool size as a multiple of rollout-batch-size")
+    p.add_argument("--dream-rsi-evolve-interval", type=int, default=8,
+                   help="Attempt controller evolution every N rollout updates")
+    p.add_argument("--dream-rsi-mutations", type=int, default=24,
+                   help="Bounded challenger policies evaluated per evolution")
+    p.add_argument("--dream-rsi-holdout-pools", type=int, default=4,
+                   help="Newest candidate pools reserved from search for promotion gating")
+    p.add_argument("--dream-rsi-min-holdout-pairs", type=int, default=4,
+                   help="Minimum paired holdout pools required for promotion")
+
     # ── misc ─────────────────────────────────────────────────────────────────
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--wandb-project", default=None)
     p.add_argument("--wandb-run-name", default=None)
 
-    return p.parse_args()
+    args = p.parse_args()
+    if args.dream_rsi_enable:
+        if not args.prm_enable:
+            p.error("--dream-rsi-enable requires --prm-enable and a reachable PRM server")
+        if not math.isfinite(args.dream_rsi_pool_factor) or args.dream_rsi_pool_factor < 1:
+            p.error("--dream-rsi-pool-factor must be finite and >= 1")
+        for name in ("rollout_batch_size", "dream_rsi_evolve_interval", "dream_rsi_mutations",
+                     "dream_rsi_holdout_pools", "dream_rsi_min_holdout_pairs"):
+            if getattr(args, name) < 1:
+                p.error(f"--{name.replace('_', '-')} must be positive")
+        if args.dream_rsi_min_holdout_pairs > args.dream_rsi_holdout_pools:
+            p.error("--dream-rsi-min-holdout-pairs cannot exceed --dream-rsi-holdout-pools")
+    return args
 
 
 # ---------------------------------------------------------------------------
@@ -880,6 +906,29 @@ def train(args: argparse.Namespace) -> None:
         except ImportError:
             logger.warning("[train] wandb not installed; skipping.")
 
+    # ── 5b. Dream-RSI controller (optional) ──────────────────────────────────
+    dream_controller = None
+    if is_main and args.dream_rsi_enable:
+        from dream_rsi import DreamRSIController
+
+        dream_controller = DreamRSIController(
+            save_dir / "dream_rsi",
+            target_batch_size=args.rollout_batch_size,
+            pool_factor=args.dream_rsi_pool_factor,
+            evolve_interval=args.dream_rsi_evolve_interval,
+            mutation_count=args.dream_rsi_mutations,
+            holdout_pools=args.dream_rsi_holdout_pools,
+            min_holdout_pairs=args.dream_rsi_min_holdout_pairs,
+            seed=args.seed,
+        )
+        logger.info(
+            "[dream-rsi] enabled: target=%d pool=%d evolve_every=%d policy_v=%d",
+            args.rollout_batch_size,
+            dream_controller.pool_target,
+            args.dream_rsi_evolve_interval,
+            dream_controller.policy.version,
+        )
+
     # ── 6. Training loop ──────────────────────────────────────────────────────
     sglang_base_url = f"http://{args.sglang_host}:{args.sglang_port}"
     grad_accum_steps = max(1, args.global_batch_size // args.mini_batch_size)
@@ -892,10 +941,17 @@ def train(args: argparse.Namespace) -> None:
         # ── 6a. Collect rollout data ──────────────────────────────────────────
         if is_main:
             submission_enabled.set()    # allow sample collection
-            logger.info("[train] rollout %d: collecting %d samples …",
-                        rollout_id, args.rollout_batch_size)
-            samples = drain_output_queue(output_queue, target=args.rollout_batch_size)
+            collect_target = dream_controller.pool_target if dream_controller else args.rollout_batch_size
+            logger.info("[train] rollout %d: collecting %d samples%s …",
+                        rollout_id, collect_target, " for Dream-RSI" if dream_controller else "")
+            samples = drain_output_queue(output_queue, target=collect_target)
             submission_enabled.clear()  # pause while we train
+            if dream_controller:
+                samples = dream_controller.select_samples(samples, rollout_id)
+                logger.info(
+                    "[dream-rsi] rollout %d: selected %d/%d candidates with policy_v=%d",
+                    rollout_id, len(samples), collect_target, dream_controller.policy.version,
+                )
         else:
             samples = []
 
@@ -910,6 +966,11 @@ def train(args: argparse.Namespace) -> None:
         if not samples:
             logger.warning("[train] rollout %d: no samples collected, skipping.", rollout_id)
             continue
+
+        if args.dream_rsi_enable and len(samples) < args.rollout_batch_size:
+            logger.warning("[dream-rsi] too few valid training candidates: %d/%d; skipping update",
+                           len(samples), args.rollout_batch_size)
+            continue  # All ranks see the same broadcast batch and skip together.
 
         # ── 6b. Train one GRPO update ─────────────────────────────────────────
         model.train()
@@ -1009,6 +1070,17 @@ def train(args: argparse.Namespace) -> None:
         if is_main and (rollout_id + 1) % args.update_weights_interval == 0:
             unwrapped = accelerator.unwrap_model(model) if accelerator else model
             push_lora_weights_to_sglang(unwrapped, sglang_base_url, temp_dir)
+
+        if is_main and dream_controller:
+            event = dream_controller.maybe_evolve(rollout_id)
+            if event is not None:
+                logger.info(
+                    "[dream-rsi] evolution rollout=%d promoted=%s reason=%s active_policy_v=%d",
+                    rollout_id,
+                    event.get("promoted"),
+                    event.get("reason"),
+                    dream_controller.policy.version,
+                )
 
     # ── 7. Cleanup ────────────────────────────────────────────────────────────
     if is_main:
