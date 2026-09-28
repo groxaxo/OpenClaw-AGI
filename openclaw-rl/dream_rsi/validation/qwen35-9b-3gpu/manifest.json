@@ -1,0 +1,49 @@
+{
+  "backend": "native_transformers_qlora_ddp",
+  "code_sha256": "7a5eabe06fc946e2dbd12a46cd45916c9297f50c41e2f9907bc67d3d7b508b1f",
+  "cycles": 2,
+  "docker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+  "holdout_ids": [
+    "holdout_rotate",
+    "holdout_runs",
+    "holdout_coins",
+    "holdout_next",
+    "holdout_product",
+    "holdout_spiral"
+  ],
+  "judges": [
+    "muse"
+  ],
+  "learning_rate": 1e-05,
+  "legacy_sglang_backend_exercised": false,
+  "max_generated_tokens": 4608,
+  "max_new_tokens": 192,
+  "max_wall_seconds": 1800,
+  "min_free_disk_gib": 5,
+  "model": "Qwen/Qwen3.5-9B",
+  "promotion_rule": "single terminal comparison, alpha=.05, mean gain>.02, no per-task regression; external veto",
+  "purpose": "bounded integration smoke, not production",
+  "quantization": "NF4 double quantization; BF16 compute; rank-8 LoRA",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "task_suite_sha256": "d6d8a4ef44710b5dbf5c1338787cd6cd0de5d71f24315f7f958fdd1160f4a69a",
+  "tests": {
+    "code_sha256": "7a5eabe06fc946e2dbd12a46cd45916c9297f50c41e2f9907bc67d3d7b508b1f",
+    "docker_sanity": {
+      "passed": 2,
+      "score": 1.0,
+      "task_id": "sanity",
+      "total": 2
+    },
+    "passed": true,
+    "tests_run": 59
+  },
+  "train_ids": [
+    "train_merge",
+    "train_window",
+    "train_brackets",
+    "train_unique",
+    "train_paths",
+    "train_subarray"
+  ],
+  "world_size": 3
+}

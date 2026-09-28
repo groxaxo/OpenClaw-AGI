@@ -1,0 +1,82 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "7a5eabe06fc946e2dbd12a46cd45916c9297f50c41e2f9907bc67d3d7b508b1f",
+    "evidence_sha256": "4eff4eb8e4fae82bc8b964c29323cca83be6fb3ea492dba5b74173294af000b4",
+    "reason": "all required judges approved",
+    "review_id": "17bc06ea2050712fcad7b91cb698607ef008caaeff6d88929415ed0bdc3c5bbc",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 84.313,
+        "reason": "Bounded smoke step 2/2: 1 LoRA-only PPO-style update, no deployment. Train/holdout disjoint, batch train-only with mixed +/-1 rewards, finite old/ref logprobs, tokens>0. Correct KL vs frozen reference, detached old, DDP checks + exact adapter reload in prior update. Pinned code, tasks, docker digest, revision; native QLoRA DDP backend distinct from legacy SGLang. Resources bounded, rollback via hashed checkpoint.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "17bc06ea2050712fcad7b91cb698607ef008caaeff6d88929415ed0bdc3c5bbc",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": false,
+    "code_sha256": "7a5eabe06fc946e2dbd12a46cd45916c9297f50c41e2f9907bc67d3d7b508b1f",
+    "evidence_sha256": "e7d8944710c124775851a50842b3f4508efe7254808f47e86a452c9e6ff13cdf",
+    "reason": "deterministic check, reviewer, or code-binding veto",
+    "review_id": "520d0f1302005fc8b0a237c521c77b1c8235d264a2446059d0fb671594e41166",
+    "stage": "checkpoint_promotion",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [
+          "deterministic_ok=false requires NOT_OK; LLM cannot override deterministic gate",
+          "statistical_gate promote=false: mean_delta 0.0 below 0.02 threshold, 0 wins/6 ties, p=1.0",
+          "heldout_before identical to heldout_after: zero improvement, cannot justify accepting candidate-2"
+        ],
+        "elapsed_s": 46.969,
+        "reason": "Checkpoint promotion denied: deterministic_ok=false. Terminal gate failed per rule (mean gain 0.0<0.02, 0 wins, p=1.0) with identical holdout vectors. Native QLoRA smoke ran 2 consistent updates with disjoint tasks but shows no efficacy. Legacy SGLang path correctly excluded.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "520d0f1302005fc8b0a237c521c77b1c8235d264a2446059d0fb671594e41166",
+        "verdict": "NOT_OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "7a5eabe06fc946e2dbd12a46cd45916c9297f50c41e2f9907bc67d3d7b508b1f",
+    "evidence_sha256": "5f014b505c3259293460e13048fc5711e1cdac4abb2eeca4069545166b4ea853",
+    "reason": "all required judges approved",
+    "review_id": "47d93e58c434bab7a5494d6d4290b8375d7f0272b17ed354cd6114df173247e2",
+    "stage": "final_review",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 93.113,
+        "reason": "Bounded smoke certification only, no efficacy or production claim. Train/holdout IDs disjoint, single terminal comparison with gate correctly failing (mean 0, p=1, promote false) and promotion_approved false, no deployment. Two DDP updates show finite positive synced gradient norms, consistent cross-rank adapter hashes with change, exact checkpoint roundtrips, per-update review IDs. Signed-reward PPO correctly labeled, KL vs frozen reference, digest-pinned Docker and model revision, tests 59 pass with matching code SHA, elapsed and memory within stated budgets. Legacy SGLang explicitly untested and excluded from claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "47d93e58c434bab7a5494d6d4290b8375d7f0272b17ed354cd6114df173247e2",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "7a5eabe06fc946e2dbd12a46cd45916c9297f50c41e2f9907bc67d3d7b508b1f",
+    "evidence_sha256": "287caae075403dfe8cd5a7f0b9af1e3e2f8b4b112d337ada0161b83597970676",
+    "reason": "all required judges approved",
+    "review_id": "af8948ba80cd55bbce17182c661433e1a357f84a4020271491b172bc96990872",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 119.957,
+        "reason": "Bounded smoke before_training cycle 0 for 1 PPO-style LoRA step on native_transformers_qlora_ddp, not production. Train/holdout IDs disjoint; batch uses only train tasks. Logprobs finite on all 3 ranks with tokens>0; scores +1,+1,-1 give non-zero signal, correctly labeled zero-baseline not GRPO. Only LoRA trainable (14.5M), frozen NF4/BF16 base, ref via disable_adapter, clipped loss + grad checks + adapter consistency + exact reload. Pinned Qwen3.5-9B rev, digest docker, code/tests hash match, 59 tests pass, resource budgets enforced. Single-use bound approval, no deployment, terminal gate separate. Legacy SGLang not exercised.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "af8948ba80cd55bbce17182c661433e1a357f84a4020271491b172bc96990872",
+        "verdict": "OK"
+      }
+    }
+  }
+]

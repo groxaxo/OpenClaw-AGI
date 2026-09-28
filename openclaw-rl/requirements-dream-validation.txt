@@ -1,0 +1,11 @@
+# Recorded validation environment; Python 3.13.13, CUDA 12.8 Torch wheel.
+# Install the CUDA torch wheel using its matching PyTorch index.
+torch==2.11.0+cu128
+transformers==5.17.0
+peft==0.21.0
+bitsandbytes==0.50.2
+accelerate==1.15.0
+safetensors==0.8.0
+numpy==2.5.2
+tokenizers==0.23.2
+huggingface-hub==1.33.0

@@ -222,6 +222,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--dream-rsi-min-holdout-pairs", type=int, default=4,
                    help="Minimum paired holdout pools required for promotion")
 
+    p.add_argument("--dream-rsi-external-judges", choices=("muse", "glm", "both"), default="both",
+                   help="Required CLI vetoes for opted-in Dream training (max reasoning)")
+
     # ── misc ─────────────────────────────────────────────────────────────────
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--wandb-project", default=None)
@@ -275,7 +278,8 @@ def compute_grpo_loss(
 
     # ── KL divergence  ───────────────────────────────────────────────────────
     # low_var_kl: k3 estimator  = (r - 1) - log(r)  ≥ 0 everywhere
-    kl = (ratio - 1) - log_ratio  # [B, T]
+    ref_log_ratio = ref_log_probs.detach() - current_log_probs
+    kl = ref_log_ratio.exp() - 1 - ref_log_ratio  # KL against frozen reference, not behavior policy
 
     # ── entropy bonus ────────────────────────────────────────────────────────
     entropy = -current_log_probs  # token-level entropy proxy
@@ -588,29 +592,13 @@ def get_ref_log_probs(
     Compute reference (base-model) log-probs by temporarily disabling LoRA.
     Works for PEFT LoRA models.
     """
-    try:
-        from peft import disable_adapter_layers, enable_adapter_layers
-        disable_adapter_layers(model)
-        with torch.no_grad():
-            ref_lp = get_token_log_probs(
-                model,
-                input_ids,
-                attention_mask,
-                multimodal_train_inputs=multimodal_train_inputs,
-            )
-        enable_adapter_layers(model)
-    except ImportError:
-        # If PEFT is not available (plain Unsloth model without PEFT adapters),
-        # fall back to current model log-probs.  The KL penalty term then
-        # evaluates to 0 everywhere (ratio=1, log_ratio=0 ⟹ kl=0), effectively
-        # disabling the KL regularisation for this batch.
-        with torch.no_grad():
-            ref_lp = get_token_log_probs(
-                model,
-                input_ids,
-                attention_mask,
-                multimodal_train_inputs=multimodal_train_inputs,
-            )
+    owner = getattr(model, "module", model)
+    if not hasattr(owner, "disable_adapter"):
+        raise RuntimeError("A frozen reference requires a PEFT disable_adapter context")
+    with owner.disable_adapter(), torch.no_grad():
+        ref_lp = get_token_log_probs(model, input_ids, attention_mask,
+                                     multimodal_train_inputs=multimodal_train_inputs)
+
     return ref_lp
 
 
@@ -908,8 +896,18 @@ def train(args: argparse.Namespace) -> None:
 
     # ── 5b. Dream-RSI controller (optional) ──────────────────────────────────
     dream_controller = None
+    external_judge = None
     if is_main and args.dream_rsi_enable:
         from dream_rsi import DreamRSIController
+        from dream_rsi.external_judge import ExternalJudgeGate
+        providers = ("muse", "glm") if args.dream_rsi_external_judges == "both" else (args.dream_rsi_external_judges,)
+        external_judge = ExternalJudgeGate(save_dir / "external_judges", Path(__file__).resolve().parents[1], providers=providers)
+
+        def review_curriculum(proposal):
+            receipt = external_judge.review("policy_promotion", proposal, deterministic_ok=True)
+            if receipt.approved:
+                external_judge.consume(receipt, "policy_promotion", proposal)
+            return receipt.approved
 
         dream_controller = DreamRSIController(
             save_dir / "dream_rsi",
@@ -919,6 +917,7 @@ def train(args: argparse.Namespace) -> None:
             mutation_count=args.dream_rsi_mutations,
             holdout_pools=args.dream_rsi_holdout_pools,
             min_holdout_pairs=args.dream_rsi_min_holdout_pairs,
+            promotion_judge=review_curriculum,
             seed=args.seed,
         )
         logger.info(
@@ -971,6 +970,25 @@ def train(args: argparse.Namespace) -> None:
             logger.warning("[dream-rsi] too few valid training candidates: %d/%d; skipping update",
                            len(samples), args.rollout_batch_size)
             continue  # All ranks see the same broadcast batch and skip together.
+
+        # Review on every rank-zero proposed update; broadcast the veto before backward.
+        if args.dream_rsi_enable:
+            approved = False
+            if is_main:
+                evidence = {"backend": "legacy_sglang_unvalidated", "rollout_id": rollout_id,
+                            "configuration": vars(args), "sample_count": len(samples),
+                            "reward_values": [s.reward for s in samples],
+                            "note": "Legacy network path is not covered by the native Qwen9B validation; inspect carefully."}
+                receipt = external_judge.review("before_training", evidence, deterministic_ok=bool(samples))
+                approved = receipt.approved
+                if approved:
+                    external_judge.consume(receipt, "before_training", evidence)
+            if accelerator is not None and accelerator.num_processes > 1:
+                decision_box = [approved]
+                dist.broadcast_object_list(decision_box, src=0)
+                approved = decision_box[0]
+            if not approved:
+                raise RuntimeError("External judge vetoed training; no optimizer update")
 
         # ── 6b. Train one GRPO update ─────────────────────────────────────────
         model.train()
@@ -1069,7 +1087,15 @@ def train(args: argparse.Namespace) -> None:
         # ── 6d. Push weights to sglang ────────────────────────────────────────
         if is_main and (rollout_id + 1) % args.update_weights_interval == 0:
             unwrapped = accelerator.unwrap_model(model) if accelerator else model
-            push_lora_weights_to_sglang(unwrapped, sglang_base_url, temp_dir)
+            if external_judge is not None:
+                # The legacy path has no fresh checkpoint holdout evaluator.
+                # Fail closed rather than advertise external opinion as evidence.
+                evidence = {"backend": "legacy_sglang_unvalidated", "rollout_id": rollout_id,
+                            "blocked_reason": "No fresh matched checkpoint holdout evidence; saved candidate only"}
+                external_judge.review("checkpoint_promotion", evidence, deterministic_ok=False)
+                logger.warning("[external-judge] skipping serving-weight publication: missing checkpoint holdout")
+            else:
+                push_lora_weights_to_sglang(unwrapped, sglang_base_url, temp_dir)
 
         if is_main and dream_controller:
             event = dream_controller.maybe_evolve(rollout_id)

@@ -1,0 +1,126 @@
+{
+  "backend": "native_transformers_qlora_ddp",
+  "elapsed_seconds": 262.361,
+  "final_external_review_ok": true,
+  "final_review_id": "47d93e58c434bab7a5494d6d4290b8375d7f0272b17ed354cd6114df173247e2",
+  "heldout_after": [
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    1.0,
+    0.0
+  ],
+  "heldout_before": [
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    1.0,
+    0.0
+  ],
+  "legacy_sglang_network_path_tested": false,
+  "memory": [
+    {
+      "peak_allocated_gib": 7.830502510070801,
+      "peak_reserved_gib": 7.96875,
+      "rank": 0
+    },
+    {
+      "peak_allocated_gib": 7.861247539520264,
+      "peak_reserved_gib": 7.98828125,
+      "rank": 1
+    },
+    {
+      "peak_allocated_gib": 7.865321636199951,
+      "peak_reserved_gib": 8.06640625,
+      "rank": 2
+    }
+  ],
+  "model": "Qwen/Qwen3.5-9B",
+  "no_regression": true,
+  "optimizer_updates": 2,
+  "production_deployed": false,
+  "promotion_approved": false,
+  "promotion_review_id": "520d0f1302005fc8b0a237c521c77b1c8235d264a2446059d0fb671594e41166",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "statistical_gate": {
+    "losses": 0,
+    "mean_delta": 0.0,
+    "one_sided_sign_p": 1.0,
+    "promote": false,
+    "reason": "mean holdout improvement below threshold",
+    "ties": 6,
+    "wins": 0
+  },
+  "updates": [
+    {
+      "adapter_hashes": [
+        "6cc93b0544a6fa5641e57039e03df9b4be15077287b6e0b569609eb44e9b7c23",
+        "6cc93b0544a6fa5641e57039e03df9b4be15077287b6e0b569609eb44e9b7c23",
+        "6cc93b0544a6fa5641e57039e03df9b4be15077287b6e0b569609eb44e9b7c23"
+      ],
+      "checkpoint": "candidate-1",
+      "checkpoint_roundtrip_exact": true,
+      "cycle": 0,
+      "gradient_norms": [
+        0.7395450472831726,
+        0.7395450472831726,
+        0.7395450472831726
+      ],
+      "per_rank_loss": [
+        {
+          "loss": -1.0,
+          "policy_loss": -1.0,
+          "reference_kl": 0.0
+        },
+        {
+          "loss": -1.0,
+          "policy_loss": -1.0,
+          "reference_kl": 0.0
+        },
+        {
+          "loss": 1.0,
+          "policy_loss": 1.0,
+          "reference_kl": 0.0
+        }
+      ],
+      "review_id": "af8948ba80cd55bbce17182c661433e1a357f84a4020271491b172bc96990872"
+    },
+    {
+      "adapter_hashes": [
+        "22639df3a3d78113a94d44a65ae9bae3ccb27123a56b008fc9ba93d9b77f9d13",
+        "22639df3a3d78113a94d44a65ae9bae3ccb27123a56b008fc9ba93d9b77f9d13",
+        "22639df3a3d78113a94d44a65ae9bae3ccb27123a56b008fc9ba93d9b77f9d13"
+      ],
+      "checkpoint": "candidate-2",
+      "checkpoint_roundtrip_exact": true,
+      "cycle": 1,
+      "gradient_norms": [
+        0.4893026351928711,
+        0.4893026351928711,
+        0.4893026351928711
+      ],
+      "per_rank_loss": [
+        {
+          "loss": -0.9999956488609314,
+          "policy_loss": -1.0,
+          "reference_kl": 0.00021598754392471164
+        },
+        {
+          "loss": -0.9999970197677612,
+          "policy_loss": -1.0,
+          "reference_kl": 0.0001445732923457399
+        },
+        {
+          "loss": 1.0000064373016357,
+          "policy_loss": 1.0,
+          "reference_kl": 0.00032248071511276066
+        }
+      ],
+      "review_id": "17bc06ea2050712fcad7b91cb698607ef008caaeff6d88929415ed0bdc3c5bbc"
+    }
+  ],
+  "validation_status": "PASS",
+  "world_size": 3
+}
