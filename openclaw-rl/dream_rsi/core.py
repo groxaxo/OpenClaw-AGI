@@ -509,7 +509,7 @@ class DreamRSIController:
         gate = holdout_gate(
             incumbent_holdout,
             challenger_holdout,
-            min_pairs=min(self.min_holdout_pairs, len(holdout)),
+            min_pairs=self.min_holdout_pairs,
             min_mean_delta=0.0,
             alpha=0.10,
         )
