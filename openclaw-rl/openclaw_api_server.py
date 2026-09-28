@@ -539,6 +539,7 @@ class OpenClawAPIServer:
 
             self._turn_counts[session_id] = self._turn_counts.get(session_id, 0) + 1
             turn_num = self._turn_counts[session_id]
+            turn_data["turn_num"] = turn_num
 
             logger.info(
                 "[OpenClaw] MAIN session=%s turn=%d prompt_tokens=%d response_tokens=%d",
@@ -621,6 +622,12 @@ class OpenClawAPIServer:
         sample.index = next(self._index_counter)
         sample.group_index = next(self._group_counter)
         sample.reward = {"score": score}
+        sample.metadata.update({
+            "session_id": session_id,
+            "turn": int(turn_data.get("turn_num", 0)),
+            "has_next_state": bool(has_next_state),
+            "prm_score": float(score),
+        })
 
         if not exclude:
             self._session_effective[session_id] = self._session_effective.get(session_id, 0) + 1
