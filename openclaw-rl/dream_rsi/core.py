@@ -426,6 +426,7 @@ class DreamRSIController:
         seed: int = 42,
         call_penalty: float = 0.01,
         parallel_bonus: float = 0.01,
+        promotion_judge=None,
     ):
         for name, value in {
             "target_batch_size": target_batch_size,
@@ -455,6 +456,7 @@ class DreamRSIController:
         self.holdout_pools = max(1, int(holdout_pools))
         self.min_holdout_pairs = max(1, int(min_holdout_pairs))
         self.seed = int(seed)
+        self.promotion_judge = promotion_judge
         self.call_penalty = float(call_penalty)
         self.parallel_bonus = float(parallel_bonus)
         self.policy = self._load_policy()
@@ -596,15 +598,21 @@ class DreamRSIController:
             min_mean_delta=0.0,
             alpha=0.10,
         )
-        if gate.promote:
+        external_ok = True
+        if gate.promote and self.promotion_judge is not None:
+            external_ok = self.promotion_judge({"rollout_id": rollout_id,
+                "incumbent": incumbent.to_dict(), "challenger": challenger.to_dict(),
+                "gate": asdict(gate), "note": "Retrospective curriculum surrogate, not live model capability evidence"}) is True
+        promoted = gate.promote and external_ok
+        if promoted:
             self._write_policy(challenger)
             self.policy = challenger
 
         event = {
             "type": "policy_evolution",
             "rollout_id": rollout_id,
-            "promoted": gate.promote,
-            "reason": gate.reason,
+            "promoted": promoted,
+            "reason": gate.reason if external_ok else "external judge vetoed policy promotion",
             "gate": asdict(gate),
             "incumbent": incumbent.to_dict(),
             "incumbent_replay": asdict(incumbent_train),

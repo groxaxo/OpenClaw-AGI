@@ -73,3 +73,38 @@ python3 -m dream_rsi.cli /path/to/checkpoints/dream_rsi/replay.jsonl --policy /p
 ```
 
 The CLI reports retrospective metrics only and does not promote a policy. Targets and mutation counts must be positive.
+
+## External CLI vetoes and native Qwen3.5-9B validation
+
+`external_judge.py` invokes Muse Spark 1.3 with `--reasoning-effort max`
+(and `--yolo`, but shell/writes/web disabled), or OpenCode GLM-5.3 with
+`--variant max` and denied tool permissions. In `both` mode every required
+reviewer must return a strict, evidence-bound `OK`. A rejection, timeout,
+malformed output or stale source is a veto, never a reason to shop for another
+approval. Review receipts are single-use. Deterministic checks remain required.
+
+The **native validation backend**, `python -m dream_rsi.live_validation`, uses
+all three GPUs as independent NF4/BF16 QLoRA replicas with synchronized LoRA
+gradients. It exercises actual Qwen3.5-9B generation, immutable coding tests in
+a digest-pinned unprivileged Docker container, replay-guided batch selection,
+an external review before every optimizer step, adapter save/reload, and one
+terminal matched-budget heldout comparison plus a separate release review.
+
+This is an explicitly bounded integration smoke (at most three updates), not a
+capability benchmark. Raw signed rewards are used as zero-baseline advantages;
+this is PPO-style policy optimization, **not group-normalized GRPO**. Training
+and heldout task IDs are disjoint. Holdout results are not used to retry or tune
+within a run. Promotion requires the registered statistical gate, no task
+regression, and all selected judges; otherwise the candidate is retained but
+not activated. No existing serving process is restarted or overwritten.
+
+This backend does **not** validate the legacy SGLang network/PRM path. The legacy
+trainer now also requests CLI reviews before opted-in Dream updates, and cannot
+publish updated serving weights without fresh checkpoint holdout evidence.
+That path currently has no such evaluator, so publication fails closed. A fix
+also makes its KL term depend on the frozen reference and uses PEFT's actual
+`disable_adapter()` context rather than silently substituting the current model.
+
+Run-specific commands, versions, reviewer outputs and measurements must be
+recorded with the actual validation evidence. Do not treat a unit test or an
+LLM opinion as evidence that a training run improved the model.
