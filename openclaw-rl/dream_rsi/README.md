@@ -108,3 +108,25 @@ also makes its KL term depend on the frozen reference and uses PEFT's actual
 Run-specific commands, versions, reviewer outputs and measurements must be
 recorded with the actual validation evidence. Do not treat a unit test or an
 LLM opinion as evidence that a training run improved the model.
+
+## Single-GPU Qwen3.5-4B continuation
+
+`qwen4b_single.py` refuses to run unless exactly one CUDA device is visible.
+It uses 32 independently tested reference solutions for supervised QLoRA and
+an eight-task development set for checkpoint selection. This is **supervised
+adaptation**, not a reproduction of Google's code-evolving Dream-RSI loop.
+
+The new final suite contains 12 in-domain task families with 20 independently
+computed small-input cases each. Several algorithm families overlap with the
+training curriculum: it measures new inputs and reworded instructions, not
+unseen-algorithm generalization or statistically significant broad capability.
+Old unfinished/previously exposed final suites are not reused as confirmation.
+A known old grid-path development label is corrected from 1 to 2 before runs.
+
+The final suite is hashed before training and claimed once across run folders.
+Both base and candidate are evaluated only after the development-selected
+checkpoint is fixed. All generation budgets are matched. Promotion still
+requires +0.08 case accuracy, final accuracy >=0.75, >=2 complete-task wins,
+zero complete-task regressions, and an independent Muse max approval. Every
+optimizer update requires a separate source/evidence-bound approval. A crash,
+missing receipt or negative final review is never reported as PASS.
