@@ -23,7 +23,7 @@ export PYTHONPATH="$ROOT/openclaw-rl${PYTHONPATH:+:$PYTHONPATH}"
 "$PYTHON_BIN" - "$ROOT" "$CASE" "$EVALUATOR_IMAGE" "$SEALED_FINAL" "$SEALED_SHA256" <<'PY'
 import contextlib, hashlib, pathlib, sys, unittest
 from dream_rsi.external_judge import ExternalJudgeGate, digest, canonical
-from dream_rsi.qwen4b_curriculum_c import TRAIN
+from dream_rsi.qwen4b_harder import TRAIN
 from dream_rsi.coding_tasks import CodingTask, grade
 from dream_rsi.qwen4b_validation import load_suite
 root,case=map(pathlib.Path,sys.argv[1:3]);image,seal,expected=sys.argv[3:]
@@ -46,7 +46,7 @@ fi
 timeout --signal=TERM --kill-after=15s 3100 "$PYTHON_BIN" -u -m dream_rsi.qwen4b_single \
     --model-path "$MODEL_PATH" --sealed-final "$SEALED_FINAL" --sealed-sha256 "$SEALED_SHA256" \
     --docker-image "$EVALUATOR_IMAGE" --output "$CASE/run" --test-report "$CASE/test-report.json" \
-    --max-epochs 6 --min-epochs 2 --learning-rate 3e-5 --max-new-tokens 256 \
+    --max-epochs 6 --min-epochs 2 --learning-rate 5e-5 --max-new-tokens 256 \
     --judge-timeout 300 --max-wall-seconds 3000 2>&1 | tee "$CASE/live.log"
 "$PYTHON_BIN" - "$CASE/run/report.json" <<'PY'
 import json,pathlib,sys

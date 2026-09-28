@@ -1,0 +1,194 @@
+[
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_left_rotate",
+    "total": 3
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_window_min",
+    "total": 2
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_touch_merge",
+    "total": 2
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_grid_paths",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_zero_subarrays",
+    "total": 3
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_prev_greater",
+    "total": 2
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_suffix_products",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_rle_decode",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_min_coins",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_longest_run",
+    "total": 3
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_outer_ring",
+    "total": 2
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_parens_only",
+    "total": 3
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_dedupe_sorted",
+    "total": 2
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_transpose",
+    "total": 2
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "train_prefix_max",
+    "total": 2
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_anagram_flag",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_flatten_once",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "train_first_index",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_strict_overlap",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_blocked_paths",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_spiral",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_right_rotate",
+    "total": 3
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "c_window_max",
+    "total": 2
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_next_greater",
+    "total": 3
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_rle",
+    "total": 3
+  },
+  {
+    "passed": 4,
+    "score": 1.0,
+    "task_id": "c_product_except",
+    "total": 4
+  },
+  {
+    "passed": 4,
+    "score": 1.0,
+    "task_id": "c_brackets",
+    "total": 4
+  },
+  {
+    "passed": 4,
+    "score": 1.0,
+    "task_id": "c_two_distinct",
+    "total": 4
+  },
+  {
+    "passed": 4,
+    "score": 1.0,
+    "task_id": "c_coin_ways",
+    "total": 4
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_stable_unique",
+    "total": 3
+  },
+  {
+    "passed": 2,
+    "score": 1.0,
+    "task_id": "c_intersections",
+    "total": 2
+  },
+  {
+    "passed": 3,
+    "score": 1.0,
+    "task_id": "c_moving_sum",
+    "total": 3
+  }
+]

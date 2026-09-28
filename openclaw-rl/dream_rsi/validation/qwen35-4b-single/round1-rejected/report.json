@@ -1,0 +1,206 @@
+{
+  "best_dev_accuracy": 0.7777777777777778,
+  "best_epoch": 2,
+  "dev_baseline": {
+    "case_accuracy": 0.6666666666666666,
+    "complete_tasks": 5,
+    "passed_cases": 18,
+    "task_count": 8,
+    "total_cases": 27
+  },
+  "elapsed_seconds": 734.194,
+  "final_external_review_ok": false,
+  "final_review_id": "d8a0e271f3722495122b2c1371cb10a764a0864f46c01229a078be98ffd999cf",
+  "gate": {
+    "case_gain": -0.016666666666666607,
+    "complete_task_losses": 1,
+    "complete_task_wins": 0,
+    "final_case_accuracy": 0.9625,
+    "passed": false
+  },
+  "history": [
+    {
+      "adapter_sha256": "49a1529d41f416092e15ad2a2c8dd9e740c21454396c90aa0f55f3f9bc021019",
+      "checkpoint_roundtrip_exact": true,
+      "dev": {
+        "case_accuracy": 0.6666666666666666,
+        "complete_tasks": 5,
+        "passed_cases": 18,
+        "task_count": 8,
+        "total_cases": 27
+      },
+      "epoch": 1,
+      "gradient_norm": 2.417691230773926,
+      "mean_sft_loss": 0.7568434709683061,
+      "review_id": "d6df4637f2680d8ad8ac78469d39996ddb4c3c96db07868fd4160f3373fc9770"
+    },
+    {
+      "adapter_sha256": "e08b87afe9b4b141c84517ea1cd017ac56b02b8befe5b03cbc01204aef70220b",
+      "checkpoint_roundtrip_exact": true,
+      "dev": {
+        "case_accuracy": 0.7777777777777778,
+        "complete_tasks": 6,
+        "passed_cases": 21,
+        "task_count": 8,
+        "total_cases": 27
+      },
+      "epoch": 2,
+      "gradient_norm": 2.3825290203094482,
+      "mean_sft_loss": 0.7433311203494668,
+      "review_id": "6ae878162b68d6eb589e821a42def9f87c05252a592ab2c1722aeaf3e57fca07"
+    },
+    {
+      "adapter_sha256": "024a238f407bb0608270543ae897a9369ab54e05cddcd7bc0331a1f51bbdd5fc",
+      "checkpoint_roundtrip_exact": true,
+      "dev": {
+        "case_accuracy": 0.7777777777777778,
+        "complete_tasks": 6,
+        "passed_cases": 21,
+        "task_count": 8,
+        "total_cases": 27
+      },
+      "epoch": 3,
+      "gradient_norm": 2.375505208969116,
+      "mean_sft_loss": 0.7004770552739501,
+      "review_id": "c57e4b12e1f8f3ebd69321795901e3cfe8bccd3a3b4c69bced86b8fd28707301"
+    },
+    {
+      "adapter_sha256": "7c9f53922be8b8b934721e53626de756c4eef1aa0af040479a7c5dfcd38f93a3",
+      "checkpoint_roundtrip_exact": true,
+      "dev": {
+        "case_accuracy": 0.7777777777777778,
+        "complete_tasks": 6,
+        "passed_cases": 21,
+        "task_count": 8,
+        "total_cases": 27
+      },
+      "epoch": 4,
+      "gradient_norm": 2.25958514213562,
+      "mean_sft_loss": 0.6340778330340981,
+      "review_id": "f22a3b25053a9a0c1c9e16e04ebf82377ddb71195627ba2d6e46f91dc65193fd"
+    }
+  ],
+  "memory": {
+    "peak_allocated_gib": 3.7043280601501465,
+    "peak_reserved_gib": 3.822265625
+  },
+  "model": "Qwen/Qwen3.5-4B",
+  "per_task": [
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_brackets",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_coins",
+      "total": 20
+    },
+    {
+      "after_passed": 16,
+      "before_passed": 20,
+      "complete_after": false,
+      "complete_before": true,
+      "task_id": "confirm_merge",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_next",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_paths",
+      "total": 20
+    },
+    {
+      "after_passed": 16,
+      "before_passed": 16,
+      "complete_after": false,
+      "complete_before": false,
+      "task_id": "confirm_product",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_rle",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_rotate",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_spiral",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_subarrays",
+      "total": 20
+    },
+    {
+      "after_passed": 19,
+      "before_passed": 19,
+      "complete_after": false,
+      "complete_before": false,
+      "task_id": "confirm_unique",
+      "total": 20
+    },
+    {
+      "after_passed": 20,
+      "before_passed": 20,
+      "complete_after": true,
+      "complete_before": true,
+      "task_id": "confirm_window",
+      "total": 20
+    }
+  ],
+  "production_deployed": false,
+  "promotion_approved": false,
+  "promotion_review_id": "23ed9e2973c0c8951e2a1925c9b1a96d2ba0cdbfbf077a619c608a52ceef246e",
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "sealed_after": {
+    "case_accuracy": 0.9625,
+    "complete_tasks": 9,
+    "passed_cases": 231,
+    "task_count": 12,
+    "total_cases": 240
+  },
+  "sealed_before": {
+    "case_accuracy": 0.9791666666666666,
+    "complete_tasks": 10,
+    "passed_cases": 235,
+    "task_count": 12,
+    "total_cases": 240
+  },
+  "total_elapsed_seconds": 763.945,
+  "validation_status": "NOT_OK"
+}

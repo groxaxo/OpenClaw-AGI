@@ -20,7 +20,7 @@ import time
 
 from .coding_tasks import CodingTask, grade
 from .external_judge import ExternalJudgeGate, JudgeError, canonical, digest
-from .qwen4b_curriculum_c import TRAIN, DEV
+from .qwen4b_harder import TRAIN, DEV, GUARDS
 from .qwen4b_validation import load_suite, promotion_gate
 
 def args():
@@ -33,7 +33,7 @@ def args():
     p.add_argument("--test-report",required=True)
     p.add_argument("--max-epochs",type=int,default=6)
     p.add_argument("--min-epochs",type=int,default=2)
-    p.add_argument("--learning-rate",type=float,default=3e-5)
+    p.add_argument("--learning-rate",type=float,default=5e-5)
     p.add_argument("--max-new-tokens",type=int,default=256)
     p.add_argument("--judge-timeout",type=int,default=300)
     p.add_argument("--max-wall-seconds",type=int,default=2400)
@@ -94,13 +94,17 @@ def main():
         raise RuntimeError("expected Qwen3.5-4B")
     manifest={"backend":"single_gpu_qwen35_4b_qlora_sft","model":"Qwen/Qwen3.5-4B",
         "revision":model_path.name,"visible_gpu_count":1,"train_examples":len(TRAIN),
-        "dev_tasks":len(DEV),"sealed_tasks":final_task_count,"sealed_sha256":a.sealed_sha256,
+        "dev_tasks":len(DEV),"guard_tasks":len(GUARDS),"sealed_tasks":final_task_count,"sealed_sha256":a.sealed_sha256,
         "learning_rate":a.learning_rate,"min_epochs":a.min_epochs,"max_epochs":a.max_epochs,
         "max_new_tokens":a.max_new_tokens,"code_sha256":source_hash,"tests":tests,
         "docker_image":a.docker_image,
         "adaptive_rule":"training and checkpoint choice use DEV only; final base/challenger evaluation happens once after candidate selection",
         "validation_scope":"in-domain coding smoke with new prompt wording and inputs, not unseen-algorithm generalization",
         "training_method":"supervised QLoRA on reference solutions; not weight-level recursive algorithm discovery",
+        "experiment_round":2,
+        "prior_round_status":"rejected: easy confirmation 235/240 base vs231/240 candidate; no deployment",
+        "new_scope":"harder fixed in-domain distribution; never pooled with previous confirmation scores",
+        "guard_rule":"no per-task case-count regression on closed interval, bracket and coin development guards",
         "max_wall_seconds":a.max_wall_seconds,"max_eval_context_tokens":512,"max_training_tokens":768,
         "max_optimizer_updates":a.max_epochs,"physical_cuda_device":os.environ.get("CUDA_VISIBLE_DEVICES"),
         "promotion_gate":{"min_case_gain":0.08,"min_final_case_accuracy":0.75,
@@ -178,6 +182,11 @@ def main():
         return F.cross_entropy(logits.reshape(-1,logits.shape[-1]).float(),ids[:,-n:].reshape(-1))
 
     dev0=evaluate(DEV,"DEV0");dev0s=score(dev0);write("dev-baseline.json",dev0)
+    guard0=evaluate(GUARDS,"GUARD0");write("guard-baseline.json",guard0)
+    def guards_ok(rows):
+        baseline={x["task_id"]:x["result"] for x in guard0}
+        return all(x["result"]["total"]==baseline[x["task_id"]]["total"] and
+                   x["result"]["passed"]>=baseline[x["task_id"]]["passed"] for x in rows)
     best_acc=dev0s["case_accuracy"];best_epoch=0;history=[]
     for epoch in range(1,a.max_epochs+1):
         event("training_epoch_gradients",epoch=epoch)
@@ -188,6 +197,7 @@ def main():
         evidence={"manifest":manifest,"epoch":epoch,"mean_sft_loss":sum(losses)/len(losses),
             "gradient_norm":float(norm),"dev_before":dev0s if not history else history[-1]["dev"],
             "adapter_before":adapter_hash(),
+            "guard_before":guard0 if not history else history[-1]["guard_records"],
             "proposed_action":"one optimizer step; sealed-suite result is deliberately absent"}
         ok=math.isfinite(float(norm)) and float(norm)>0 and all(math.isfinite(x) for x in losses)
         approval=judge.review("before_training",evidence,deterministic_ok=ok)
@@ -199,14 +209,16 @@ def main():
         current_hash=adapter_hash()
         if current_hash==initial_hash:raise RuntimeError("adapter unchanged")
         dev=evaluate(DEV,f"DEV{epoch}");ds=score(dev)
+        guard=evaluate(GUARDS,f"GUARD{epoch}");guard_passed=guards_ok(guard)
         ck=out/f"epoch-{epoch}";ck.mkdir(exist_ok=False);model.save_pretrained(ck,safe_serialization=True)
         before=adapter_hash();state=load_file(ck/"adapter_model.safetensors");set_peft_model_state_dict(model,state)
         if adapter_hash()!=before:raise RuntimeError("checkpoint roundtrip mismatch")
         item={"epoch":epoch,"dev":ds,"mean_sft_loss":sum(losses)/len(losses),
               "gradient_norm":float(norm),"adapter_sha256":current_hash,
-              "review_id":approval.review_id,"checkpoint_roundtrip_exact":True}
+              "review_id":approval.review_id,"checkpoint_roundtrip_exact":True,
+              "guard_passed":guard_passed,"guard_records":guard}
         history.append(item);write(f"epoch-{epoch}.json",item)
-        if ds["case_accuracy"]>best_acc+1e-12:
+        if guard_passed and ds["case_accuracy"]>best_acc+1e-12:
             best_acc=ds["case_accuracy"];best_epoch=epoch
         target=max(0.88,min(0.98,dev0s["case_accuracy"]+0.12))
         if epoch>=a.min_epochs and (best_acc>=target or (best_epoch>0 and epoch-best_epoch>=2)):break
@@ -237,9 +249,13 @@ def main():
         per.append({"task_id":task_id,"before_passed":br["passed"],"after_passed":ar["passed"],
                     "total":br["total"],"complete_before":bc,"complete_after":ac})
     gate,b,q=promotion_gate(sealed0,sealed1)
+    selected_guard=next(x["guard_records"] for x in history if x["epoch"]==best_epoch)
+    gate["development_guards_passed"]=guards_ok(selected_guard)
+    gate["passed"]=gate["passed"] and gate["development_guards_passed"]
     pe={"manifest":manifest,"best_epoch_selected_on_dev_only":best_epoch,"dev_baseline":dev0s,
         "best_dev_accuracy":best_acc,"sealed_before":b,"sealed_after":q,"gate":gate,
         "per_task":per,"candidate_sha256":adapter_hash(),
+        "guard_baseline":guard0,"selected_guard":selected_guard,
         "proposed_action":"accept experimental adapter only; do not alter existing service"}
     decision=judge.review("checkpoint_promotion",pe,deterministic_ok=bool(gate["passed"]))
     if decision.approved:judge.consume(decision,"checkpoint_promotion",pe)

@@ -97,3 +97,35 @@ class GraderIntegrityTests(unittest.TestCase):
         with patch('dream_rsi.coding_tasks.subprocess.run',return_value=fake):
             r=grade(CodingTask('test','x',(([1],999),)),'def solve(data): return 0','python@sha256:'+'a'*64)
         self.assertEqual(r['passed'],0)
+
+class HarderRoundTests(unittest.TestCase):
+    def test_round2_splits_and_counts(self):
+        from dream_rsi.qwen4b_harder import TRAIN,DEV,GUARDS
+        self.assertEqual((len(TRAIN),len(DEV),len(GUARDS)),(46,12,3))
+        groups=[{x.task_id for x in s} for s in (TRAIN,DEV,GUARDS)]
+        for i,g in enumerate(groups):
+            for h in groups[i+1:]:self.assertFalse(g&h)
+    def test_harder_suite_deterministic(self):
+        from dream_rsi.qwen4b_harder import build_hard_suite
+        a=build_hard_suite(72591);self.assertEqual(a,build_hard_suite(72591))
+        self.assertNotEqual(a,build_hard_suite(81238));self.assertEqual(len(a),12)
+        self.assertEqual(sum(len(t['cases']) for t in a),240)
+    def test_lru_stored_minus_one_remains_recent(self):
+        from dream_rsi.qwen4b_harder import hard_oracle
+        data=[2,[['put',1,-1],['put',2,7],['get',1],['put',3,8],['get',2],['get',1]]]
+        self.assertEqual(hard_oracle('lru',data),[-1,-1,-1])
+    def test_round2_known_reference_values(self):
+        from dream_rsi.qwen4b_harder import hard_oracle
+        for kind,data,expected in [('chunks',[[1,2,3,4,5],2],[2,1,4,3,5]),
+          ('range',[[1,4,2,7],2],[3,2,5]),('union',[[1,4],[3,6],[8,10]],7),
+          ('minpath',[[1,3,1],[1,5,1],[4,2,1]],7),('prefix',[[1,-1,2,-2],0],2),
+          ('smaller',[3,1,2,0],[-1,-1,1,-1]),('runs','aaabbcca',[3,2,2,1]),
+          ('sum',[1,2,3],[5,4,3]),('rpn',['7','-3','/'],-2),
+          ('bfs',[[[0,0,0],[1,1,0],[0,0,0]],[0,0],[2,0]],6),('edit',['kitten','sitting'],3)]:
+            with self.subTest(kind=kind):self.assertEqual(hard_oracle(kind,data),expected)
+    def test_second_round_preserves_old_promotion_threshold(self):
+        from dream_rsi.qwen4b_validation import promotion_gate
+        b=[{'task_id':str(i),'result':{'passed':0 if i>9 else 20,'total':20}} for i in range(12)]
+        a=[{'task_id':str(i),'result':{'passed':20,'total':20}} for i in range(12)]
+        self.assertTrue(promotion_gate(b,a)[0]['passed'])
+        self.assertFalse(promotion_gate(a,a)[0]['passed'])

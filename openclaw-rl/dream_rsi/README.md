@@ -130,3 +130,23 @@ requires +0.08 case accuracy, final accuracy >=0.75, >=2 complete-task wins,
 zero complete-task regressions, and an independent Muse max approval. Every
 optimizer update requires a separate source/evidence-bound approval. A crash,
 missing receipt or negative final review is never reported as PASS.
+
+### Second preregistered single-GPU distribution
+
+The first corrected trial remains rejected: 235/240 base versus 231/240
+candidate, with a closed-interval regression. Its near-ceiling baseline also
+could not support the fixed +8-percentage-point criterion. It is not relabeled
+as a pass or pooled with later results.
+
+`qwen4b_harder.py` defines a separate, harder in-domain distribution, 46
+reference training examples, 12 development tasks and three regression guards.
+The full plan and new confirmation cases are fixed before the second round's
+model evaluation. No promotion thresholds were relaxed. Closed-interval,
+bracket and coin regression guards must not lose any previously passing cases;
+only guard-passing development checkpoints can reach confirmation.
+
+Training still uses exactly one GPU, Muse max approval before every optimizer
+update, and source/evidence hashes. The second round uses learning rate 5e-5
+and at most six full-batch updates, with matched 256-token evaluation budgets.
+It measures adaptation within a trained algorithm distribution, not unseen
+algorithm discovery, broad capability, or a statistically significant effect.
