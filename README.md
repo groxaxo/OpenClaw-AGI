@@ -422,22 +422,12 @@ We sincerely thank these projects for their valuable insights and high-quality i
 
 ---
 
-## 🧠 Experimental Dream-RSI meta-controller
+## Experimental replay-guided curriculum controller
 
-This fork now includes an optional **Dream-RSI-inspired frozen-replay controller** for the OpenClaw-RL path. It is based on the public Dream-RSI paper mechanics; it is **not** Google's unreleased reference implementation.
+This fork includes a default-off, Dream-RSI-inspired **curriculum-selection experiment** for the OpenClaw-RL training path. It is not Google's implementation and does not implement prefix-only online discovery-tree replay.
 
-When enabled, OpenClaw-RL collects a larger PRM-scored candidate pool, persists a compact content-free replay trace, selects a GRPO curriculum through an exploit/explore/recover policy, generates bounded challenger policies offline, and only promotes a challenger after a paired holdout gate.
+The controller selects training samples from already PRM-scored pools, searches bounded policy parameters offline, and uses session-disjoint retrospective holdouts before changing the sampler. A better replay score does not establish model improvement or inference-cost savings; that requires separate live evaluation.
 
-The feature is default-off, so existing recipes are unchanged.
+The sampler is enabled only with `--dream-rsi-enable` and requires `--prm-enable` plus a reachable PRM server. The API also preserves sample metadata and fixes PRM next-state pairing when disk conversation logging is disabled.
 
-```bash
-python openclaw-rl/unsloth_qlora_trainer.py \
-  ...existing arguments... \
-  --dream-rsi-enable \
-  --dream-rsi-pool-factor 2.0 \
-  --dream-rsi-evolve-interval 8 \
-  --dream-rsi-mutations 24 \
-  --dream-rsi-holdout-pools 4
-```
-
-Implementation notes, state layout, offline replay, and guardrails are documented in [`openclaw-rl/dream_rsi/README.md`](./openclaw-rl/dream_rsi/README.md).
+Usage, state layout, CPU-only tests and limitations are documented in [`openclaw-rl/dream_rsi/README.md`](./openclaw-rl/dream_rsi/README.md). Executed checks are recorded in [`VALIDATION.md`](./openclaw-rl/dream_rsi/VALIDATION.md).

@@ -15,6 +15,8 @@ def main() -> int:
     p.add_argument("--mutations", type=int, default=24)
     p.add_argument("--seed", type=int, default=42)
     args = p.parse_args()
+    if args.target < 1 or args.mutations < 1:
+        p.error("--target and --mutations must be positive integers")
 
     store = TraceStore(args.trace)
     pools = store.load_pools()

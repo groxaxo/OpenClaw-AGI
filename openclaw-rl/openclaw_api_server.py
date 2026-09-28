@@ -308,7 +308,8 @@ class OpenClawAPIServer:
 
     def _buffer_record(self, session_id: str, turn_num: int, messages: list,
                        prompt_text: str, response_text: str, tool_calls: list):
-        if not self._record_file:
+        # PRM needs next-state pairing even when conversation logging is off.
+        if not self._record_file and not self._prm_enabled:
             return
         self._pending_records[session_id] = {
             "session_id": session_id,

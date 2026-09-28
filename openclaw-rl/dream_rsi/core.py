@@ -15,9 +15,8 @@ from typing import Sequence
 class PolicyConfig:
     """Bounded, replayable controller policy.
 
-    Dream-RSI's paper evolves controller code; until the official implementation
-    is released, OpenClaw-AGI keeps the mutable surface constrained to auditable
-    numeric policy parameters.
+    This independent curriculum experiment evolves numeric parameters, not
+    controller source. It is not a reference Dream-RSI implementation.
     """
 
     version: int = 1
@@ -43,8 +42,12 @@ class PolicyConfig:
             "delta_weight": (0.0, 4.0),
             "depth_penalty": (0.0, 1.0),
         }
+        if type(self.version) is not int or self.version < 1:
+            raise ValueError("version must be a positive integer")
         values = asdict(self)
         for key, (lo, hi) in bounded.items():
+            if type(values[key]) not in (int, float) or not math.isfinite(values[key]):
+                raise ValueError(f"{key} must be a finite number")
             value = float(values[key])
             if not lo <= value <= hi:
                 raise ValueError(f"{key}={value} outside [{lo}, {hi}]")
@@ -55,8 +58,12 @@ class PolicyConfig:
 
     @classmethod
     def from_dict(cls, data: dict) -> "PolicyConfig":
-        allowed = set(cls.__dataclass_fields__)
-        return cls(**{k: v for k, v in data.items() if k in allowed}).validated()
+        if not isinstance(data, dict):
+            raise ValueError("policy must be an object")
+        unknown = set(data) - set(cls.__dataclass_fields__)
+        if unknown:
+            raise ValueError(f"unknown policy fields: {sorted(unknown)}")
+        return cls(**data).validated()
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -73,6 +80,20 @@ class Candidate:
     parent_id: str | None = None
     delta_vs_parent: float = 0.0
     metadata: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        for name in ("score", "delta_vs_parent"):
+            value = getattr(self, name)
+            if type(value) not in (int, float) or not math.isfinite(value):
+                raise ValueError(f"{name} must be a finite number")
+        if not isinstance(self.node_id, str) or not self.node_id:
+            raise ValueError("node_id must be a nonempty string")
+        if not isinstance(self.session_id, str) or not self.session_id:
+            raise ValueError("session_id must be a nonempty string")
+        if type(self.turn) is not int or self.turn < 0:
+            raise ValueError("turn must be a nonnegative integer")
+        if type(self.valid) is not bool:
+            raise ValueError("valid must be boolean")
 
 
 @dataclass(frozen=True)
@@ -136,7 +157,11 @@ def select_candidates(candidates: Sequence[Candidate], target: int, policy: Poli
     """Deterministic exploit/explore/recover selection on frozen observations."""
 
     policy = policy.validated()
-    if target <= 0:
+    if type(target) is not int or target < 0:
+        raise ValueError("target must be a nonnegative integer")
+    if len({c.node_id for c in candidates}) != len(candidates):
+        raise ValueError("candidate node IDs must be unique within a pool")
+    if target == 0:
         return []
     usable = [c for c in candidates if c.valid]
     if len(usable) <= target:
@@ -208,7 +233,9 @@ def objective(
     parallel_bonus: float = 0.01,
 ) -> ReplayMetrics:
     if not selected:
-        return ReplayMetrics(-math.inf, -math.inf, -math.inf, -math.inf, 0, max(1, rounds), 0, 0.0)
+        # Empty pools carry no evidence. Keep serialized metrics finite;
+        # evolution excludes pools with fewer than the target valid samples.
+        return ReplayMetrics(0.0, 0.0, 0.0, 0.0, 0, max(1, rounds), 0, 0.0)
     scores = [float(c.score) for c in selected]
     best = max(scores)
     mean = statistics.fmean(scores)
@@ -248,6 +275,9 @@ def replay_policy(
 def mutate_policy(policy: PolicyConfig, seed: int, count: int = 24) -> list[PolicyConfig]:
     """Deterministically generate bounded challengers around an incumbent."""
 
+    policy.validated()
+    if type(count) is not int or count < 1:
+        raise ValueError("mutation count must be a positive integer")
     rng = random.Random(seed)
     out: list[PolicyConfig] = []
     seen: set[str] = set()
@@ -298,11 +328,21 @@ def holdout_gate(
     min_mean_delta: float = 0.0,
     alpha: float = 0.10,
 ) -> PromotionDecision:
+    if type(min_pairs) is not int or min_pairs < 1:
+        raise ValueError("min_pairs must be a positive integer")
+    if not math.isfinite(alpha) or not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must be between zero and one")
+    if not math.isfinite(min_mean_delta) or min_mean_delta < 0.0:
+        raise ValueError("min_mean_delta must be finite and nonnegative")
     if len(incumbent_values) != len(challenger_values):
         raise ValueError("incumbent/challenger holdout vectors must have equal length")
+    if any(not math.isfinite(float(v)) for v in (*incumbent_values, *challenger_values)):
+        raise ValueError("holdout values must be finite")
     if len(incumbent_values) < min_pairs:
         return PromotionDecision(False, 0.0, 0, 0, 0, 1.0, f"need at least {min_pairs} paired holdout episodes")
     deltas = [float(c) - float(i) for i, c in zip(incumbent_values, challenger_values)]
+    if any(not math.isfinite(d) for d in deltas):
+        raise ValueError("holdout differences must be finite")
     wins = sum(d > 1e-12 for d in deltas)
     losses = sum(d < -1e-12 for d in deltas)
     ties = len(deltas) - wins - losses
@@ -342,17 +382,17 @@ class TraceStore:
                     "fail_class": c.fail_class,
                     "parent_id": c.parent_id,
                     "delta_vs_parent": c.delta_vs_parent,
-                    "metadata": c.metadata,
+                    "metadata": {"has_next_state": bool(c.metadata.get("has_next_state", False))},
                 }
                 for c in candidates
             ],
         }
         with self.path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False, sort_keys=True) + "\n")
+            f.write(json.dumps(record, ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n")
 
     def append_event(self, event: dict) -> None:
         with self.path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+            f.write(json.dumps(event, ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n")
 
     def load_pools(self) -> list[list[Candidate]]:
         if not self.path.exists():
@@ -387,14 +427,26 @@ class DreamRSIController:
         call_penalty: float = 0.01,
         parallel_bonus: float = 0.01,
     ):
-        if target_batch_size <= 0:
-            raise ValueError("target_batch_size must be > 0")
-        if pool_factor < 1.0:
-            raise ValueError("pool_factor must be >= 1.0")
+        for name, value in {
+            "target_batch_size": target_batch_size,
+            "evolve_interval": evolve_interval,
+            "mutation_count": mutation_count,
+            "holdout_pools": holdout_pools,
+            "min_holdout_pairs": min_holdout_pairs,
+        }.items():
+            if type(value) is not int or value < 1:
+                raise ValueError(f"{name} must be a positive integer")
+        if not math.isfinite(pool_factor) or pool_factor < 1.0:
+            raise ValueError("pool_factor must be finite and >= 1.0")
+        if min_holdout_pairs > holdout_pools:
+            raise ValueError("min_holdout_pairs cannot exceed holdout_pools")
+        if any(not math.isfinite(v) or v < 0 for v in (call_penalty, parallel_bonus)):
+            raise ValueError("objective coefficients must be finite and nonnegative")
         self.state_dir = Path(state_dir)
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.policy_path = self.state_dir / "policy.json"
         self.history_path = self.state_dir / "policy_history.jsonl"
+        self.evaluation_state_path = self.state_dir / "evaluation_state.json"
         self.trace = TraceStore(self.state_dir / "replay.jsonl")
         self.target_batch_size = int(target_batch_size)
         self.pool_factor = float(pool_factor)
@@ -406,6 +458,11 @@ class DreamRSIController:
         self.call_penalty = float(call_penalty)
         self.parallel_bonus = float(parallel_bonus)
         self.policy = self._load_policy()
+        state = (json.loads(self.evaluation_state_path.read_text(encoding="utf-8"))
+                 if self.evaluation_state_path.exists() else {})
+        self._last_evolution_pool_count = state.get("consumed_pool_count", 0)
+        if type(self._last_evolution_pool_count) is not int or self._last_evolution_pool_count < 0:
+            raise ValueError("invalid persisted replay cursor")
 
     @property
     def pool_target(self) -> int:
@@ -432,12 +489,18 @@ class DreamRSIController:
         score = float(reward.get("score", 0.0) if isinstance(reward, dict) else reward or 0.0)
         node_id = str(md.get("dream_node_id") or f"{session_id}:{turn}:{getattr(sample, 'index', 'na')}")
         parent_id = md.get("dream_parent_id")
+        status = getattr(sample, "status", "completed")
+        status = getattr(status, "value", status)
+        mask = getattr(sample, "loss_mask", None)
+        trainable = mask is None or any(value > 0 for value in mask)
+        valid = (not bool(getattr(sample, "remove_sample", False))
+                 and status in ("completed", "truncated") and trainable)
         return Candidate(
             node_id=node_id,
             session_id=session_id,
             turn=turn,
             score=score,
-            valid=not bool(getattr(sample, "remove_sample", False)),
+            valid=valid,
             fail_class=md.get("fail_class"),
             parent_id=str(parent_id) if parent_id else None,
             delta_vs_parent=float(md.get("delta_vs_parent", 0.0) or 0.0),
@@ -446,18 +509,11 @@ class DreamRSIController:
 
     def select_samples(self, samples: Sequence, rollout_id: int):
         candidates = [self._sample_to_candidate(s) for s in samples]
-        self.trace.append_pool(rollout_id, candidates)
         selected = select_candidates(candidates, self.target_batch_size, self.policy)
-        selected_ids = {c.node_id for c in selected}
-        out = [sample for sample, candidate in zip(samples, candidates) if candidate.node_id in selected_ids]
-        if len(out) < self.target_batch_size:
-            already = {id(x) for x in out}
-            for sample in samples:
-                if id(sample) not in already:
-                    out.append(sample)
-                    if len(out) >= self.target_batch_size:
-                        break
-        return out[: self.target_batch_size]
+        self.trace.append_pool(rollout_id, candidates)
+        by_id = {candidate.node_id: sample for sample, candidate in zip(samples, candidates)}
+        # Never pad a short valid batch with excluded or zero-mask samples.
+        return [by_id[c.node_id] for c in selected]
 
     def maybe_evolve(self, rollout_id: int) -> dict | None:
         if (rollout_id + 1) % self.evolve_interval != 0:
@@ -466,8 +522,35 @@ class DreamRSIController:
         if len(pools) < self.holdout_pools + 2:
             return None
 
-        train_pools = pools[:-self.holdout_pools]
+        if len(pools) < self._last_evolution_pool_count:
+            raise ValueError("replay trace was truncated behind its evaluation cursor")
+        if len(pools) - self._last_evolution_pool_count < self.holdout_pools:
+            return None  # Do not re-use holdout pools, including after restart.
         holdout = pools[-self.holdout_pools:]
+        if any(sum(c.valid for c in pool) < self.target_batch_size for pool in holdout):
+            return None
+        heldout_sessions = {c.session_id for pool in holdout for c in pool}
+        train_pools = [
+            [c for c in pool if c.session_id not in heldout_sessions]
+            for pool in pools[:-self.holdout_pools]
+        ]
+        train_pools = [pool for pool in train_pools
+                       if sum(c.valid for c in pool) >= self.target_batch_size]
+        if len(train_pools) < 2:
+            return None
+        # Each statistical pair must represent disjoint recorded sessions.
+        seen_sessions: set[str] = set()
+        for pool in holdout:
+            sessions = {c.session_id for c in pool}
+            if seen_sessions & sessions:
+                return None
+            seen_sessions.update(sessions)
+        # Claim this evaluation window before scoring. A failure consumes the
+        # window conservatively instead of allowing repeated attempts on it.
+        state_tmp = self.evaluation_state_path.with_suffix(".json.tmp")
+        state_tmp.write_text(json.dumps({"consumed_pool_count": len(pools)}) + "\n", encoding="utf-8")
+        os.replace(state_tmp, self.evaluation_state_path)
+        self._last_evolution_pool_count = len(pools)
         incumbent = self.policy
         incumbent_train = replay_policy(
             train_pools, incumbent, self.target_batch_size, self.call_penalty, self.parallel_bonus
@@ -514,8 +597,8 @@ class DreamRSIController:
             alpha=0.10,
         )
         if gate.promote:
-            self.policy = challenger
             self._write_policy(challenger)
+            self.policy = challenger
 
         event = {
             "type": "policy_evolution",
@@ -534,4 +617,4 @@ class DreamRSIController:
 
     def _append_history(self, event: dict) -> None:
         with self.history_path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+            f.write(json.dumps(event, ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n")

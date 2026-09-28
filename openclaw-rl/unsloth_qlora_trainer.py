@@ -227,7 +227,19 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--wandb-project", default=None)
     p.add_argument("--wandb-run-name", default=None)
 
-    return p.parse_args()
+    args = p.parse_args()
+    if args.dream_rsi_enable:
+        if not args.prm_enable:
+            p.error("--dream-rsi-enable requires --prm-enable and a reachable PRM server")
+        if not math.isfinite(args.dream_rsi_pool_factor) or args.dream_rsi_pool_factor < 1:
+            p.error("--dream-rsi-pool-factor must be finite and >= 1")
+        for name in ("rollout_batch_size", "dream_rsi_evolve_interval", "dream_rsi_mutations",
+                     "dream_rsi_holdout_pools", "dream_rsi_min_holdout_pairs"):
+            if getattr(args, name) < 1:
+                p.error(f"--{name.replace('_', '-')} must be positive")
+        if args.dream_rsi_min_holdout_pairs > args.dream_rsi_holdout_pools:
+            p.error("--dream-rsi-min-holdout-pairs cannot exceed --dream-rsi-holdout-pools")
+    return args
 
 
 # ---------------------------------------------------------------------------
@@ -954,6 +966,11 @@ def train(args: argparse.Namespace) -> None:
         if not samples:
             logger.warning("[train] rollout %d: no samples collected, skipping.", rollout_id)
             continue
+
+        if args.dream_rsi_enable and len(samples) < args.rollout_batch_size:
+            logger.warning("[dream-rsi] too few valid training candidates: %d/%d; skipping update",
+                           len(samples), args.rollout_batch_size)
+            continue  # All ranks see the same broadcast batch and skip together.
 
         # ── 6b. Train one GRPO update ─────────────────────────────────────────
         model.train()
