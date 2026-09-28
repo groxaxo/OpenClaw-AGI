@@ -1,0 +1,136 @@
+[
+  {
+    "response_chars": 200,
+    "response_sha256": "7b27e7eedf8b9aa018600ae27d0023ed7d8947e5104edbf8434e46a70075e9f4",
+    "result": {
+      "passed": 0,
+      "score": -1.0,
+      "task_id": "cdev_chunk_reverse",
+      "total": 3
+    },
+    "task_id": "cdev_chunk_reverse"
+  },
+  {
+    "response_chars": 238,
+    "response_sha256": "f8b64e096bd3a78e963af89ef564454dfb14f3209b1da087bd3cca031f20a3ce",
+    "result": {
+      "passed": 0,
+      "score": -1.0,
+      "task_id": "cdev_window_range",
+      "total": 3
+    },
+    "task_id": "cdev_window_range"
+  },
+  {
+    "response_chars": 587,
+    "response_sha256": "e8977da48836679a6565a6bbcb982fe7a449a95ea2a2872d6a044381850a92e9",
+    "result": {
+      "passed": 3,
+      "score": 1.0,
+      "task_id": "cdev_union_length",
+      "total": 3
+    },
+    "task_id": "cdev_union_length"
+  },
+  {
+    "response_chars": 721,
+    "response_sha256": "974592ac6365bc637ce6f1d3bf281ce57ad8401edd0fabd9a85bbcd52c3475a7",
+    "result": {
+      "error": "invalid syntax (<unknown>, line 1)",
+      "passed": 0,
+      "score": -1.0,
+      "task_id": "cdev_grid_min",
+      "total": 3
+    },
+    "task_id": "cdev_grid_min"
+  },
+  {
+    "response_chars": 217,
+    "response_sha256": "8410806519d5a5313f856c3d3a3589d89d4c2aec9c9a5fea455a3f94cf7480ec",
+    "result": {
+      "passed": 4,
+      "score": 1.0,
+      "task_id": "cdev_prefix_hits",
+      "total": 4
+    },
+    "task_id": "cdev_prefix_hits"
+  },
+  {
+    "response_chars": 296,
+    "response_sha256": "d463d6a52da9d43b44bf73476513e4301c2370c01352f06c9e7f06740bbf9c7e",
+    "result": {
+      "passed": 3,
+      "score": 1.0,
+      "task_id": "cdev_prev_smaller",
+      "total": 3
+    },
+    "task_id": "cdev_prev_smaller"
+  },
+  {
+    "response_chars": 349,
+    "response_sha256": "9bbfb35cbca6510fa5e7a1836355c7f50ccdfec77c7ebea138c72a5af91fc210",
+    "result": {
+      "passed": 4,
+      "score": 1.0,
+      "task_id": "cdev_run_lengths",
+      "total": 4
+    },
+    "task_id": "cdev_run_lengths"
+  },
+  {
+    "response_chars": 143,
+    "response_sha256": "7d38732af0f88c24691b23312298eca9c967f388166ea2d854db955404643c7f",
+    "result": {
+      "passed": 4,
+      "score": 1.0,
+      "task_id": "cdev_sum_except",
+      "total": 4
+    },
+    "task_id": "cdev_sum_except"
+  },
+  {
+    "response_chars": 509,
+    "response_sha256": "e0889b4d9a96ac608343d7456b56cf36e8c4d3d9bd5665b6444f83eb2ddd11b4",
+    "result": {
+      "passed": 3,
+      "score": 1.0,
+      "task_id": "ddev_rpn",
+      "total": 3
+    },
+    "task_id": "ddev_rpn"
+  },
+  {
+    "response_chars": 726,
+    "response_sha256": "5a48220724f14abfb9c42345767baee7f997daa132af65721d3f6f552ebc0876",
+    "result": {
+      "passed": 3,
+      "score": 1.0,
+      "task_id": "ddev_lru",
+      "total": 3
+    },
+    "task_id": "ddev_lru"
+  },
+  {
+    "response_chars": 724,
+    "response_sha256": "bc45091057774da240bd098905fb6dff7506b266a97aa7caa36ae4cc8ba8365d",
+    "result": {
+      "error": "invalid syntax (<unknown>, line 1)",
+      "passed": 0,
+      "score": -1.0,
+      "task_id": "ddev_bfs",
+      "total": 3
+    },
+    "task_id": "ddev_bfs"
+  },
+  {
+    "response_chars": 548,
+    "response_sha256": "5cc651b89462dc86ed68a71bb96e68117eb4927fa6c8a5666a9523895602bd48",
+    "result": {
+      "passed": 3,
+      "score": 1.0,
+      "task_id": "ddev_edit",
+      "total": 3
+    },
+    "task_id": "ddev_edit"
+  }
+]

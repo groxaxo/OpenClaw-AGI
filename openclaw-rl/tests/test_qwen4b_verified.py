@@ -129,3 +129,25 @@ class HarderRoundTests(unittest.TestCase):
         a=[{'task_id':str(i),'result':{'passed':20,'total':20}} for i in range(12)]
         self.assertTrue(promotion_gate(b,a)[0]['passed'])
         self.assertFalse(promotion_gate(a,a)[0]['passed'])
+
+class VerifiedRepairTests(unittest.TestCase):
+    def test_repair_curriculum_and_development_are_explicit(self):
+        from dream_rsi.qwen4b_repair import TRAIN,DEV,GUARDS
+        self.assertEqual((len(TRAIN),len(DEV),len(GUARDS)),(58,12,3))
+        self.assertFalse({x.task_id for x in TRAIN}&{x.task_id for x in DEV})
+        self.assertTrue(all(x.task_id.startswith('repair_dev_') for x in DEV))
+    def test_verified_self_output_is_preserved(self):
+        from dream_rsi.qwen4b_repair import TRAIN,choose_target
+        result=choose_target(TRAIN[0],{'response':'def solve(data): return data','result':{'passed':3,'total':3}})
+        self.assertEqual(result['target_source'],'verified_self_replay')
+        self.assertEqual(result['weight'],1.)
+        self.assertEqual(result['solution'],'def solve(data): return data')
+    def test_failed_output_is_replaced_by_reference(self):
+        from dream_rsi.qwen4b_repair import TRAIN,choose_target
+        result=choose_target(TRAIN[0],{'response':'broken','result':{'passed':0,'total':3}})
+        self.assertEqual(result['solution'],TRAIN[0].solution)
+        self.assertEqual(result['weight'],4.)
+        self.assertEqual(result['target_source'],'verified_reference_repair')
+    def test_empty_verified_output_rejected(self):
+        from dream_rsi.qwen4b_repair import TRAIN,choose_target
+        with self.assertRaises(ValueError):choose_target(TRAIN[0],{'response':'','result':{'passed':1,'total':1}})

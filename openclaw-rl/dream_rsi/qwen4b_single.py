@@ -20,12 +20,14 @@ import time
 
 from .coding_tasks import CodingTask, grade
 from .external_judge import ExternalJudgeGate, JudgeError, canonical, digest
-from .qwen4b_harder import TRAIN, DEV, GUARDS
+from .qwen4b_repair import TRAIN, DEV, GUARDS, choose_target
 from .qwen4b_validation import load_suite, promotion_gate
 
 def args():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--model-path",required=True)
+    p.add_argument("--warm-start",required=True)
+    p.add_argument("--warm-start-sha256",required=True)
     p.add_argument("--sealed-final",required=True)
     p.add_argument("--sealed-sha256",required=True)
     p.add_argument("--docker-image",required=True)
@@ -33,7 +35,7 @@ def args():
     p.add_argument("--test-report",required=True)
     p.add_argument("--max-epochs",type=int,default=6)
     p.add_argument("--min-epochs",type=int,default=2)
-    p.add_argument("--learning-rate",type=float,default=5e-5)
+    p.add_argument("--learning-rate",type=float,default=2e-5)
     p.add_argument("--max-new-tokens",type=int,default=256)
     p.add_argument("--judge-timeout",type=int,default=300)
     p.add_argument("--max-wall-seconds",type=int,default=2400)
@@ -99,11 +101,15 @@ def main():
         "max_new_tokens":a.max_new_tokens,"code_sha256":source_hash,"tests":tests,
         "docker_image":a.docker_image,
         "adaptive_rule":"training and checkpoint choice use DEV only; final base/challenger evaluation happens once after candidate selection",
-        "validation_scope":"in-domain coding smoke with new prompt wording and inputs, not unseen-algorithm generalization",
+        "validation_scope":"known prompt and algorithm families with new generated final inputs; not unseen-prompt, unseen-algorithm, or broad coding generalization",
         "training_method":"supervised QLoRA on reference solutions; not weight-level recursive algorithm discovery",
-        "experiment_round":2,
-        "prior_round_status":"rejected: easy confirmation 235/240 base vs231/240 candidate; no deployment",
-        "new_scope":"harder fixed in-domain distribution; never pooled with previous confirmation scores",
+        "experiment_round":3,
+        "warm_start_adapter_sha256":a.warm_start_sha256,
+        "warm_start_status":"experimental unpromoted DEV-selected checkpoint from rejected round 2",
+        "repair_method":"verify current responses on training cases; replay successful responses at weight1 and repair failures with reference targets at weight4",
+        "development_scope":"previously exposed round-2 confirmation cases are now development; templates and algorithm families explicitly overlap training",
+        "prior_round_status":"round1 rejected 235/240 vs231/240; round2 improved106/240 to146/240 but below fixed75%floor; neither deployed",
+        "new_scope":"known-task program correctness on newly generated final inputs; no unseen-task or broad-capability claim; do not pool trials",
         "guard_rule":"no per-task case-count regression on closed interval, bracket and coin development guards",
         "max_wall_seconds":a.max_wall_seconds,"max_eval_context_tokens":512,"max_training_tokens":768,
         "max_optimizer_updates":a.max_epochs,"physical_cuda_device":os.environ.get("CUDA_VISIBLE_DEVICES"),
@@ -129,6 +135,9 @@ def main():
     model=get_peft_model(model,LoraConfig(r=8,lora_alpha=16,lora_dropout=0.0,
         target_modules=["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"],
         task_type="CAUSAL_LM"))
+    warm=Path(a.warm_start).resolve()/"adapter_model.safetensors"
+    if not warm.is_file():raise RuntimeError("missing experimental warm-start adapter")
+    set_peft_model_state_dict(model,load_file(warm))
     tok=AutoTokenizer.from_pretrained(str(model_path),local_files_only=True)
     params=[p for p in model.parameters() if p.requires_grad]
     opt=torch.optim.AdamW(params,lr=a.learning_rate,weight_decay=0.0)
@@ -144,6 +153,7 @@ def main():
             h.update(name.encode());h.update(t.detach().cpu().contiguous().view(torch.uint8).numpy().tobytes())
         return h.hexdigest()
     initial_hash=adapter_hash()
+    if initial_hash!=a.warm_start_sha256:raise RuntimeError("warm-start adapter content mismatch")
 
     def prompt(desc):
         return tok.apply_chat_template([{"role":"user","content":
@@ -161,7 +171,7 @@ def main():
             response=tok.decode(out_ids[0,inputs["input_ids"].shape[1]:],skip_special_tokens=True)
             result=grade(task,response,a.docker_image)
             rec={"task_id":task.task_id,"result":result,
-                 "response_sha256":hashlib.sha256(response.encode()).hexdigest(),"response_chars":len(response)}
+                 "response_sha256":hashlib.sha256(response.encode()).hexdigest(),"response_chars":len(response),"response":response}
             records.append(rec)
             with (out/("responses-"+label+".jsonl")).open("a") as f:
                 f.write(canonical({**rec,"response":response})+"\n")
@@ -187,15 +197,30 @@ def main():
         baseline={x["task_id"]:x["result"] for x in guard0}
         return all(x["result"]["total"]==baseline[x["task_id"]]["total"] and
                    x["result"]["passed"]>=baseline[x["task_id"]]["passed"] for x in rows)
+    # No final-suite outcomes are evaluated or used to construct this data.
+    training_tasks=tuple(CodingTask(ex.task_id,ex.description,ex.cases) for ex in TRAIN)
+    current_training=evaluate(training_tasks,"TRAIN_CALIBRATION")
+    by_id={x["task_id"]:x for x in current_training}
+    repair_data=[choose_target(ex,by_id[ex.task_id]) for ex in TRAIN]
+    write("repair-dataset.json",repair_data)
+    dataset_summary={"examples":len(repair_data),"replay_examples":sum(x["target_source"]=="verified_self_replay" for x in repair_data),
+                     "repair_examples":sum(x["target_source"]=="verified_reference_repair" for x in repair_data),
+                     "sha256":digest(repair_data)}
+    write("repair-dataset-summary.json",dataset_summary)
+    event("repair_dataset_fixed",**dataset_summary)
+    total_weight=sum(x["weight"] for x in repair_data)
+    from types import SimpleNamespace
     best_acc=dev0s["case_accuracy"];best_epoch=0;history=[]
     for epoch in range(1,a.max_epochs+1):
         event("training_epoch_gradients",epoch=epoch)
         model.train();opt.zero_grad(set_to_none=True);losses=[]
-        for ex in TRAIN:
-            loss=loss_for(ex)/len(TRAIN);loss.backward();losses.append(float(loss.detach())*len(TRAIN))
+        for row in repair_data:
+            loss=loss_for(SimpleNamespace(**row))*row["weight"]/total_weight
+            loss.backward();losses.append(float(loss.detach())*total_weight/row["weight"])
         norm=torch.nn.utils.clip_grad_norm_(params,1.0,error_if_nonfinite=True)
         evidence={"manifest":manifest,"epoch":epoch,"mean_sft_loss":sum(losses)/len(losses),
             "gradient_norm":float(norm),"dev_before":dev0s if not history else history[-1]["dev"],
+            "repair_dataset":dataset_summary,
             "adapter_before":adapter_hash(),
             "guard_before":guard0 if not history else history[-1]["guard_records"],
             "proposed_action":"one optimizer step; sealed-suite result is deliberately absent"}
@@ -220,8 +245,8 @@ def main():
         history.append(item);write(f"epoch-{epoch}.json",item)
         if guard_passed and ds["case_accuracy"]>best_acc+1e-12:
             best_acc=ds["case_accuracy"];best_epoch=epoch
-        target=max(0.88,min(0.98,dev0s["case_accuracy"]+0.12))
-        if epoch>=a.min_epochs and (best_acc>=target or (best_epoch>0 and epoch-best_epoch>=2)):break
+        target=max(0.80,min(0.92,dev0s["case_accuracy"]+0.12))
+        if epoch>=a.min_epochs and best_acc>=target:break
 
     if best_epoch==0:
         write("report.json",{"validation_status":"NOT_OK","reason":"no DEV improvement",

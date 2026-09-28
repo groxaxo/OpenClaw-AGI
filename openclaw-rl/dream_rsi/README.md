@@ -150,3 +150,28 @@ update, and source/evidence hashes. The second round uses learning rate 5e-5
 and at most six full-batch updates, with matched 256-token evaluation budgets.
 It measures adaptation within a trained algorithm distribution, not unseen
 algorithm discovery, broad capability, or a statistically significant effect.
+
+### Third round: verified repairs and preservation of correct answers
+
+Round 2 measured a genuine 106/240 to 146/240 gain (+16.67 percentage points),
+two complete-task wins and zero losses, but failed the unchanged 75% final
+accuracy floor. It remains rejected and was never deployed.
+
+The third round starts from round 2's experimental DEV-selected adapter, not
+an activated serving model. It collects the current model's answers to 58
+training prompts and tests them. Verified correct answers become self-replay
+SFT targets at weight 1; failures use independently verified reference targets
+at weight 4. This avoids replacing every already-correct answer with a different
+human coding style. The derived dataset is fixed and hashed before updates.
+
+The earlier confirmation prompts/cases are explicitly reclassified as
+**development**. The third final input set is generated and hashed before the
+run. Prompt and algorithm families overlap training, so the supported claim is
+known-task program correctness on new generated inputs, not unseen-task or
+broad coding generalization. All attempted rounds remain in the audit trail.
+
+Third-round learning rate is 2e-5, at most six full-batch optimizer updates,
+with independent Muse max approval before each one, preservation of the warm
+checkpoint's guard case counts, and the same deterministic promotion criteria.
+The original official base remains the confirmation comparator and the active
+production model remains untouched. No threshold is relaxed to force a PASS.

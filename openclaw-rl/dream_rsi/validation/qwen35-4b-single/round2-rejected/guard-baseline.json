@@ -1,0 +1,35 @@
+[
+  {
+    "response_chars": 284,
+    "response_sha256": "2b6b688a68e60d1cfea1ecdd8647b3c7698c0a0d47bf31054d139d3d7fc6d1b4",
+    "result": {
+      "passed": 3,
+      "score": 0.5,
+      "task_id": "guard_closed_merge",
+      "total": 4
+    },
+    "task_id": "guard_closed_merge"
+  },
+  {
+    "response_chars": 394,
+    "response_sha256": "bd5025beaa20067ad6d3fe4e8efd3ab1dc467d1540c25f7acf5ab30d691088e0",
+    "result": {
+      "passed": 4,
+      "score": 1.0,
+      "task_id": "guard_brackets",
+      "total": 4
+    },
+    "task_id": "guard_brackets"
+  },
+  {
+    "response_chars": 439,
+    "response_sha256": "a281ce533a3d2b04e6919181bab037b7b6bd79b7f25e38f51385878fa48664a8",
+    "result": {
+      "passed": 2,
+      "score": 0.33333333333333326,
+      "task_id": "guard_coins",
+      "total": 3
+    },
+    "task_id": "guard_coins"
+  }
+]
