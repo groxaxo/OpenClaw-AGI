@@ -80,6 +80,7 @@ class ReplayMetrics:
     objective: float
     best_score: float
     mean_score: float
+    mean_abs_score: float
     selected: int
     rounds: int
     distinct_sessions: int
@@ -146,7 +147,7 @@ def select_candidates(candidates: Sequence[Candidate], target: int, policy: Poli
     def exploit_key(c: Candidate):
         f = features[c.node_id]
         utility = (
-            policy.score_weight * c.score
+            policy.score_weight * (0.80 * abs(c.score) + 0.20 * c.score)
             + policy.delta_weight * f["delta"]
             - policy.depth_penalty * f["depth"] * (1.0 - 0.5 * policy.beta)
         )
@@ -207,17 +208,28 @@ def objective(
     parallel_bonus: float = 0.01,
 ) -> ReplayMetrics:
     if not selected:
-        return ReplayMetrics(-math.inf, -math.inf, -math.inf, 0, max(1, rounds), 0, 0.0)
+        return ReplayMetrics(-math.inf, -math.inf, -math.inf, -math.inf, 0, max(1, rounds), 0, 0.0)
     scores = [float(c.score) for c in selected]
     best = max(scores)
     mean = statistics.fmean(scores)
+    mean_abs = statistics.fmean(abs(s) for s in scores)
     n = len(selected)
     k = max(1, int(rounds))
     distinct = len({c.session_id for c in selected})
     positive = sum(1 for s in scores if s > 0) / n
     diversity = distinct / n
-    value = best - call_penalty * n + parallel_bonus * (n / k) + 0.05 * diversity
-    return ReplayMetrics(value, best, mean, n, k, distinct, positive)
+    # With OpenClaw's {-1, 0, +1} PRM, max(score) saturates quickly.  Keep
+    # Dream-RSI's best/compute/parallel structure, but add training-signal
+    # informativeness and a small diversity term so replay remains meaningful.
+    value = (
+        best
+        + 0.25 * mean_abs
+        + 0.05 * mean
+        - call_penalty * n
+        + parallel_bonus * (n / k)
+        + 0.05 * diversity
+    )
+    return ReplayMetrics(value, best, mean, mean_abs, n, k, distinct, positive)
 
 
 def replay_policy(
