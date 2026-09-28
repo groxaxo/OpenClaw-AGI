@@ -418,3 +418,26 @@ We sincerely thank these projects for their valuable insights and high-quality i
 ---
 
 
+
+
+---
+
+## 🧠 Experimental Dream-RSI meta-controller
+
+This fork now includes an optional **Dream-RSI-inspired frozen-replay controller** for the OpenClaw-RL path. It is based on the public Dream-RSI paper mechanics; it is **not** Google's unreleased reference implementation.
+
+When enabled, OpenClaw-RL collects a larger PRM-scored candidate pool, persists a compact content-free replay trace, selects a GRPO curriculum through an exploit/explore/recover policy, generates bounded challenger policies offline, and only promotes a challenger after a paired holdout gate.
+
+The feature is default-off, so existing recipes are unchanged.
+
+```bash
+python openclaw-rl/unsloth_qlora_trainer.py \
+  ...existing arguments... \
+  --dream-rsi-enable \
+  --dream-rsi-pool-factor 2.0 \
+  --dream-rsi-evolve-interval 8 \
+  --dream-rsi-mutations 24 \
+  --dream-rsi-holdout-pools 4
+```
+
+Implementation notes, state layout, offline replay, and guardrails are documented in [`openclaw-rl/dream_rsi/README.md`](./openclaw-rl/dream_rsi/README.md).
