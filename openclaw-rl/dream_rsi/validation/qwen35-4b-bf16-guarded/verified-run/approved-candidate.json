@@ -1,0 +1,38 @@
+{
+  "adapter_file_sha256": "2f0816a757b0d2405578bb0238e8fab1459cbbc1134c2d7f80995f0a24cb31e1",
+  "adapter_path": "/home/op/dream-qwen4b-guarded.3ZPNcF/run-003/epoch-1",
+  "adapter_tensor_state_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+  "after": {
+    "case_accuracy": 0.85,
+    "complete_tasks": 10,
+    "passed_cases": 204,
+    "task_count": 12,
+    "total_cases": 240
+  },
+  "base_path": "/home/op/dream-qwen4b-guarded.3ZPNcF/model/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "before": {
+    "case_accuracy": 0.7333333333333333,
+    "complete_tasks": 8,
+    "passed_cases": 176,
+    "task_count": 12,
+    "total_cases": 240
+  },
+  "code_sha256": "957a2b99598b74389888916f7781c105b50df4b529531c9d9fb48f6e36b21fea",
+  "cold_reproduction_passed": true,
+  "gate": {
+    "case_gain": 0.1166666666666667,
+    "complete_task_losses": 0,
+    "complete_task_wins": 2,
+    "development_guards_passed": true,
+    "final_case_accuracy": 0.85,
+    "passed": true
+  },
+  "model": "Qwen/Qwen3.5-4B",
+  "physical_gpu": 0,
+  "production_deployed": false,
+  "review_count": 5,
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "scope": "known-prompt, in-domain supervised BF16 LoRA; not production deployment or general RSI",
+  "status": "PASS",
+  "test_count": 100
+}
