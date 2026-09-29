@@ -1,0 +1,322 @@
+[
+  {
+    "accepted_scale": 1.0,
+    "adapter_sha256": "6ce092229e48e3d503966896421b2043512992563715740944afcbaa8ce82540",
+    "checkpoint_roundtrip_exact": true,
+    "dev": {
+      "case_accuracy": 0.7541666666666667,
+      "complete_tasks": 8,
+      "passed_cases": 181,
+      "task_count": 12,
+      "total_cases": 240
+    },
+    "epoch": 1,
+    "gradient_norm": 0.4525018036365509,
+    "guard_passed": true,
+    "guard_records": [
+      {
+        "response": "def solve(data):\n    data.sort()\n    if not data:\n        return []\n    merged = [data[0]]\n    for a, b in data[1:]:\n        if a <= merged[-1][1]:\n            merged[-1] = (merged[-1][0], max(merged[-1][1], b))\n        else:\n            merged.append((a, b))\n    return merged\n",
+        "response_chars": 278,
+        "response_sha256": "413529d57efdf9646c0c2fa2c66777ad8732d1861151214bc137d3d7526b13cc",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_closed_merge",
+          "total": 4
+        },
+        "task_id": "guard_closed_merge"
+      },
+      {
+        "response": "def solve(data):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    for char in data:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or stack[-1] != pairs[char]:\n                return False\n            stack.pop()\n    return not stack\n",
+        "response_chars": 310,
+        "response_sha256": "e37a46dc0606d7407ae3344062f5aeece3d2a56a6edde43a74f7de3719fd1713",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_brackets",
+          "total": 4
+        },
+        "task_id": "guard_brackets"
+      },
+      {
+        "response": "def solve(data):\n    coins, amount = data\n    if amount == 0:\n        return 0\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for coin in coins:\n        if coin <= 0:\n            continue\n        for i in range(coin, amount + 1):\n            dp[i] = min(dp[i], dp[i - coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1\n",
+        "response_chars": 349,
+        "response_sha256": "a6586ece83fdd4079bb085b5981ddb2b19deb3687dd45c1f0df464d1e071b27b",
+        "result": {
+          "passed": 3,
+          "score": 1.0,
+          "task_id": "guard_coins",
+          "total": 3
+        },
+        "task_id": "guard_coins"
+      }
+    ],
+    "line_search": [
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 1.0
+      }
+    ],
+    "mean_sft_loss": 0.12170874107901969,
+    "proposal_accepted": true,
+    "review_id": "432de7501993585b4126b8495d1ed31bae30c70dedf551a460f3bdcce13fd4ca"
+  },
+  {
+    "accepted_scale": 1.0,
+    "adapter_sha256": "6d205217702709bac50bdbc3d787134d2f0ab8d7fa55166cfe1e7d15bc9e9d45",
+    "checkpoint_roundtrip_exact": true,
+    "dev": {
+      "case_accuracy": 0.7625,
+      "complete_tasks": 8,
+      "passed_cases": 183,
+      "task_count": 12,
+      "total_cases": 240
+    },
+    "epoch": 2,
+    "gradient_norm": 0.3410247266292572,
+    "guard_passed": true,
+    "guard_records": [
+      {
+        "response": "def solve(data):\n    data.sort()\n    if not data:\n        return []\n    merged = [data[0]]\n    for a, b in data[1:]:\n        if a <= merged[-1][1]:\n            merged[-1] = (merged[-1][0], max(merged[-1][1], b))\n        else:\n            merged.append((a, b))\n    return merged\n",
+        "response_chars": 278,
+        "response_sha256": "413529d57efdf9646c0c2fa2c66777ad8732d1861151214bc137d3d7526b13cc",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_closed_merge",
+          "total": 4
+        },
+        "task_id": "guard_closed_merge"
+      },
+      {
+        "response": "def solve(data):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    for char in data:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or stack[-1] != pairs[char]:\n                return False\n            stack.pop()\n    return not stack\n",
+        "response_chars": 310,
+        "response_sha256": "e37a46dc0606d7407ae3344062f5aeece3d2a56a6edde43a74f7de3719fd1713",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_brackets",
+          "total": 4
+        },
+        "task_id": "guard_brackets"
+      },
+      {
+        "response": "def solve(data):\n    coins, amount = data\n    if amount == 0:\n        return 0\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for coin in coins:\n        if coin <= 0:\n            continue\n        for i in range(coin, amount + 1):\n            dp[i] = min(dp[i], dp[i - coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1\n",
+        "response_chars": 349,
+        "response_sha256": "a6586ece83fdd4079bb085b5981ddb2b19deb3687dd45c1f0df464d1e071b27b",
+        "result": {
+          "passed": 3,
+          "score": 1.0,
+          "task_id": "guard_coins",
+          "total": 3
+        },
+        "task_id": "guard_coins"
+      }
+    ],
+    "line_search": [
+      {
+        "dev": {
+          "case_accuracy": 0.7625,
+          "complete_tasks": 8,
+          "passed_cases": 183,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 1.0
+      }
+    ],
+    "mean_sft_loss": 0.1151883390137628,
+    "proposal_accepted": true,
+    "review_id": "f017da29f68b4156eb6710a5ec5516462177994f9d36320ace7c20c20c4cfe9a"
+  },
+  {
+    "accepted_scale": 0.0,
+    "adapter_sha256": "6d205217702709bac50bdbc3d787134d2f0ab8d7fa55166cfe1e7d15bc9e9d45",
+    "checkpoint_roundtrip_exact": true,
+    "dev": {
+      "case_accuracy": 0.7625,
+      "complete_tasks": 8,
+      "passed_cases": 183,
+      "task_count": 12,
+      "total_cases": 240
+    },
+    "epoch": 3,
+    "gradient_norm": 0.21792717278003693,
+    "guard_passed": true,
+    "guard_records": [
+      {
+        "response": "def solve(data):\n    data.sort()\n    if not data:\n        return []\n    merged = [data[0]]\n    for a, b in data[1:]:\n        if a <= merged[-1][1]:\n            merged[-1] = (merged[-1][0], max(merged[-1][1], b))\n        else:\n            merged.append((a, b))\n    return merged\n",
+        "response_chars": 278,
+        "response_sha256": "413529d57efdf9646c0c2fa2c66777ad8732d1861151214bc137d3d7526b13cc",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_closed_merge",
+          "total": 4
+        },
+        "task_id": "guard_closed_merge"
+      },
+      {
+        "response": "def solve(data):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    for char in data:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or stack[-1] != pairs[char]:\n                return False\n            stack.pop()\n    return not stack\n",
+        "response_chars": 310,
+        "response_sha256": "e37a46dc0606d7407ae3344062f5aeece3d2a56a6edde43a74f7de3719fd1713",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_brackets",
+          "total": 4
+        },
+        "task_id": "guard_brackets"
+      },
+      {
+        "response": "def solve(data):\n    coins, amount = data\n    if amount == 0:\n        return 0\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for coin in coins:\n        if coin <= 0:\n            continue\n        for i in range(coin, amount + 1):\n            dp[i] = min(dp[i], dp[i - coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1\n",
+        "response_chars": 349,
+        "response_sha256": "a6586ece83fdd4079bb085b5981ddb2b19deb3687dd45c1f0df464d1e071b27b",
+        "result": {
+          "passed": 3,
+          "score": 1.0,
+          "task_id": "guard_coins",
+          "total": 3
+        },
+        "task_id": "guard_coins"
+      }
+    ],
+    "line_search": [
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 1.0
+      },
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 0.5
+      },
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 0.25
+      }
+    ],
+    "mean_sft_loss": 0.10320687374185016,
+    "proposal_accepted": false,
+    "review_id": "a7ef5e54ca991f69a247f3c6bf35e886219b701834f575a40f6363edfed29f72"
+  },
+  {
+    "accepted_scale": 0.0,
+    "adapter_sha256": "6d205217702709bac50bdbc3d787134d2f0ab8d7fa55166cfe1e7d15bc9e9d45",
+    "checkpoint_roundtrip_exact": true,
+    "dev": {
+      "case_accuracy": 0.7625,
+      "complete_tasks": 8,
+      "passed_cases": 183,
+      "task_count": 12,
+      "total_cases": 240
+    },
+    "epoch": 4,
+    "gradient_norm": 0.21795861423015594,
+    "guard_passed": true,
+    "guard_records": [
+      {
+        "response": "def solve(data):\n    data.sort()\n    if not data:\n        return []\n    merged = [data[0]]\n    for a, b in data[1:]:\n        if a <= merged[-1][1]:\n            merged[-1] = (merged[-1][0], max(merged[-1][1], b))\n        else:\n            merged.append((a, b))\n    return merged\n",
+        "response_chars": 278,
+        "response_sha256": "413529d57efdf9646c0c2fa2c66777ad8732d1861151214bc137d3d7526b13cc",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_closed_merge",
+          "total": 4
+        },
+        "task_id": "guard_closed_merge"
+      },
+      {
+        "response": "def solve(data):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    for char in data:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or stack[-1] != pairs[char]:\n                return False\n            stack.pop()\n    return not stack\n",
+        "response_chars": 310,
+        "response_sha256": "e37a46dc0606d7407ae3344062f5aeece3d2a56a6edde43a74f7de3719fd1713",
+        "result": {
+          "passed": 4,
+          "score": 1.0,
+          "task_id": "guard_brackets",
+          "total": 4
+        },
+        "task_id": "guard_brackets"
+      },
+      {
+        "response": "def solve(data):\n    coins, amount = data\n    if amount == 0:\n        return 0\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for coin in coins:\n        if coin <= 0:\n            continue\n        for i in range(coin, amount + 1):\n            dp[i] = min(dp[i], dp[i - coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1\n",
+        "response_chars": 349,
+        "response_sha256": "a6586ece83fdd4079bb085b5981ddb2b19deb3687dd45c1f0df464d1e071b27b",
+        "result": {
+          "passed": 3,
+          "score": 1.0,
+          "task_id": "guard_coins",
+          "total": 3
+        },
+        "task_id": "guard_coins"
+      }
+    ],
+    "line_search": [
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 1.0
+      },
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 0.5
+      },
+      {
+        "dev": {
+          "case_accuracy": 0.7541666666666667,
+          "complete_tasks": 8,
+          "passed_cases": 181,
+          "task_count": 12,
+          "total_cases": 240
+        },
+        "guards_preserved": true,
+        "scale": 0.25
+      }
+    ],
+    "mean_sft_loss": 0.10320687374185016,
+    "proposal_accepted": false,
+    "review_id": "e0bfb212108f3d909cad004f0e8629827c2d50a03dcbcb0b64fe2a636a01f973"
+  }
+]

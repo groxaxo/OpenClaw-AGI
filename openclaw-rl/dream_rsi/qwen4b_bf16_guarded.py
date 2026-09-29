@@ -23,6 +23,7 @@ from .coding_tasks import CodingTask, extract_code, grade
 from .external_judge import ExternalJudgeGate, JudgeError, canonical, digest
 from .qwen4b_repair import TRAIN, DEV, GUARDS, choose_target
 from .qwen4b_validation import load_suite, promotion_gate
+from .qwen4b_replay_verification import verification_tasks, make_target, complete_tasks_preserved
 
 def accept_public_update(guards_passed, old, new):
     """Never trade public guard regressions for aggregate DEV improvements."""
@@ -109,13 +110,13 @@ def main():
         "learning_rate":a.learning_rate,"min_epochs":a.min_epochs,"max_epochs":a.max_epochs,
         "max_new_tokens":a.max_new_tokens,"code_sha256":source_hash,"tests":tests,
         "docker_image":a.docker_image,
-        "adaptive_rule":"proposed adapter deltas 1,0.5,0.25 evaluated on public guards and DEV only; accept first with zero guard regression and nondecreasing DEV; else revert and halve LR; confirmation used once after candidate fixed",
+        "adaptive_rule":"proposed deltas1,.5,.25; require named guards, zero loss of any incumbent complete DEV task, nondecreasing aggregate DEV; otherwise revert and halve LR; confirmation used only after candidate fixed",
         "validation_scope":"known prompt and algorithm families with new generated final inputs; not unseen-prompt, unseen-algorithm, or broad coding generalization",
         "training_method":"supervised BF16 LoRA on verified self-replay and repairs; not weight-level recursive algorithm discovery",
-        "experiment_round":4,
+        "experiment_round":5,
         "base_precision":"frozen original BF16 weights",
         "warm_start_status":"none; start from original base",
-        "repair_method":"verified exact self-replay weight4, canonical verified reference repairs weight4, verified guard replay weight16",
+        "repair_method":"verbatim successful responses, including fences; self-replay must pass pooled public cases from equivalent reference-AST aliases and exact-description DEV; repairs verified on the same stronger tests; replay4/repair4/guard16",
         "development_scope":"previously exposed round-2 confirmation cases are now development; templates and algorithm families explicitly overlap training",
         "prior_round_status":"round1 rejected 235/240 vs231/240; round2 improved106/240 to146/240 but below fixed75%floor; neither deployed",
         "new_scope":"known-task program correctness on newly generated final inputs; no unseen-task or broad-capability claim; do not pool trials",
@@ -205,21 +206,25 @@ def main():
     training_tasks=tuple(CodingTask(ex.task_id,ex.description,ex.cases) for ex in TRAIN)
     current_training=evaluate(training_tasks,"TRAIN_CALIBRATION")
     by_id={x["task_id"]:x for x in current_training}
+    strong_tasks=verification_tasks(TRAIN,DEV)
     repair_data=[]
     for ex in TRAIN:
-        record=by_id[ex.task_id]
-        correct=record["result"]["passed"]==record["result"]["total"]
-        code=extract_code(record["response"]) if correct else ast.unparse(ast.parse(ex.solution))+"\n"
-        verification=grade(CodingTask(ex.task_id,ex.description,ex.cases),code,a.docker_image)
+        record=dict(by_id[ex.task_id])
+        verification_task=strong_tasks[ex.task_id]
+        strong_result=grade(verification_task,record["response"],a.docker_image)
+        correct=strong_result["passed"]==strong_result["total"]
+        code=make_target(record["response"],correct,ex.solution)
+        verification=grade(verification_task,code,a.docker_image)
         if verification["passed"]!=verification["total"]:raise RuntimeError("unverified training target: "+ex.task_id)
+        record["result"]=strong_result
         row=choose_target(ex,record)
-        row.update(solution=code,weight=4.0)
+        row.update(solution=code,weight=4.0,public_verification_cases=verification["total"],verbatim_replay=correct)
         repair_data.append(row)
     for task,record in zip(GUARDS,guard0):
         if record["result"]["passed"]!=record["result"]["total"]:
             raise RuntimeError("BF16 baseline must solve all guard cases before guarded training")
         repair_data.append({"task_id":"preserve_"+task.task_id,"description":task.description,
-           "solution":extract_code(record["response"]),"weight":16.0,"target_source":"verified_guard_replay",
+           "solution":record["response"],"weight":16.0,"target_source":"verified_guard_replay",
            "prior_passed":record["result"]["passed"],"prior_total":record["result"]["total"]})
     write("repair-dataset.json",repair_data)
     dataset_summary={"examples":len(repair_data),"replay_examples":sum(x["target_source"]=="verified_self_replay" for x in repair_data),
@@ -266,7 +271,8 @@ def main():
             if passed:
                 trial_dev=evaluate(DEV,f"DEV{epoch}-scale{scale}")
                 entry["dev"]=score(trial_dev)
-                if accept_public_update(passed,score(incumbent_dev),entry["dev"]):
+                entry["incumbent_complete_tasks_preserved"]=complete_tasks_preserved(incumbent_dev,trial_dev)
+                if entry["incumbent_complete_tasks_preserved"] and accept_public_update(passed,score(incumbent_dev),entry["dev"]):
                     accepted=True;accepted_scale=scale
                     incumbent_state=snapshot();incumbent_dev=trial_dev;incumbent_guard=trial_guard
             line_search.append(entry)

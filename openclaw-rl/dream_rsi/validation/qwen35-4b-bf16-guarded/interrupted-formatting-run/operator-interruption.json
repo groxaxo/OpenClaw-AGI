@@ -1,0 +1,16 @@
+{
+  "confirmation_consumed": false,
+  "reason": "Stop before final confirmation to correct non-exact self-replay target formatting; public development plateaued and full/smaller proposals regressed. No final-suite outputs were computed.",
+  "status": "INTERRUPTED_NOT_PROMOTED",
+  "terminated_owned_processes": [
+    [
+      1161552,
+      "training"
+    ],
+    [
+      1240047,
+      "reviewer"
+    ]
+  ],
+  "timestamp": 1790647069.3322783
+}

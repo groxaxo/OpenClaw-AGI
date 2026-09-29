@@ -53,3 +53,32 @@ configuration are tied to the source hash in the preregistration evidence.
 No GitHub Actions, service restarts or model deletion were used. All model work
 runs on one RTX 3090 on the authorized .51 host, reached through Desktop
 Commander's Mac connection and SSH because the direct .51 agent is offline.
+
+## Verbatim replay and stronger verification correction
+
+The first BF16 attempt was interrupted before final confirmation. Four approved
+optimizer proposals completed: DEV 174/240 to 181/240 to 183/240, followed by two
+rejected proposals. The incumbent was preserved and no final suite was consumed.
+
+A read-only Muse diagnosis and direct data audit found that eight correct replay
+answers had their Markdown fences stripped. Every successful response also had
+outer whitespace normalized. This was not exact response replay. Separately, a
+naive previous-smaller-element program passed its two sparse training cases but
+failed broader already-public development cases, so it was incorrectly reused
+as a successful target.
+
+The corrected continuation preserves successful raw responses verbatim. It
+groups training aliases by identical reference-program AST, pools their cases
+with exact-description public DEV cases, and verifies replay and repair targets
+on those stronger checks. This uses public DEV during dataset construction and
+therefore supports only the explicitly stated known-task/in-domain claim.
+
+The public line search additionally refuses to lose any incumbent fully solved
+DEV task, even if aggregate accuracy rises. The final promotion thresholds were
+not weakened. These are combined correctness improvements, not a single-factor
+causal experiment.
+
+100 tests and all 58 reference programs passed the expanded 594 case checks
+(some inputs are shared across alias programs). The same preregistered final
+suite remains unconsumed and will be evaluated only after candidate selection.
+Current run evidence will be recorded before any PASS claim or merge.
