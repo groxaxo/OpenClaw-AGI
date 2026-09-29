@@ -1,0 +1,11 @@
+{
+  "status": "BLOCKED_RESOURCE",
+  "reason": "selected GPU lacks 12 GiB headroom",
+  "optimizer_proposals": 0,
+  "model_loaded": false,
+  "confirmation_consumed": false,
+  "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+  "accepted_parent_file_unchanged": true,
+  "successful_promotions": 1,
+  "other_gpu_jobs_stopped": false
+}

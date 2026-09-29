@@ -1,0 +1,21 @@
+{
+  "hypothesis": "The epoch-1 full-batch AdamW direction is dominated by 9 repair examples at weight 12.0 (~108/352 of gradient weight) while already-solved RPN and LRU each contribute only two near-zero-loss replay examples at weight 4.0 (~8/352 per family) in a shared r=8 LoRA subspace; each family is anchored by two divergent verbatim implementations (RPN list-membership vs string-membership; LRU OrderedDict vs manual dict+order) while DEV0 matches only the alias form, so the anchor is split and the incumbent sits in a narrow basin where one program-token flip loses all 40 cases, which is why scale 1.0 breaks RPN via data.split() and scales 0.5/0.25 break LRU via data[1:] plus pop() with no jointly-preserving point on the same segment.",
+  "next_controlled_change": "If the current run plateaus with best_epoch==0 after min/max epochs, start one fresh identical single-GPU continuation changing only --repair-weight from 12.0 to 8.0, keeping LR 5e-5 with same halve-on-reject, r=8 targets, 1.0/0.5/0.25 line search, replay 4.0/guard 16.0, promotion gate, immediate-parent comparator, Qwen3.5-4B BF16 LoRA, one-GPU rule, and sealed-after-DEV-only evaluation unchanged, to test whether a less repair-dominated direction preserves RPN/LRU while still allowing DEV gain.",
+  "observations": [
+    "DEV0 is 372/435 cases and 10/12 complete tasks; only failures are repair_dev_hard_confirm_range 0/32 and repair_dev_hard_confirm_sum 2/33, while RPN and LRU are 40/40 each.",
+    "Repair dataset is 61 examples: 49 self-replay at 4.0, 9 reference-repair at 12.0, 3 guard-replay at 16.0, total weight 352, so each replay is ~1.1% and each repair ~3.4% of the full-batch gradient.",
+    "RPN has two divergent replay targets: d_rpn uses list membership while repair_alias_rpn uses string membership; DEV0 RPN matches the alias string form.",
+    "LRU has two divergent replay targets: d_lru uses OrderedDict/move_to_end while repair_alias_lru uses dict plus order list with pop(0); DEV0 LRU matches the manual alias form.",
+    "Epoch 1 took one full-batch AdamW step with r=8, LR 5e-5, mean_sft_loss 0.20866, grad_norm 1.01585, then rejected all scales with 332/435 cases, 9 complete, guards_preserved true, incumbent_complete_tasks_preserved false.",
+    "Scale 1.0 loses RPN 40 to 0 via for token in data.split() versus baseline for token in data, while LRU stays 40/40.",
+    "Scales 0.5 and 0.25 preserve RPN 40/40 but lose LRU 40 to 0 via for op in data[1:] and order.pop() versus baseline operations=data[1] with order.pop(0).",
+    "Guards stay 11/11 at all scales; all other DEV scores are unchanged except smaller which changes implementation but stays 35/35 at scale 1.0.",
+    "Source interpolates incumbent+scale*(proposal-incumbent) and halves LR after full rejection, so the 0.25 trial already tests about one-quarter magnitude along the same direction and still breaks a solved family."
+  ],
+  "risks": [
+    "Lowering repair weight may slow or prevent fixing range 0/32 and sum 2/33, leaving best_epoch==0 again.",
+    "RPN/LRU may remain single-token brittle even with rebalanced gradients, so this one change may still revert and need a separate anchor/data experiment.",
+    "Repeated DEV-steered reruns can overfit the 12 public DEV aliases; sealed suite must stay post-hoc after candidate fixing with no retries on its result.",
+    "Changing the promotion gate, immediate-parent comparator, model, one-GPU rule, or final-test independence alongside this weight would break comparability to the approved parent."
+  ]
+}
