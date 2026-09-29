@@ -53,9 +53,49 @@ pinned model, retired parent suite hash and fresh confirmation hash. The script
 rejects multiple GPU selectors, locks its GPU, runs tests first, applies a hard
 runtime limit, and does not deploy or alter an existing model server.
 
-## Current state
+## Measured continuation results
 
-Generation 1 is verified. The first continuation is prepared; no generation-2
-success is claimed until its measured report, reviewer receipts and cold
-reproduction are recorded. Machine-readable lineage evidence will be kept
-under `validation/qwen35-4b-chain/`.
+Generation 1 remains the accepted checkpoint. Its original confirmation result
+was 176/240 -> 204/240 (73.33% -> 85.00%), two complete-family wins and no losses,
+with cold reproduction; the next generation is not compared to that original
+base again.
+
+The first completed continuation loaded that approved checkpoint and executed
+four separately Muse-approved optimizer proposals on GPU 0. Public development
+remained **372/435 -> 372/435**, with ten of twelve families fully solved. The
+first two proposals and all their line-search alternatives were rejected for
+losing previously solved families. The third half-sized and fourth full-sized
+updates preserved results but added no correct cases. They are not successful
+promotions. The run returned `NOT_OK: no DEV improvement` before consuming the
+registered confirmation suite. The approved parent was not overwritten.
+
+A second bounded continuation is now testing one factor: reference-repair weight
+8 instead of 12. Initial learning rate remains **2.5e-5**, not 5e-5; all other
+model, comparator, GPU, line-search, epoch, and promotion rules are unchanged.
+This variant is motivated by a read-only public-data diagnosis of interference
+with already-correct RPN/LRU outputs, not by final-suite outcomes. Its result is
+pending and is not included in the successful-generation count. Both variants
+are public-development search within one heldout evaluation opportunity, not
+two independent final-test trials.
+
+An initial setup was interrupted before any optimizer step to align public
+stopping with the fixed two-family promotion requirement. No confirmation
+outcomes were consumed by that correction. Its record is retained separately.
+
+Evidence: `validation/qwen35-4b-chain/`. Completed rejected trials retain their
+reports, configuration, reviewer receipts, and acceptance-integrity audit.
+The JSON lineage separates one verified successful generation, completed
+rejections, setup interruptions, and pending work. An integrity-audit PASS means
+the audit agrees with the rejection; it does not turn that model run into a PASS.
+
+## Validation of this continuation implementation
+
+120 unit/regression tests passed. All 58 reference programs passed 1,010 expanded
+public case checks, and the 240 generated confirmation gold answers agreed with
+independent reference programs. These are evaluator/data checks, not model
+performance scores. The one-GPU launcher CHECK_ONLY path, syntax, compilation,
+whitespace checks and multi-GPU-selector rejection passed. Executed code bundle:
+`85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7`.
+
+No existing model-serving service was restarted or replaced. Model weights,
+adapter binaries and raw CLI transcripts remain on the owner's machine.

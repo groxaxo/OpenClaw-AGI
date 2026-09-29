@@ -1,0 +1,97 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "8ee5675a949773ff50a08a2874c64fa2e460fd0209f3815fd71c340c23e43da4",
+    "reason": "all required judges approved",
+    "review_id": "191169994b28bce778a439fd7a9eebe63e57dee5c18914465f46db60ca27cea7",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 72.495,
+        "reason": "Bounded before_training step for single_gpu_qwen35_4b_incremental_promotion, distinct from legacy SGLang/9B paths. deterministic_ok true with finite loss 0.209 and grad-norm 1.016>0, LR 2.5e-5 in bounds. Parent binding intact: adapter_before equals parent tensor hash. Guards 11/11 preserved baseline, DEV 372/435 public only, repair dataset 61=58+3 hashed, sealed suite preregistered but unevaluated preventing leakage. Line search 1/0.5/0.25 with revert/halve provides rollback; digest-pinned image, fixed thresholds, and promotion comparator parent-only support reproducibility. No deployment claimed.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "191169994b28bce778a439fd7a9eebe63e57dee5c18914465f46db60ca27cea7",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "58231c61ba6f3eae9cae44f5e0998a9f6064c9c3d148b14942ca2e61c7d0abc9",
+    "reason": "all required judges approved",
+    "review_id": "6174b74ae900c520abd10b9cfe3a23d0d9fa3d0f513d4bfdf2eec4a84de2bc9d",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 78.728,
+        "reason": "Bounded before_training step on single_gpu_qwen35_4b_incremental_promotion: epoch 3/4, one BF16 LoRA update + guard/DEV line search, no confirmation use. Gradients finite (norm 1.01, loss 0.21), LR 6.25e-06 consistent with two halve-on-reject, adapter matches approved parent. Guards 11/11 complete, DEV 372/435 disclosed as development with overlap, sealed suite only digest-bound. Dataset 58+3 hashed, repair weight in manifest, docker digest-pinned, single GPU, revert/roundtrip and single-use approval preserved. No deployment or efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "6174b74ae900c520abd10b9cfe3a23d0d9fa3d0f513d4bfdf2eec4a84de2bc9d",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "3ab80327f49119432932ebbac6088691d2b494a67859d4e7c932f25a384f88fc",
+    "reason": "all required judges approved",
+    "review_id": "95824c07d7c015eea4d6cd6fddd63dfde82b7a1cdcfebf4421ba52281d263491",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 82.74,
+        "reason": "Preflight for bounded single-GPU BF16 LoRA continuation is justified. Sealed 12-task suite hash-locked, single-use, evaluated only after DEV-selected checkpoint fixed; TRAIN/DEV/guards only steer updates. Immediate approved parent comparator with tensor/file/approval digests, config and cold-repro checks. Guards + zero complete-DEV loss + nondecreasing DEV line search with revert/halve LR. Unchanged gate +8pp/75%/2 wins/0 losses. Frozen base, SFT gradients with finite/positive norm gate, per-step Muse approval, digest-pinned Docker, 1 GPU, token/wall/disk budgets, checkpoint roundtrip, no serving deploy. Scope explicitly known-task new inputs, no unseen/broad claim, no pooling.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "95824c07d7c015eea4d6cd6fddd63dfde82b7a1cdcfebf4421ba52281d263491",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "486e502a0d59c716d9ca1894ffb9105031e29f58e672a27824786a99a6dd8b73",
+    "reason": "all required judges approved",
+    "review_id": "d8c3a564c3ce0070a080cf11c19c21a891d0d9e7ef42a9c4ddd7ac25f7c3e11f",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 99.74,
+        "reason": "Bounded epoch-2 before_training optimizer step on single_gpu_qwen35_4b_incremental_promotion backend. Gradients finite (norm 1.01>0), loss finite, LR 1.25e-5 within 1e-6..5e-4 and consistent with halve-on-reject, epochs/LR/tokens/wall/single-GPU/digest-pinned image within manifest bounds. Guards 11/11 preserved, DEV 372/435 baseline, repair dataset 49+9+3=61 with sha, adapter continuity to parent hash after revert, sealed confirmation correctly absent, no train/sealed ID overlap, parent-comparator and guard-preserving 1/0.5/0.25 revert line search with roundtrip provide rollback/reproducibility. No production or efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "d8c3a564c3ce0070a080cf11c19c21a891d0d9e7ef42a9c4ddd7ac25f7c3e11f",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "56229ba7c994978e734c607672f37352cd398d3595039cf8c9cb6a886c89bfd3",
+    "reason": "all required judges approved",
+    "review_id": "40695e9a5b047e308ba937146975924f2f7415508b3d11c2620d179d2b30a28e",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 105.237,
+        "reason": "Bounded before_training step on single_gpu_qwen35_4b_incremental_promotion: epoch 4/4, LR 6.25e-06 within 1e-6..5e-4 halving rule, grad 1.02 finite>0, loss finite, deterministic_ok true. Guards 4/4,4/4,3/3 pass; DEV 372/435 baseline preserved via 1/.5/.25 line search with revert. Sealed suite only hash-checked, confirmation absent, DEV correctly labeled development with overlap disclosed. Repair data 58+3 hashed, weights replay4/repair12/guard16, parent digests bound, checkpoint roundtrip and single-GPU/resource budgets enforced. No deployment or efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "40695e9a5b047e308ba937146975924f2f7415508b3d11c2620d179d2b30a28e",
+        "verdict": "OK"
+      }
+    }
+  }
+]

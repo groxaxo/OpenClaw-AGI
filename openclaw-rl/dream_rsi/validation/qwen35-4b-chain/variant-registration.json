@@ -1,0 +1,33 @@
+{
+  "status": "PREREGISTERED_PUBLIC_VARIANT",
+  "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+  "previous_completed_continuation": "run-002",
+  "previous_result": "NOT_OK: no public development improvement",
+  "change": {
+    "repair_weight": {
+      "before": 12.0,
+      "after": 8.0
+    }
+  },
+  "fixed": {
+    "learning_rate": 2.5e-05,
+    "max_epochs": 4,
+    "min_epochs": 2,
+    "max_new_tokens": 512,
+    "physical_gpu": 0,
+    "replay_weight": 4,
+    "guard_weight": 16,
+    "comparator": "immediate approved parent",
+    "line_search": [
+      1.0,
+      0.5,
+      0.25
+    ],
+    "promotion_min_gain": 0.08,
+    "promotion_min_accuracy": 0.75,
+    "promotion_min_complete_wins": 2,
+    "promotion_max_complete_losses": 0
+  },
+  "confirmation_previously_consumed": false,
+  "scope": "Second bounded public-development search. Same final suite remains unseen and unconsumed; this is not a second independent holdout trial."
+}
