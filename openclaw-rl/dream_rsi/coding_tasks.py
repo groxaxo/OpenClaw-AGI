@@ -59,7 +59,7 @@ def extract_code(response: str) -> str:
             raise ValueError("unsupported code construct")
         if isinstance(node, (ast.Import, ast.ImportFrom)):
             modules = [n.name for n in node.names] if isinstance(node, ast.Import) else [node.module]
-            if any(m not in {"math", "collections", "heapq", "bisect", "itertools", "functools"} for m in modules):
+            if any(m not in {"math", "collections", "heapq", "bisect", "itertools", "functools", "csv", "decimal", "fractions", "ipaddress", "json", "posixpath", "re", "shlex", "io"} for m in modules):
                 raise ValueError("import not allowlisted")
     return code
 
