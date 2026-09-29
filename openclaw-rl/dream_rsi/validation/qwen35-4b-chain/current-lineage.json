@@ -1,0 +1,43 @@
+{
+  "as_of": "2026-09-29",
+  "scope": "tracked continuations since approved generation 1",
+  "lineage": {
+    "successful_promotions": 1,
+    "continuation_attempts": 3,
+    "rejected_or_interrupted_continuations": 3,
+    "accepted_tip_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69"
+  },
+  "attempts": [
+    {
+      "attempt": "run-002",
+      "method": "broad verified replay and repairs",
+      "status": "NOT_OK",
+      "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+      "optimizer_proposals": 4
+    },
+    {
+      "attempt": "run-004",
+      "method": "broad verified replay and repairs",
+      "status": "NOT_OK",
+      "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+      "optimizer_proposals": 4
+    },
+    {
+      "attempt": "projected-minimal-repair/run-001",
+      "method": "two minimal public repairs plus first-order projection",
+      "status": "NOT_OK",
+      "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+      "optimizer_proposals": 3
+    }
+  ],
+  "new_successful_generations": 0,
+  "completed_training_continuations": 3,
+  "optimizer_proposals_in_completed_continuations": 11,
+  "resource_blocked_launches": 1,
+  "setup_interruptions_before_training": 1,
+  "latest_run_exit_code": 3,
+  "accepted_adapter_unchanged": true,
+  "confirmation_consumed": false,
+  "production_deployed": false,
+  "interpretation": "one verified successful generation so far; not a bound on achievable future progress"
+}

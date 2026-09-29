@@ -78,7 +78,50 @@ retired-public suite, fresh confirmation and digest-pinned Docker image paths.
 confirmation; after a suite is consumed, cold reproduction may check only the
 already-locked candidate and cannot select another checkpoint.
 
-## Result
+## Executed result: NOT_OK; accepted parent preserved
 
-The current run is not yet a completed promotion. Results and the exact
-successful-generation count will be recorded with the final evidence.
+The bounded single-GPU run completed all three optimizer proposals and exited
+with the explicit non-success code 3. It did not meet the unchanged public
+prerequisites for final confirmation. No new checkpoint was promoted.
+
+| Proposal | Retained public cases | Complete families | Disposition |
+|---|---:|---:|---|
+| Parent | 372/435 | 10/12 | Previously approved generation 1 |
+| 1 | 372/435 | 10/12 | Full projected update preserved results but added no cases |
+| 2 | 372/435 | 10/12 | All trial sizes rejected; returned to retained state |
+| 3 | 372/435 | 10/12 | All trial sizes rejected; returned to retained state |
+
+The full second proposal repaired sum-excluding-self from 2/33 to 33/33, but
+broke LRU from 40/40 to 0/40. Its total was 363/435, with one newly complete
+family and one lost complete family. It was therefore rejected, rather than
+being counted as progress. Smaller alternatives also lost LRU. The first-order
+projection did not guarantee behavioral preservation; the actual tests caught
+this. Raw rejected outputs are retained with the evidence.
+
+Four actual Muse Spark 1.3 max-reasoning reviews (preflight plus three optimizer
+proposals) approved bounded execution. All action receipts are source/evidence
+bound and consumed once. There was **no promotion or final-model approval**:
+no candidate qualified to reach that stage. The independent receipt/lineage
+audit passed because it confirmed this rejection; it does not make the model
+result a PASS. No cold reproduction was run for an unqualified candidate.
+
+Validation includes 127 passing unit/regression tests, 65 actual public cases
+passed by the two minimal reference repairs, reverified base-shard hashes,
+unchanged accepted-parent adapter identity, Python compilation and git checks,
+launcher syntax, rejection of multi-GPU selectors, exclusive-lock rejection of
+a concurrent launch, and a successful CHECK_ONLY run after training ended.
+
+The executable-source bundle used by tests, training and reviews is
+`ca041bb0f80e4108d43de60aa329ecf37abde75b3196ddb917dcc42197d591b8`.
+
+Successful-generation count remains **1 total, 0 new**. Across the tracked
+continuations from that accepted parent, three training runs have completed
+(4 + 4 + 3 optimizer proposals), all without a promotion. A resource-blocked
+launch and a pre-training setup interruption are counted separately.
+
+The preregistered confirmation remains unconsumed, the accepted adapter bytes
+are unchanged, and no serving model was deployed. This is a plateau in these
+tested methods, not a proof of a maximum possible chain length.
+
+Evidence is in `validation/qwen35-4b-chain/projected-minimal-repair-rejected/`;
+the cumulative counts are in `validation/qwen35-4b-chain/current-lineage.json`.

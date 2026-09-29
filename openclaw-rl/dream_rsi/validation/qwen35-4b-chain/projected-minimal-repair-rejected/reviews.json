@@ -1,0 +1,78 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "ca041bb0f80e4108d43de60aa329ecf37abde75b3196ddb917dcc42197d591b8",
+    "evidence_sha256": "74f114d32e4340ad09341c2a190f9be755a661aeb65f84a8739d7ce73ccd5363",
+    "reason": "all required judges approved",
+    "review_id": "09ecac3935384bee63871ac35a4da6f01b96ef98b1866b89776194405ba128bb",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 87.535,
+        "reason": "Bounded before_training proposal on single_gpu_qwen35_4b_protected_repair backend. deterministic_ok=true with finite mean loss 0.49 and grad norm 5.14>0. 26 anchor rows match 10 complete DEV+3 guards x2 mean/tail. Guards 4/4,4/4,3/3 preserved baseline. 2 minimal repairs match 2 incomplete DEV. LR 2.5e-5 is halved per revert rule within 1e-6..5e-4, epoch 3/3, single GPU, digest-pinned image, token budgets enforced. No sealed evaluation, comparator is approved parent, hashes bind code/parent/dataset. Rollback via 1/0.5/0.25 line search requiring guards+complete-task preservation and optimizer reset.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "09ecac3935384bee63871ac35a4da6f01b96ef98b1866b89776194405ba128bb",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "ca041bb0f80e4108d43de60aa329ecf37abde75b3196ddb917dcc42197d591b8",
+    "evidence_sha256": "3d08bf2b203b01ce0de4df8c9f78da2cbc3477e4a376f1b85b02ea369db438cf",
+    "reason": "all required judges approved",
+    "review_id": "a8791d3853fcaadba646cc0622eda04fcdc94a5db564bfd64c28f7453b879d87",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 135.839,
+        "reason": "Preflight for bounded single-GPU BF16 LoRA minimal-repair smoke is justified. Sealed suite digest-checked now, loaded only after DEV-selected checkpoint fixed, single-consumed, cannot steer training; DEV is expanded public data. Guards + zero complete-task loss + nondecreasing DEV line search 1/0.5/0.25 with revert and LR halve, unchanged promotion gate. Per-epoch Muse veto, code/evidence hash binding, parent tensor/file/approval binding with approved-parent comparator. Gradients finite/clipped, projected first-order only with actual tests required, optimizer reset. Budgets: 1 GPU, 3 updates, 1280/768 tokens, 2400s, pinned Docker sandbox. No deployment, checkpoint roundtrip, explicit known-task-only scope; n=2 acceptable for smoke, not efficacy proof.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "a8791d3853fcaadba646cc0622eda04fcdc94a5db564bfd64c28f7453b879d87",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "ca041bb0f80e4108d43de60aa329ecf37abde75b3196ddb917dcc42197d591b8",
+    "evidence_sha256": "0a09ce6d1ba4e823e1e8c142719be58e6adec9ce4259e371bc03c91c3ea72e69",
+    "reason": "all required judges approved",
+    "review_id": "f80d8f5fafdc8c9d6644c21b166e7e59bdde038c5c92537442f971a57a192bf0",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 117.677,
+        "reason": "Bounded before_training proposal for single_gpu protected_repair backend. deterministic_ok true, finite loss 0.57 and grad norm 4.69, LR 5e-05 within limits, epoch 1/3. Adapter matches approved parent tensor. 2 repairs match 10/12 complete DEV; 26 anchors match 13 solved x2. Guards all passing with full records for rollback. Sealed suite hashed, confirmation absent, no leakage. DEV overlap disclosed, no broad claim. Line search 1/.5/.25 with guard and complete-task preservation plus revert/halve provides rollback. Digest-pinned image, tests pass, code binding intact.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "f80d8f5fafdc8c9d6644c21b166e7e59bdde038c5c92537442f971a57a192bf0",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "ca041bb0f80e4108d43de60aa329ecf37abde75b3196ddb917dcc42197d591b8",
+    "evidence_sha256": "bfa4742dbb8fb591a2cf49b22282fb4771ae51ff161effc172ef40e33d410fc8",
+    "reason": "all required judges approved",
+    "review_id": "6d568ad8845c768ab3c6ae419027be485965dcea214d02360e0037bd67794d19",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 140.42,
+        "reason": "Bounded epoch-2 single projected AdamW proposal with full/half/quarter public line search; confirmation absent. Backend single_gpu_qwen35_4b_protected_repair distinct from legacy SGLang. Guards 4/4,4/4,3/3 pass; DEV 372/435=0.855 with 10/12 complete matches 26 anchor rows (13 solved x mean+tail). Two repairs match two DEV failures. Finite loss 0.49, grad norm 5.14>0, LR 5e-05 in bounds, digest-pinned image, single GPU, max 3 updates. No sealed outcomes used; sealed only digest-checked. Revert/halve-LR, guard+complete-task preservation, checkpoint roundtrip provide rollback.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "6d568ad8845c768ab3c6ae419027be485965dcea214d02360e0037bd67794d19",
+        "verdict": "OK"
+      }
+    }
+  }
+]
