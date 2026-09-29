@@ -1,0 +1,25 @@
+{
+  "change_from_previous_trial": "anchor choice/contrast only; same two minimal repairs, same initial LR, full/half/quarter public line search",
+  "comparison_scope": "immediate approved generation-1 parent; known prompts, new final inputs; not general RSI",
+  "confirmation_path": "/home/op/dream-qwen4b-chain.8nWOF3/sealed/generation2-confirmation.json",
+  "confirmation_previously_consumed": false,
+  "confirmation_sha256": "7ad3de087bd86bcb83f6b4f8d20f2dd173e88c5c92955284fbc7ff96f7335e86",
+  "fixed_promotion_gate": {
+    "max_complete_losses": 0,
+    "min_case_gain": 0.08,
+    "min_complete_wins": 2,
+    "min_final_accuracy": 0.75
+  },
+  "learning_rate": 5e-05,
+  "max_new_tokens": 512,
+  "max_proposals": 3,
+  "max_wall_seconds": 1800,
+  "method": "individual token-margin gradient protection",
+  "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+  "physical_gpu": 1,
+  "public_counterexamples_sha256": "40f0d2a7cf76a307ac79adebfe74986c84d882cc7278406e8d3b7f1d7b0372af",
+  "source_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+  "purpose": "fresh end-to-end reproducibility run of merged main; not a new generation",
+  "tested_commit": "fe201c67c56cae04510688618b0feecfa53d8b4c",
+  "prior_run": "/home/op/dream-qwen4b-margins.FCF7pJ/run-001"
+}

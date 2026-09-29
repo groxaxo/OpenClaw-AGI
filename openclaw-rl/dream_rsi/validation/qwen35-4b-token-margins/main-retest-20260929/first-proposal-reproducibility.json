@@ -1,0 +1,19 @@
+{
+  "phase": "first optimizer proposal",
+  "same_parent_load_record": true,
+  "same_repair_dataset": true,
+  "same_first_anchor_identities_and_margins": true,
+  "first_anchor_gradient_norm_prior": 58.84942626953125,
+  "first_anchor_gradient_norm_retest": 58.89576721191406,
+  "root_cause": "not isolated by this retest; numerical reproducibility gap observed, not a causal diagnosis",
+  "prior": {
+    "mean_sft_loss": 0.5725239962339401,
+    "gradient_norm": 4.69068717956543,
+    "accepted_scale": 0.5
+  },
+  "retest": {
+    "mean_sft_loss": 0.5725239962339401,
+    "gradient_norm": 4.699758052825928,
+    "accepted_scale": 0.0
+  }
+}

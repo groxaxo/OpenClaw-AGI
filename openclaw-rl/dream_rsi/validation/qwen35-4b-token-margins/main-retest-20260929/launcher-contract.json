@@ -1,0 +1,17 @@
+{
+  "multiple_gpus": {
+    "exit_code": 64,
+    "stderr": "Exactly one numeric GPU selector required",
+    "passed": true
+  },
+  "concurrent_run": {
+    "exit_code": 73,
+    "stderr": "Another run owns this experiment lock",
+    "passed": true
+  },
+  "consumed_suite": {
+    "exit_code": 65,
+    "passed": true
+  },
+  "syntax_and_compilation": "PASS"
+}

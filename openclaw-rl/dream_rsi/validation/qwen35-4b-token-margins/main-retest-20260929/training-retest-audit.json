@@ -1,0 +1,93 @@
+{
+  "status": "REPRODUCTION_MISMATCH",
+  "scope": "training rerun, fixed-checkpoint public reproduction, and evidence audit",
+  "tested_main_commit": "fe201c67c56cae04510688618b0feecfa53d8b4c",
+  "source_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+  "physical_gpu": 1,
+  "optimizer_proposals": 3,
+  "epochs": [
+    {
+      "epoch": 1,
+      "dev": {
+        "case_accuracy": 0.8551724137931035,
+        "complete_tasks": 10,
+        "passed_cases": 372,
+        "task_count": 12,
+        "total_cases": 435
+      },
+      "accepted_scale": 0.0,
+      "adapter_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+      "adapter_identical_to_prior_run": false,
+      "dev_score_identical_to_prior_run": true,
+      "accepted_scale_identical_to_prior_run": false,
+      "review_id": "ab6c92383478a93052b3a1862398c845cd68641a1df6e9143c1076ce6439dd6c",
+      "guard_passed": true
+    },
+    {
+      "epoch": 2,
+      "dev": {
+        "case_accuracy": 0.8551724137931035,
+        "complete_tasks": 10,
+        "passed_cases": 372,
+        "task_count": 12,
+        "total_cases": 435
+      },
+      "accepted_scale": 0.25,
+      "adapter_sha256": "d64503af8dd8709feeec2f018ca4fe97ec80b1ef4261cbea1f49d39e42c6feba",
+      "adapter_identical_to_prior_run": false,
+      "dev_score_identical_to_prior_run": true,
+      "accepted_scale_identical_to_prior_run": false,
+      "review_id": "f4406de34a4275ddd2d2654bd8a1145022eb17e2383d123d1f794a4352ed9fea",
+      "guard_passed": true
+    },
+    {
+      "epoch": 3,
+      "dev": {
+        "case_accuracy": 0.8551724137931035,
+        "complete_tasks": 10,
+        "passed_cases": 372,
+        "task_count": 12,
+        "total_cases": 435
+      },
+      "accepted_scale": 0.5,
+      "adapter_sha256": "dd60e60a9a37a4e8b9811be03e0d8d4742ab621abef6cf753e8e6250133f3149",
+      "adapter_identical_to_prior_run": false,
+      "dev_score_identical_to_prior_run": false,
+      "accepted_scale_identical_to_prior_run": false,
+      "review_id": "76106c7ba710948b32bd67dcc6489866879711931d928429262e5b8c3af1c6da",
+      "guard_passed": true
+    }
+  ],
+  "baseline": {
+    "case_accuracy": 0.8551724137931035,
+    "complete_tasks": 10,
+    "passed_cases": 372,
+    "task_count": 12,
+    "total_cases": 435
+  },
+  "last_retained": {
+    "case_accuracy": 0.8551724137931035,
+    "complete_tasks": 10,
+    "passed_cases": 372,
+    "task_count": 12,
+    "total_cases": 435
+  },
+  "source_and_approval_audit": "PASS",
+  "training_scores_reproduced": false,
+  "training_adapter_states_bit_exact": false,
+  "model_promotion_status": "NOT_OK",
+  "promotion_approved": false,
+  "confirmation_consumed": false,
+  "original_accepted_adapter_unchanged": true,
+  "new_successful_generations": 0,
+  "successful_generations_total": 1,
+  "historical_exploratory_continuations": 4,
+  "this_run_is_reproduction": true,
+  "new_training_proposals_in_this_reproduction": 3,
+  "launcher_exit_code": 3,
+  "test_report": {
+    "code_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+    "passed": true,
+    "tests_run": 136
+  }
+}
