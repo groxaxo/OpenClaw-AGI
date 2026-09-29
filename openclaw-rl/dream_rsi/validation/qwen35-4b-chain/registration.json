@@ -1,0 +1,12 @@
+{
+  "seed": 629174083,
+  "suite_sha256": "7ad3de087bd86bcb83f6b4f8d20f2dd173e88c5c92955284fbc7ff96f7335e86",
+  "retired_parent_sha256": "1d3a63473dbe110b59b0ced3b8390068b39425ee162c696e7db0987dd9bd3eb2",
+  "created_at": "2026-09-29T03:42:51.242730+00:00",
+  "tasks": 12,
+  "cases": 240,
+  "public_development_cases": 435,
+  "cross_public_final_exact_inputs": 0,
+  "selection_used_model_outputs": false,
+  "scope": "known task prompts, new case inputs; incremental comparison against approved parent"
+}

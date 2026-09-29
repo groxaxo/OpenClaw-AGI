@@ -1,0 +1,37 @@
+{
+  "successful_promotions": 1,
+  "accepted_tip": {
+    "successful_generation": 1,
+    "model": "Qwen/Qwen3.5-4B",
+    "status": "PASS",
+    "adapter_tensor_state_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+    "adapter_file_sha256": "2f0816a757b0d2405578bb0238e8fab1459cbbc1134c2d7f80995f0a24cb31e1",
+    "evidence": "../qwen35-4b-bf16-guarded/verified-run/",
+    "main_commit": "e917cffcc7c5d43b58a553fb736d9eaae4182fdd",
+    "cold_reproduction_passed": true
+  },
+  "completed_continuations": [
+    {
+      "id": "continuation-1",
+      "status": "NOT_OK",
+      "reason": "no DEV improvement",
+      "optimizer_proposals": 4,
+      "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+      "dev_passed_before": 372,
+      "dev_passed_after": 372,
+      "dev_total": 435,
+      "confirmation_consumed": false,
+      "evidence": "continuation-1-rejected/"
+    }
+  ],
+  "active_continuation": {
+    "id": "continuation-2",
+    "status": "RUNNING",
+    "repair_weight": 8,
+    "initial_learning_rate": 2.5e-05,
+    "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+    "note": "not counted as successful until promotion plus cold reproduction"
+  },
+  "setup_interruptions": 1,
+  "production_deployed": false
+}

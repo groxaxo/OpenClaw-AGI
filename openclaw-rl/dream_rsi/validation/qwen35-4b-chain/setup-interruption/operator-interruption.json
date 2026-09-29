@@ -1,0 +1,6 @@
+{
+  "status": "INTERRUPTED",
+  "optimizer_updates": 0,
+  "confirmation_consumed": false,
+  "reason": "Early-stop eligibility inherited from base training could stop after one family gain; align to unchanged two-family continuation gate before any optimizer update."
+}
