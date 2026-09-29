@@ -69,14 +69,19 @@ updates preserved results but added no correct cases. They are not successful
 promotions. The run returned `NOT_OK: no DEV improvement` before consuming the
 registered confirmation suite. The approved parent was not overwritten.
 
-A second bounded continuation is now testing one factor: reference-repair weight
-8 instead of 12. Initial learning rate remains **2.5e-5**, not 5e-5; all other
-model, comparator, GPU, line-search, epoch, and promotion rules are unchanged.
-This variant is motivated by a read-only public-data diagnosis of interference
-with already-correct RPN/LRU outputs, not by final-suite outcomes. Its result is
-pending and is not included in the successful-generation count. Both variants
-are public-development search within one heldout evaluation opportunity, not
-two independent final-test trials.
+The second bounded job changed one factor: reference-repair weight 8 instead of
+12, with initial LR **2.5e-5** and all other settings unchanged. Muse approved its
+preflight, but before model loading other GPU jobs reduced free VRAM below the
+unchanged **12 GiB headroom guard**. It stopped with `BLOCKED_RESOURCE`; it loaded
+no model and executed no optimizer update. This is not a failed model-performance
+experiment and does not count as a completed training continuation. Existing GPU
+jobs were left untouched. The registered final suite remains unconsumed.
+
+The variant was motivated by a public-only diagnostic hypothesis that repair
+examples were interfering with already-correct RPN/LRU outputs. The diagnostic
+incorrectly inferred the source default LR of 5e-5; the executed manifest and
+receipts show 2.5e-5. Its original text and an explicit correction are retained.
+The weight-8 hypothesis has therefore **not yet been tested by training**.
 
 An initial setup was interrupted before any optimizer step to align public
 stopping with the fixed two-family promotion requirement. No confirmation
@@ -84,8 +89,9 @@ outcomes were consumed by that correction. Its record is retained separately.
 
 Evidence: `validation/qwen35-4b-chain/`. Completed rejected trials retain their
 reports, configuration, reviewer receipts, and acceptance-integrity audit.
-The JSON lineage separates one verified successful generation, completed
-rejections, setup interruptions, and pending work. An integrity-audit PASS means
+The JSON lineage separates one verified successful generation, one completed
+rejection, one setup interruption and one resource-blocked launch. No experiment
+is still running from this task. An integrity-audit PASS means
 the audit agrees with the rejection; it does not turn that model run into a PASS.
 
 ## Validation of this continuation implementation
@@ -99,3 +105,24 @@ whitespace checks and multi-GPU-selector rejection passed. Executed code bundle:
 
 No existing model-serving service was restarted or replaced. Model weights,
 adapter binaries and raw CLI transcripts remain on the owner's machine.
+
+## Final count for this continuation request
+
+| Category | Count | Meaning |
+|---|---:|---|
+| Verified successful generations total | 1 | Previously approved and cold-reproduced checkpoint remains the tip |
+| New successful generations | 0 | No child beat the accepted parent |
+| Completed training continuations | 1 | Four real proposals, no DEV improvement |
+| Resource-blocked launch | 1 | Approved preflight; no model loading or training |
+| Setup interruption | 1 | Early-stop correction before any optimizer update |
+
+The accepted adapter is still the original approved generation-1 artifact.
+Neither its bytes nor any production serving model were replaced. The new
+240-case confirmation has not been consumed or used to guide the public search.
+
+This records a plateau for the tested settings, **not a maximum achievable run
+count**. The next controlled experiment is still repair weight 8 versus 12 at the
+same actual initial learning rate, once GPU headroom is available. Do not lower
+performance thresholds or use an unpromoted intermediate as the next parent to
+inflate the count. A fresh-process reproduction is required before incrementing
+this lineage after any future promotion.

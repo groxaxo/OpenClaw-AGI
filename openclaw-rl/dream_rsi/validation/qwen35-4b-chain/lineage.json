@@ -24,14 +24,27 @@
       "evidence": "continuation-1-rejected/"
     }
   ],
-  "active_continuation": {
-    "id": "continuation-2",
-    "status": "RUNNING",
-    "repair_weight": 8,
-    "initial_learning_rate": 2.5e-05,
-    "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
-    "note": "not counted as successful until promotion plus cold reproduction"
-  },
+  "active_continuation": null,
   "setup_interruptions": 1,
-  "production_deployed": false
+  "production_deployed": false,
+  "resource_blocked_attempts": [
+    {
+      "id": "continuation-2",
+      "status": "BLOCKED_RESOURCE",
+      "reason": "GPU free memory below unchanged 12 GiB headroom guard",
+      "repair_weight": 8,
+      "initial_learning_rate": 2.5e-05,
+      "model_loaded": false,
+      "optimizer_proposals": 0,
+      "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+      "confirmation_consumed": false,
+      "evidence": "continuation-2-resource-blocked/"
+    }
+  ],
+  "completed_training_continuations": 1,
+  "new_successful_promotions": 0,
+  "confirmed_successful_promotions_total": 1,
+  "confirmation_status": "registered, no model evaluated, unconsumed",
+  "other_gpu_jobs_stopped": false,
+  "interpretation": "One observed public-development plateau; not a demonstrated global limit of the model or method."
 }

@@ -1,0 +1,6 @@
+{
+  "diagnostic_scope": "hypothesis, not an authorization or causal proof",
+  "correction": "The read-only diagnostic inferred LR 5e-5 from a source default. The executed manifest and proposal-1 receipt record LR 2.5e-5.",
+  "actual_initial_learning_rate": 2.5e-05,
+  "next_one_factor_comparison_would_hold_actual_lr_fixed": true
+}

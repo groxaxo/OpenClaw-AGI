@@ -1,0 +1,21 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "da1512994a45b43c84f27e4ba1aac0de46df319ec78e5dc0db8cfc772179c531",
+    "reason": "all required judges approved",
+    "review_id": "788f24447c79d0cb0dc60e1aa05218dd30999b1bf04f8ea3161d7ec291cb64b8",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 105.492,
+        "reason": "Preflight for bounded single-GPU BF16 LoRA continuation is justified. Sealed 12-task suite pre-registered by hash, single-use, evaluated only after DEV-selected checkpoint fixed vs immediate parent, not base. Public TRAIN/DEV+retired merged as development with overlap disclosed; no broad generalization claim. Guards require no per-task regression, zero complete-task loss, +0.08/0.75/2-win gate unchanged. 2-4 updates, LR 2.5e-5, pinned docker, 1 GPU, context budgets, per-step Muse approval, revert/halve, no deployment.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "788f24447c79d0cb0dc60e1aa05218dd30999b1bf04f8ea3161d7ec291cb64b8",
+        "verdict": "OK"
+      }
+    }
+  }
+]
