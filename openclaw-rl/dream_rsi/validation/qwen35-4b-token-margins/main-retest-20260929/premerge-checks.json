@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "scope": "documentation, source, unit tests, and launcher checks; NOT training reproducibility",
+  "tests_run": 136,
+  "documentation_review_id": "6d489fb615009648515a0a63ea7984380f76b4e96871eb8b70db0df9d14fe883",
+  "accepted_parent_file_unchanged": true,
+  "cold_check_exit_code": 0,
+  "training_launcher_exit_code": 3,
+  "check_only_stdout": "TESTS_PASS 136 CASE /home/op/dream-qwen4b-main-retest.Tg3PzU/launcher-smoke/run.5SFpq8\nCHECK_ONLY_PASS=/home/op/dream-qwen4b-main-retest.Tg3PzU/launcher-smoke/run.5SFpq8\n"
+}

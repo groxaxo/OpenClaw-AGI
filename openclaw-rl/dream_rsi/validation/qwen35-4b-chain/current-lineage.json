@@ -36,8 +36,18 @@
       "outcome_detail": "public development improved without regression but did not meet unchanged promotion prerequisites",
       "parent_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
       "optimizer_proposals": 3,
-      "public_before": {"passed_cases": 372, "total_cases": 435, "complete_families": 10, "families": 12},
-      "public_after": {"passed_cases": 403, "total_cases": 435, "complete_families": 11, "families": 12},
+      "public_before": {
+        "passed_cases": 372,
+        "total_cases": 435,
+        "complete_families": 10,
+        "families": 12
+      },
+      "public_after": {
+        "passed_cases": 403,
+        "total_cases": 435,
+        "complete_families": 11,
+        "families": 12
+      },
       "guard_cases_passed": 11,
       "development_candidate_sha256": "e4c1e5fe16cc79013006d31a4d03f11bfdbe0df196549dbe152c982beee156e3",
       "development_candidate_status": "DEVELOPMENT_ONLY",
@@ -66,5 +76,23 @@
   "accepted_adapter_unchanged": true,
   "confirmation_consumed": false,
   "production_deployed": false,
-  "interpretation": "one verified successful generation; promising unpromoted public-search state retained; not a bound on achievable future progress"
+  "interpretation": "one verified successful generation; promising unpromoted public-search state retained; not a bound on achievable future progress",
+  "reproduction_runs": [
+    {
+      "run": "merged-main-retest-20260929",
+      "purpose": "repeat the documented training experiment, not another exploratory method",
+      "optimizer_proposals": 3,
+      "model_outcome": "NOT_OK",
+      "training_score_reproduction": "MISMATCH",
+      "public_before": 372,
+      "public_after": 372,
+      "total_public_cases": 435,
+      "saved_candidate_cold_cases": 403,
+      "cold_output_hashes_reproduced": 45,
+      "new_successful_generations": 0,
+      "confirmation_consumed": false
+    }
+  ],
+  "optimizer_proposals_in_reproductions": 3,
+  "total_optimizer_proposals_in_continuations_and_reproductions": 17
 }

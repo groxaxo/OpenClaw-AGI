@@ -185,3 +185,13 @@ thresholds. The 92.64% development candidate is not the accepted comparator.
 Any future extension must retain failures and total proposal counts, preserve
 honest public/confirmation separation, and earn a new promotion through the
 same accepted-parent comparison and cold reproduction.
+
+## Merged-main retest — 29 September 2026
+
+See [MAIN_E2E_RETEST.md](MAIN_E2E_RETEST.md). The actual three-proposal rerun
+retained 372/435 rather than the earlier 403/435: training reproducibility is
+not established. A separate cold process reproduced all 45 recorded response
+hashes for the accepted parent, saved development candidate and rerun candidate;
+the saved development adapter still scores 403/435. All 136 tests and execution
+receipt checks passed. These results do not promote either candidate or consume
+final confirmation. One verified successful generation remains accepted.

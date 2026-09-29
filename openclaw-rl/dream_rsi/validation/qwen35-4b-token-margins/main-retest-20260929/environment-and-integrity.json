@@ -1,0 +1,30 @@
+{
+  "python": "3.13.13 | packaged by conda-forge | (main, Apr  8 2026, 02:00:33) [GCC 14.3.0]",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "peft": "0.21.0",
+    "safetensors": "0.8.0",
+    "accelerate": "1.15.0",
+    "tokenizers": "0.23.2",
+    "bitsandbytes": "0.50.2"
+  },
+  "base_shards": [
+    {
+      "filename": "model.safetensors-00001-of-00002.safetensors",
+      "sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+      "matches_previously_verified_official_digest": true
+    },
+    {
+      "filename": "model.safetensors-00002-of-00002.safetensors",
+      "sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+      "matches_previously_verified_official_digest": true
+    }
+  ],
+  "parent_adapter_file_sha256": "2f0816a757b0d2405578bb0238e8fab1459cbbc1134c2d7f80995f0a24cb31e1",
+  "gpu_inventory": [
+    "0, NVIDIA GeForce RTX 3090, GPU-89c6bfdc-6f42-d312-de77-a9fb1ae370d8",
+    "1, NVIDIA GeForce RTX 3090, GPU-828df6fd-3fd0-ed25-0b2b-2b6d9d8dca47",
+    "2, NVIDIA GeForce RTX 3090, GPU-78996a05-18c5-e153-b621-096273299d41"
+  ]
+}
