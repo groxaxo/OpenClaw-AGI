@@ -94,5 +94,75 @@
     }
   ],
   "optimizer_proposals_in_reproductions": 3,
-  "total_optimizer_proposals_in_continuations_and_reproductions": 17
+  "total_optimizer_proposals_in_continuations_and_reproductions": 17,
+  "new_task_measurements": [
+    {
+      "experiment": "new-task-transfer-20260929",
+      "status": "MEASUREMENT_COMPLETE_ACCEPTANCE_NOT_OK",
+      "start_status": "DEVELOPMENT_ONLY",
+      "start_tensor_sha256": "e4c1e5fe16cc79013006d31a4d03f11bfdbe0df196549dbe152c982beee156e3",
+      "candidate_tensor_sha256": "f6c456474cf3ff8970f544c8e011cd87eab92999f90d5d97f364d69baf35038e",
+      "completed_training_runs": 1,
+      "resource_blocked_launches": 1,
+      "optimizer_proposals": 3,
+      "new_successful_generations": 0,
+      "confirmation_before": {
+        "case_accuracy": 0.3958333333333333,
+        "complete_tasks": 3,
+        "passed_cases": 95,
+        "task_count": 10,
+        "total_cases": 240
+      },
+      "confirmation_after": {
+        "case_accuracy": 0.5875,
+        "complete_tasks": 3,
+        "passed_cases": 141,
+        "task_count": 10,
+        "total_cases": 240
+      },
+      "transfer_before": {
+        "case_accuracy": 0.6388888888888888,
+        "complete_tasks": 3,
+        "passed_cases": 92,
+        "task_count": 6,
+        "total_cases": 144
+      },
+      "transfer_after": {
+        "case_accuracy": 0.625,
+        "complete_tasks": 3,
+        "passed_cases": 90,
+        "task_count": 6,
+        "total_cases": 144
+      },
+      "old_public_regression_before": {
+        "case_accuracy": 0.9282511210762332,
+        "complete_tasks": 14,
+        "passed_cases": 414,
+        "task_count": 15,
+        "total_cases": 446
+      },
+      "old_public_regression_after": {
+        "case_accuracy": 1.0,
+        "complete_tasks": 15,
+        "passed_cases": 446,
+        "task_count": 15,
+        "total_cases": 446
+      },
+      "original_chain_confirmation_consumed": false,
+      "new_task_reserved_suite_consumed": true,
+      "global_lineage_advanced": false,
+      "evidence_path": "validation/qwen35-4b-new-tasks/completed-20260929/",
+      "fixed_artifact_cold_reproduction": {
+        "status": "PASS",
+        "hashes_matched": 47,
+        "training_steps": 0
+      },
+      "cold_reproduction": {
+        "status": "PASS",
+        "output_hashes_reproduced": 47,
+        "new_training_steps": 0,
+        "new_promotions": 0
+      }
+    }
+  ]
 }

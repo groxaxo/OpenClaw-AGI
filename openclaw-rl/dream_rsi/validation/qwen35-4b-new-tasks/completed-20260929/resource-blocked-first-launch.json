@@ -1,0 +1,73 @@
+{
+  "scope": "earlier GPU-0 resource-blocked launch; no loaded model or optimizer step",
+  "manifest": {
+    "adaptation_families": 10,
+    "approved_tensor_sha256": "4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69",
+    "backend": "new_task_bf16_token_margin_sft",
+    "comparator": "exact saved development checkpoint; approved generation 1 is a separate zero-shot reference",
+    "confirmation_cases": 240,
+    "determinism": "strict torch deterministic algorithms, cudnn deterministic, TF32 off, CUBLAS :4096:8; not by itself a reproducibility proof",
+    "dev_cases": 240,
+    "docker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+    "experimental_acceptance_gate": {
+      "max_lost_complete": 0,
+      "min_accuracy": 0.75,
+      "min_case_gain": 0.08,
+      "min_new_complete": 2,
+      "no_transfer_or_regression_case_loss": true
+    },
+    "global_lineage_advanced": false,
+    "learning_rate": 5e-05,
+    "max_new_tokens": 512,
+    "max_optimizer_proposals": 3,
+    "max_wall_seconds": 2700,
+    "method": "verified failed-new-task reference SFT; three weakest token-margin anchors per solved public answer; full/half/quarter projected line search",
+    "model": "Qwen/Qwen3.5-4B",
+    "physical_gpu": "0",
+    "production_deployed": false,
+    "public_suite_sha256": "99625ce58d3a25beeabdc51ff5769c7fec0dddeece4af158ad667bb2c9168c2f",
+    "reserved_suite_sha256": "5648565feae13f4cc8aab008c9c15fdb6b687feb7115d2e744e3fe6a56253319",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "scope": "new-to-this-experiment task families; adaptation confirmation has known prompts/new inputs; transfer tasks are excluded from adaptation",
+    "selection": "public DEV only, preserve every public old regression score and every solved new DEV task; final and transfer remain untouched",
+    "source_sha256": "13f204c446402d890dc6e21645b6505d133ae4989418bda9fc8caaab2d14cb0e",
+    "starting_checkpoint_status": "DEVELOPMENT_ONLY cold-verified artifact",
+    "starting_tensor_sha256": "e4c1e5fe16cc79013006d31a4d03f11bfdbe0df196549dbe152c982beee156e3",
+    "tests": {
+      "code_sha256": "13f204c446402d890dc6e21645b6505d133ae4989418bda9fc8caaab2d14cb0e",
+      "passed": true,
+      "reference_case_checks": 720,
+      "reference_programs_verified": 10,
+      "registry_sha256": "8df3ecb488da502a3df32f853a77238d8e8b7b261c885c40c56782d49ac9bd40",
+      "tests_run": 150
+    },
+    "transfer_cases": 144,
+    "transfer_only_families": 6
+  },
+  "failure": {
+    "error": "selected GPU lacks 12 GiB headroom",
+    "status": "NOT_OK",
+    "type": "RuntimeError"
+  },
+  "reviews": [
+    {
+      "approved": true,
+      "code_sha256": "13f204c446402d890dc6e21645b6505d133ae4989418bda9fc8caaab2d14cb0e",
+      "evidence_sha256": "e823c2dba45b37994d7927db5525403f75ffd5ed635bafe2d49bd3e2e4bd70f0",
+      "reason": "all required judges approved",
+      "review_id": "4737ac8720233e2136743a14b672e8f8cb259c15b0cec76e9045596069de57a5",
+      "stage": "preflight",
+      "verdicts": {
+        "muse": {
+          "blocking_issues": [],
+          "elapsed_s": 147.687,
+          "reason": "Preflight approves bounded new_task_bf16_token_margin_sft measurement only, not deployment or lineage promotion. Leakage controlled: public DEV-only training, reserved suite hash-locked and single-use via candidate-locked/consumed marker, disjoint train/dev/confirmation inputs, transfer-only families excluded until after selection, golds in trusted parent. Gradients correct: verified reference SFT + 3 weakest token-margin contrasts, projected_delta, LoRA-only, finite/norm gates per-epoch Muse approval. Resources bounded: 1 GPU, 12GiB headroom, 2700s wall + disk watchdog, 512 tokens, context/anchor budgets. Approval single-use code/evidence-bound with per-step reviews. Reproducibility via strict determinism + cold script; rollback via 1.0/0.5/0.25 public-preserved line search. Smoke scope honest: known prompts/new inputs, 240/144 cases acceptable for smoke, no efficacy claim.",
+          "requested_model": "muse-spark-1.3",
+          "requested_reasoning": "max",
+          "review_id": "4737ac8720233e2136743a14b672e8f8cb259c15b0cec76e9045596069de57a5",
+          "verdict": "OK"
+        }
+      }
+    }
+  ]
+}

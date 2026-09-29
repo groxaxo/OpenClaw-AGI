@@ -1,0 +1,6 @@
+{
+  "new_families": 16,
+  "exact_prompt_collisions_with_prior_curriculum": [],
+  "prior_unique_prompts_checked": 61,
+  "scope": "exact-prompt comparison, not proof of unseen pretraining or semantic independence"
+}
