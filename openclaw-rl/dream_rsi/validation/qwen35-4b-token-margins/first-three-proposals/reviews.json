@@ -1,0 +1,78 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+    "evidence_sha256": "638e1af7a7ae3201fc236ae11f8ee23ba7b4014f3786520a855ac982bc2304e6",
+    "reason": "all required judges approved",
+    "review_id": "50802e47f9aec0cbe13066d310b6f6e700f703fc45e9446fcd567d15d222eac1",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 155.5,
+        "reason": "Approve one bounded epoch 3/3 AdamW proposal on 2 verified public repairs with token-margin projection (40 anchors <96 cap) plus 1/0.5/0.25 public guard/DEV line search; sealed confirmation absent, no leakage. Finite loss 0.36 and grad norm 4.6 clipped to 1.0, LR 5e-5 in bounds, single-GPU BF16 LoRA backend single_gpu_qwen35_4b_token_margin_repair distinct from legacy SGLang. Hashes for code, docker, sealed, counterexamples, margins, adapter bind reproducibility; parent comparator retained; revert+halve LR, optimizer reset and roundtrip give rollback. Small-n OK for smoke step, no efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "50802e47f9aec0cbe13066d310b6f6e700f703fc45e9446fcd567d15d222eac1",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+    "evidence_sha256": "41ecab929daa978a6e2544481645411981ce37636abcfc29da4a57a62bd19b57",
+    "reason": "all required judges approved",
+    "review_id": "683c525f58325a117205956d42da448149470abc028b093e6874ae497e56e0f9",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 80.602,
+        "reason": "Bounded before_training for single-GPU token-margin backend: 1 AdamW proposal + 1/.5/.25 public line search, confirmation absent, no efficacy claim. Guards 11/11 passing, DEV 372/435 with 10/12 complete matching 2-repair scope, finite loss 0.57 and grad norm 4.69, LR 5e-05 within bounds, 40 anchors <96, adapter matches approved parent, code/tests/docker/sealed/parent/counterexample hashes pinned, revert-on-regression and optimizer reset defined, no sealed outcomes used, legacy paths distinguished.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "683c525f58325a117205956d42da448149470abc028b093e6874ae497e56e0f9",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+    "evidence_sha256": "73cb8db4c743677e5c2e78d1bd7d09b5440f272c41e4c99f5a371c7d27cb77b1",
+    "reason": "all required judges approved",
+    "review_id": "4fbc84b5f7e3796a68bc63b7be82a7d7218a03e73ec91eb0c1dc302f6ac3b2b1",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 101.329,
+        "reason": "Bounded epoch-2 single-GPU token-margin AdamW proposal with 1/.5/.25 public line search, revert on guard or complete-task loss, and optimizer reset. Evidence shows finite loss 0.54, grad-norm 4.9>0, LR 5e-5, 40 anchors within 96, 2 verified repairs, DEV 372/435 with 10 complete, guards 4/4,4/4,3/3. Sealed suite hash-locked and unevaluated, comparator is approved parent, digest-pinned image, single-GPU and token budgets enforced, adapter/parent/dataset/counterexample hashes bind reproducibility. No deployment or efficacy claim; confirmation absent as required.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "4fbc84b5f7e3796a68bc63b7be82a7d7218a03e73ec91eb0c1dc302f6ac3b2b1",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "63e891855636eba1dd73d0876d4253ab03a0ef45bd7706c527be083c8f1b70c9",
+    "evidence_sha256": "2757a4c74f31769143a23ebe6fc179a8eae8266736407f781600f34b54f37ce2",
+    "reason": "all required judges approved",
+    "review_id": "b535097ce69e80a55874fbc4b18254898ba7a20f74f43579a6a0699d3126a658",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 131.672,
+        "reason": "Preflight for bounded single-GPU token-margin BF16 LoRA continuation is justified. Sealed 12-task suite digest-pinned and single-consume, evaluated only after DEV-selected checkpoint vs immediate approved parent; no steering or pooling. Training limited to 2 verified minimal repairs, LR 5e-5, <=3 updates, 1280/768 token caps, 1800s wall, 1 GPU, 96 anchors. Gradients are exact chosen-minus-competitor contrasts, projection first-order only with mandatory guard and complete-task preservation, 1/.5/.25 revert and LR halving. Parent/retired/counterexample/sealed/code digests, pinned docker, and per-step Muse vetoes bind reproducibility and approval; checkpoint roundtrip and no deployment enable rollback. Scope is known-task correctness only, distinct from legacy SGLang path.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "b535097ce69e80a55874fbc4b18254898ba7a20f74f43579a6a0699d3126a658",
+        "verdict": "OK"
+      }
+    }
+  }
+]
