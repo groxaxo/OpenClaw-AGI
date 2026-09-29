@@ -1,0 +1,20 @@
+[
+  {
+    "task_id": "repair_dev_hard_confirm_lru",
+    "before": {
+      "passed": 40,
+      "score": 1.0,
+      "task_id": "repair_dev_hard_confirm_lru",
+      "total": 40
+    },
+    "rejected_after": {
+      "passed": 0,
+      "score": -1.0,
+      "task_id": "repair_dev_hard_confirm_lru",
+      "total": 40
+    },
+    "first_divergent_token": 6,
+    "old_local_text": "def solve(data):\n    capacity = data[0]\n    operations = data[1]\n   ",
+    "rejected_local_text": "def solve(data):\n    cache = {}\n    order = []\n    capacity = data[0]"
+  }
+]

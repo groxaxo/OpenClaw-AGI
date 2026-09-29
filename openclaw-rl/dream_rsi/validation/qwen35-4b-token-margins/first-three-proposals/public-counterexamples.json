@@ -1,0 +1,17 @@
+[
+  {
+    "response": "def solve(data):\n    cache = {}\n    order = []\n    capacity = data[0]\n    results = []\n    \n    for op in data[1:]:\n        if op[0] == \"put\":\n            key, value = op[1], op[2]\n            if len(cache) >= capacity:\n                if capacity > 0:\n                    lru_key = order.pop()\n                    del cache[lru_key]\n            cache[key] = value\n            order.append(key)\n        elif op[0] == \"get\":\n            key = op[1]\n            if key in cache:\n                order.remove(key)\n                order.append(key)\n                results.append(cache[key])\n            else:\n                results.append(-1)\n    \n    return results\n",
+    "source_sha256": "b565d69b2fe9eef83ae68757552560d7576ceea9e6b4c50a4eccf8ec9343ba25",
+    "task_id": "repair_dev_hard_confirm_lru"
+  },
+  {
+    "response": "def solve(data):\n    stack = []\n    for token in data.split():\n        if token in '+-*/':\n            b = stack.pop()\n            a = stack.pop()\n            if token == '+':\n                stack.append(a + b)\n            elif token == '-':\n                stack.append(a - b)\n            elif token == '*':\n                stack.append(a * b)\n            elif token == '/':\n                stack.append(int(a / b))\n        else:\n            stack.append(int(token))\n    return stack[0]\n",
+    "source_sha256": "280193f19323a401b4d40a9d835c9d24a756b541bbd5cc761ccf8958e54dc1a9",
+    "task_id": "repair_dev_hard_confirm_rpn"
+  },
+  {
+    "response": "def solve(data):\n    result = []\n    prev = -1\n    for x in data:\n        if x > prev:\n            result.append(prev)\n        else:\n            result.append(-1)\n        prev = x\n    return result\n",
+    "source_sha256": "f76ee4447e4ef8d020c273fc20d9ac68193c63af133eaacd9a43b02c8f5e51e9",
+    "task_id": "repair_dev_hard_confirm_smaller"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "public_response_hashes_reproduced": 15,
+  "original_run": "/home/op/dream-qwen4b-projected.byux8T/run-001",
+  "scope": "DEV and guards only; no final data"
+}

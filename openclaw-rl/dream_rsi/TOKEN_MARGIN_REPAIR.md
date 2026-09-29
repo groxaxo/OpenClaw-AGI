@@ -63,9 +63,35 @@ relevant public cases. These counts validate implementation and targets, not
 model improvement. This experiment uses GPU 1 because it was free; no other GPU
 is made visible to the process and unrelated GPU 0/2 workloads are untouched.
 
-## Result
+## First registered result: partial development gain, no promotion
 
-The live result is pending. No new successful generation is claimed here until
-the completed report, required reviews and cold reproduction support it.
-This remains known-prompt, in-domain supervised research, not official Dream-RSI
-or evidence of broad unseen-task generalization.
+Three individually approved optimizer proposals completed on GPU 1. The accepted
+parent reproduced 372/435 public cases and ten complete families. Proposal 1's
+half-sized change and proposal 2's full change retained that score. Proposal 3's
+full change reached **403/435 (92.64%), eleven complete families**, preserving all
+previously complete families and all 11 separate guard cases. Sum-excluding-self
+improved from 2/33 to 33/33 while LRU stayed 40/40. Window range remains 0/32.
+
+This is NOT a promoted generation: the gain is 31/435 = 7.13 percentage points,
+below the fixed eight-point threshold, and only one new family is complete.
+The run returned NOT_OK without evaluating confirmation. Its checkpoint is
+saved explicitly as DEVELOPMENT_ONLY, never as the accepted parent.
+
+The projection used forty token-contrast anchors per proposal. Eleven first-
+proposal teacher-forced margins were nonpositive. A separate no-training probe
+reproduced the parent's three diagnostic prefixes exactly. LRU's contrast was
+zero during full-answer scoring but +0.125 during actual cached decoding. RPN's
+cached logits tied at 24.375, while a float64 dot product of those same frozen
+weights and hidden values gives a -0.00611 contrast. Thus cached evaluation and
+output rounding both matter. This diagnostic does not prove a causal fix or
+justify changing the production model's precision.
+
+Evidence, all four completed review receipts, the unpromoted checkpoint hashes
+and the read-only numerical probe are under
+`validation/qwen35-4b-token-margins/first-three-proposals/`.
+
+A separately registered follow-up may continue public optimization from this
+candidate, but must retain generation 1 as the final comparator. It must verify
+the candidate's bytes, lineage and cold public outputs, request fresh approvals,
+and leave the confirmation set untouched until all original prerequisites pass.
+There are no new successful generations at this point.
