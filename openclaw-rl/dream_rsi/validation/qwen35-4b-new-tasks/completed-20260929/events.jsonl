@@ -1,0 +1,9 @@
+{"elapsed_seconds":0.0,"physical_gpu":"2","stage":"started"}
+{"elapsed_seconds":96.717,"sha256":"e4c1e5fe16cc79013006d31a4d03f11bfdbe0df196549dbe152c982beee156e3","stage":"saved_checkpoint_loaded"}
+{"elapsed_seconds":276.716,"repair_count":7,"stage":"targets_fixed","target_sha256":"1e7085a02445fcf3bd516e9c42dc0168085615141ba2cd272127abce6a2f5496"}
+{"elapsed_seconds":276.717,"epoch":1,"stage":"training_proposal"}
+{"accepted":true,"dev":{"case_accuracy":0.5375,"complete_tasks":3,"passed_cases":129,"task_count":10,"total_cases":240},"elapsed_seconds":566.043,"epoch":1,"stage":"proposal_completed"}
+{"elapsed_seconds":566.043,"epoch":2,"stage":"training_proposal"}
+{"accepted":false,"dev":{"case_accuracy":0.5375,"complete_tasks":3,"passed_cases":129,"task_count":10,"total_cases":240},"elapsed_seconds":1009.608,"epoch":2,"stage":"proposal_completed"}
+{"elapsed_seconds":1009.608,"epoch":3,"stage":"training_proposal"}
+{"accepted":true,"dev":{"case_accuracy":0.5791666666666667,"complete_tasks":3,"passed_cases":139,"task_count":10,"total_cases":240},"elapsed_seconds":1295.735,"epoch":3,"stage":"proposal_completed"}

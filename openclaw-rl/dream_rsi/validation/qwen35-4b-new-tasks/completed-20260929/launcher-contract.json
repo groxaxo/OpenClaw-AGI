@@ -1,0 +1,14 @@
+{
+  "multiple_gpu_rejection": {
+    "exit_code": 64,
+    "passed": true
+  },
+  "concurrent_launch_rejection": {
+    "exit_code": 73,
+    "passed": true
+  },
+  "consumed_suite_rejection": {
+    "exit_code": 65,
+    "passed": true
+  }
+}

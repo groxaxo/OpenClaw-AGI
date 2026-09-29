@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "scope": "source, tests, measured-result integrity; not model acceptance",
+  "unit_tests": 150,
+  "compilation": true,
+  "launcher_syntax": true,
+  "git_diff_check": true,
+  "cold_output_hashes_matched": 47,
+  "source_sha256": "13f204c446402d890dc6e21645b6505d133ae4989418bda9fc8caaab2d14cb0e",
+  "model_acceptance_passed": false,
+  "global_lineage_advanced": false
+}

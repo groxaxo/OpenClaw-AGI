@@ -1,0 +1,183 @@
+{
+  "status": "MEASURED_NOT_ACCEPTED",
+  "model": "Qwen/Qwen3.5-4B",
+  "adapter_path": "/home/op/dream-qwen4b-newtasks.sIzsVr/run-002/selected",
+  "adapter_tensor_state_sha256": "f6c456474cf3ff8970f544c8e011cd87eab92999f90d5d97f364d69baf35038e",
+  "adapter_file_sha256": "91c7d7f803eb8be4fc6befbb4cbe28ed0116e3f38274a971d0a46b30f4a90f23",
+  "starting_status": "DEVELOPMENT_ONLY",
+  "starting_tensor_sha256": "e4c1e5fe16cc79013006d31a4d03f11bfdbe0df196549dbe152c982beee156e3",
+  "cold_reproduction_passed": true,
+  "model_acceptance_passed": false,
+  "global_lineage_advanced": false,
+  "production_deployed": false,
+  "confirmation": {
+    "after": {
+      "case_accuracy": 0.5875,
+      "complete_tasks": 3,
+      "passed_cases": 141,
+      "task_count": 10,
+      "total_cases": 240
+    },
+    "before": {
+      "case_accuracy": 0.3958333333333333,
+      "complete_tasks": 3,
+      "passed_cases": 95,
+      "task_count": 10,
+      "total_cases": 240
+    },
+    "case_gain": 0.1916666666666667,
+    "lost_complete": 0,
+    "newly_complete": 0,
+    "tasks": [
+      {
+        "after_passed": 24,
+        "before_passed": 24,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_bucket",
+        "total": 24
+      },
+      {
+        "after_passed": 6,
+        "before_passed": 0,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_csv_record",
+        "total": 24
+      },
+      {
+        "after_passed": 1,
+        "before_passed": 1,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_ipv4",
+        "total": 24
+      },
+      {
+        "after_passed": 18,
+        "before_passed": 0,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_merge_patch",
+        "total": 24
+      },
+      {
+        "after_passed": 24,
+        "before_passed": 24,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_ordering",
+        "total": 24
+      },
+      {
+        "after_passed": 21,
+        "before_passed": 12,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_paths",
+        "total": 24
+      },
+      {
+        "after_passed": 0,
+        "before_passed": 0,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_pointer",
+        "total": 24
+      },
+      {
+        "after_passed": 0,
+        "before_passed": 0,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_round_even",
+        "total": 24
+      },
+      {
+        "after_passed": 24,
+        "before_passed": 24,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_versions",
+        "total": 24
+      },
+      {
+        "after_passed": 23,
+        "before_passed": 10,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "confirmation_wildcard",
+        "total": 24
+      }
+    ]
+  },
+  "transfer": {
+    "after": {
+      "case_accuracy": 0.625,
+      "complete_tasks": 3,
+      "passed_cases": 90,
+      "task_count": 6,
+      "total_cases": 144
+    },
+    "before": {
+      "case_accuracy": 0.6388888888888888,
+      "complete_tasks": 3,
+      "passed_cases": 92,
+      "task_count": 6,
+      "total_cases": 144
+    },
+    "case_gain": -0.01388888888888884,
+    "lost_complete": 0,
+    "newly_complete": 0,
+    "tasks": [
+      {
+        "after_passed": 24,
+        "before_passed": 24,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "transfer_bipartite",
+        "total": 24
+      },
+      {
+        "after_passed": 24,
+        "before_passed": 24,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "transfer_range_add",
+        "total": 24
+      },
+      {
+        "after_passed": 2,
+        "before_passed": 4,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "transfer_rational",
+        "total": 24
+      },
+      {
+        "after_passed": 16,
+        "before_passed": 16,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "transfer_rectangle",
+        "total": 24
+      },
+      {
+        "after_passed": 24,
+        "before_passed": 24,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "transfer_roman",
+        "total": 24
+      },
+      {
+        "after_passed": 0,
+        "before_passed": 0,
+        "lost_complete": false,
+        "newly_complete": false,
+        "task_id": "transfer_shell_words",
+        "total": 24
+      }
+    ]
+  }
+}

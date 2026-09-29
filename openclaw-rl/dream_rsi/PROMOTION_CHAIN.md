@@ -195,3 +195,21 @@ hashes for the accepted parent, saved development candidate and rerun candidate;
 the saved development adapter still scores 403/435. All 136 tests and execution
 receipt checks passed. These results do not promote either candidate or consume
 final confirmation. One verified successful generation remains accepted.
+
+## Separate new-task measurement
+
+`NEW_TASK_EXPERIMENT.md` records a completed experiment starting from the
+cold-verified DEVELOPMENT_ONLY adapter, not from an artificially promoted
+parent. New adaptation-input confirmation improved 95/240 -> 141/240, while
+transfer-only cases fell 92/144 -> 90/144. Public old-task checks improved
+414/446 -> 446/446. Experimental acceptance was rejected; this does not add a
+successful generation or replace any accepted checkpoint.
+
+This experiment has its own consumed/retired reserved suites and three actual
+optimizer proposals, tracked separately in `new_task_measurements` in the
+ledger. A fresh-process, zero-training cold check reproduced **47/47 recorded
+output hashes** across saved-start/child confirmation and transfer plus the
+15-task old regression set. The original chain's unused confirmation remains
+untouched. The new result demonstrates bounded task-specific adaptation, not
+broad transfer or a reproducible training recipe; refer to the complete report
+and cold reproduction evidence.

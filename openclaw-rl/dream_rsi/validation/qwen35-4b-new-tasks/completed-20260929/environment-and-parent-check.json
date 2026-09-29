@@ -1,0 +1,32 @@
+{
+  "starting_public_outputs_checked": 15,
+  "all_old_output_hashes_match": true,
+  "per_task": {
+    "repair_dev_hard_confirm_chunks": true,
+    "repair_dev_hard_confirm_range": true,
+    "repair_dev_hard_confirm_union": true,
+    "repair_dev_hard_confirm_minpath": true,
+    "repair_dev_hard_confirm_prefix": true,
+    "repair_dev_hard_confirm_smaller": true,
+    "repair_dev_hard_confirm_runs": true,
+    "repair_dev_hard_confirm_sum": true,
+    "repair_dev_hard_confirm_rpn": true,
+    "repair_dev_hard_confirm_lru": true,
+    "repair_dev_hard_confirm_bfs": true,
+    "repair_dev_hard_confirm_edit": true,
+    "guard_closed_merge": true,
+    "guard_brackets": true,
+    "guard_coins": true
+  },
+  "versions": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "peft": "0.21.0",
+    "safetensors": "0.8.0",
+    "tokenizers": "0.23.2",
+    "accelerate": "1.15.0"
+  },
+  "python": "Python 3.13.13",
+  "model_path": "/home/op/dream-qwen4b-guarded.3ZPNcF/model/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "source_sha256": "13f204c446402d890dc6e21645b6505d133ae4989418bda9fc8caaab2d14cb0e"
+}
