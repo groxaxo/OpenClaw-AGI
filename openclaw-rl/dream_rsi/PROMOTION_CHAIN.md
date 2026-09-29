@@ -1,128 +1,156 @@
 # Qwen3.5-4B promotion lineage
 
-## Verified starting point
+## Current verified count — 29 September 2026
 
-Generation 1 is documented in `VALIDATION_BF16_GUARDED.md` and was merged to
-`main` in PR #6 (`e917cffcc7c5d43b58a553fb736d9eaae4182fdd`). It scored
-176/240 -> 204/240 against the original frozen BF16 base on its registered
-confirmation suite, retained all 11 separate guard checks, passed Muse max
-promotion/final reviews, and reproduced the exact outputs in a fresh process.
-Its logical adapter SHA256 is
-`4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69`.
-
-## What constitutes a successful next run
-
-A continuation must load the exact **last approved adapter**, verify its file
-and logical tensor hashes, and compare its child against that parent. Comparing
-a succession of candidates only to the original base does not demonstrate
-successive improvements. Optimizer steps, approved proposals, or repeated
-reproduction checks do not increment the successful-generation count.
-
-The unchanged engineering promotion gate requires >=0.08 absolute case-accuracy
-gain, >=0.75 child accuracy, >=2 newly complete task families, zero lost complete
-families, preserved development guards, and an independent Muse max approval.
-The final audit must approve, and a new-process locked-checkpoint reproduction
-must pass before the child becomes the next parent. Rejected/interrupted trials
-remain in the record but never replace the accepted checkpoint.
-
-The first continuation uses one visible GPU, BF16 + the existing rank-8 LoRA,
-maximum four optimizer proposals, LR 2.5e-5, replay weight 4, reference repair
-weight 12, and guard weight 16. Full/half/quarter proposal sizes are evaluated
-only on public development; regressions are reverted. Every optimizer proposal
-requires its own hash-bound, single-use Muse approval.
-
-The published generation-1 confirmation cases are explicitly retired into
-DEVELOPMENT, merged by exact prompt with prior development and deduplicated.
-They are not claimed as unseen evidence. A new 12-family/240-case confirmation
-is preregistered before training and excludes all exact public inputs. It is
-consumed once, only after development selects a fixed candidate. The comparison
-uses identical prompts, deterministic decoding and 512-token budgets for parent
-and child. This measures known-task, in-domain program correctness, not broad
-unseen-task generalization, population-level significance, or official Dream-RSI.
-
-## Saturation and honest stopping
-
-An eight-point minimum improvement becomes mathematically unavailable on a
-fixed distribution above 92% parent accuracy. The runner must not lower that
-threshold, reset the comparator to the original base, or rename reproductions
-as new successes. Report the reached generation and the plateau/ceiling; any
-new benchmark or acceptance policy must be a separately declared experiment.
-
-Use `run_qwen4b_continuation.sh` with the explicit parent acceptance record,
-pinned model, retired parent suite hash and fresh confirmation hash. The script
-rejects multiple GPU selectors, locks its GPU, runs tests first, applies a hard
-runtime limit, and does not deploy or alter an existing model server.
-
-## Measured continuation results
-
-Generation 1 remains the accepted checkpoint. Its original confirmation result
-was 176/240 -> 204/240 (73.33% -> 85.00%), two complete-family wins and no losses,
-with cold reproduction; the next generation is not compared to that original
-base again.
-
-The first completed continuation loaded that approved checkpoint and executed
-four separately Muse-approved optimizer proposals on GPU 0. Public development
-remained **372/435 -> 372/435**, with ten of twelve families fully solved. The
-first two proposals and all their line-search alternatives were rejected for
-losing previously solved families. The third half-sized and fourth full-sized
-updates preserved results but added no correct cases. They are not successful
-promotions. The run returned `NOT_OK: no DEV improvement` before consuming the
-registered confirmation suite. The approved parent was not overwritten.
-
-The second bounded job changed one factor: reference-repair weight 8 instead of
-12, with initial LR **2.5e-5** and all other settings unchanged. Muse approved its
-preflight, but before model loading other GPU jobs reduced free VRAM below the
-unchanged **12 GiB headroom guard**. It stopped with `BLOCKED_RESOURCE`; it loaded
-no model and executed no optimizer update. This is not a failed model-performance
-experiment and does not count as a completed training continuation. Existing GPU
-jobs were left untouched. The registered final suite remains unconsumed.
-
-The variant was motivated by a public-only diagnostic hypothesis that repair
-examples were interfering with already-correct RPN/LRU outputs. The diagnostic
-incorrectly inferred the source default LR of 5e-5; the executed manifest and
-receipts show 2.5e-5. Its original text and an explicit correction are retained.
-The weight-8 hypothesis has therefore **not yet been tested by training**.
-
-An initial setup was interrupted before any optimizer step to align public
-stopping with the fixed two-family promotion requirement. No confirmation
-outcomes were consumed by that correction. Its record is retained separately.
-
-Evidence: `validation/qwen35-4b-chain/`. Completed rejected trials retain their
-reports, configuration, reviewer receipts, and acceptance-integrity audit.
-The JSON lineage separates one verified successful generation, one completed
-rejection, one setup interruption and one resource-blocked launch. No experiment
-is still running from this task. An integrity-audit PASS means
-the audit agrees with the rejection; it does not turn that model run into a PASS.
-
-## Validation of this continuation implementation
-
-120 unit/regression tests passed. All 58 reference programs passed 1,010 expanded
-public case checks, and the 240 generated confirmation gold answers agreed with
-independent reference programs. These are evaluator/data checks, not model
-performance scores. The one-GPU launcher CHECK_ONLY path, syntax, compilation,
-whitespace checks and multi-GPU-selector rejection passed. Executed code bundle:
-`85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7`.
-
-No existing model-serving service was restarted or replaced. Model weights,
-adapter binaries and raw CLI transcripts remain on the owner's machine.
-
-## Final count for this continuation request
+**One verified successful generation remains the accepted tip. No child has
+passed promotion in the three completed continuations from that checkpoint.**
+The current machine-readable ledger is `validation/qwen35-4b-chain/current-lineage.json`.
+It supersedes the earlier pending/resource-blocked description of the weight-8
+variant while retaining that historical launch separately.
 
 | Category | Count | Meaning |
 |---|---:|---|
-| Verified successful generations total | 1 | Previously approved and cold-reproduced checkpoint remains the tip |
-| New successful generations | 0 | No child beat the accepted parent |
-| Completed training continuations | 1 | Four real proposals, no DEV improvement |
-| Resource-blocked launch | 1 | Approved preflight; no model loading or training |
-| Setup interruption | 1 | Early-stop correction before any optimizer update |
+| Verified successful generations total | 1 | Approved and cold-reproduced checkpoint from PR #6 |
+| New successful generations | 0 | No continuation child met the unchanged promotion gate |
+| Completed training continuations | 3 | Weight-12, weight-8 retry, projected minimal repair |
+| Optimizer proposals in those continuations | 11 | 4 + 4 + 3; not successful generations |
+| Resource-blocked launches | 1 | Approved preflight but no model loading or optimizer step |
+| Setup interruptions before training | 1 | Stopping-rule correction before any update |
 
-The accepted adapter is still the original approved generation-1 artifact.
-Neither its bytes nor any production serving model were replaced. The new
-240-case confirmation has not been consumed or used to guide the public search.
+All completed continuations preserve the accepted parent on disk. The new
+240-case confirmation is still registered and unconsumed. No experiment from
+this continuation task remains running; no production inference service was
+changed.
 
-This records a plateau for the tested settings, **not a maximum achievable run
-count**. The next controlled experiment is still repair weight 8 versus 12 at the
-same actual initial learning rate, once GPU headroom is available. Do not lower
-performance thresholds or use an unpromoted intermediate as the next parent to
-inflate the count. A fresh-process reproduction is required before incrementing
-this lineage after any future promotion.
+## Verified starting checkpoint
+
+Generation 1 is documented in `VALIDATION_BF16_GUARDED.md` and merged in PR #6,
+commit `e917cffcc7c5d43b58a553fb736d9eaae4182fdd`. Against the original frozen
+BF16 Qwen3.5-4B base, it scored 176/240 -> 204/240 (73.33% -> 85.00%) on its
+registered confirmation suite, with two complete-family wins, zero losses and
+all 11 separate regression checks preserved. Muse promotion/final reviews and
+fresh-process exact-output reproduction passed.
+
+Logical adapter SHA-256:
+`4350f1d97ab1402eae61f24d501da6d3c4f26826ff2d2cc656dfdfa9d89e7b69`.
+Adapter file SHA-256:
+`2f0816a757b0d2405578bb0238e8fab1459cbbc1134c2d7f80995f0a24cb31e1`.
+
+The model revision remains `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`, with
+original frozen BF16 weights and the existing rank-8 LoRA. The original parent
+confirmation is now public DEVELOPMENT, not a reusable unseen test.
+
+## Definition of a successful continuation
+
+Each continuation must load the exact last approved adapter, validate its file,
+configuration and logical tensor identity, and compare the child against that
+immediate parent. Repeatedly comparing children with the original base cannot
+establish a succession of improvements. Optimizer proposals, non-regressing
+updates, independent execution approvals, and cold reproductions alone do not
+increment the successful-generation count.
+
+The unchanged engineering gate requires >=0.08 absolute case-accuracy gain,
+>=0.75 child accuracy, >=2 newly complete families, zero complete-family losses,
+regression guards preserved, Muse max promotion approval, final review and a
+fresh-process locked-checkpoint reproduction. Only after all these pass may a
+child become the next parent. Rejections and interruptions remain visible but
+never replace an accepted checkpoint.
+
+The published generation-1 confirmation is merged by exact prompt into earlier
+public development and deduplicated by input; conflicting gold answers fail
+validation. This produces 435 cases over 12 known families. The approved parent
+scores 372/435, with 10/12 complete. These are a different public distribution
+from the original 204/240 confirmation and must not be pooled or substituted.
+
+The new 12-family / 240-case confirmation was generated and hashed before the
+continuation searches. Exact public inputs were excluded and gold answers were
+independently cross-checked. It is consumed once, only after public development
+fixes a candidate; parent and child use identical prompts and deterministic
+512-token generation. The measured scope is known-prompt, in-domain program
+correctness, not unseen-task generalization or population-level significance.
+
+## Completed continuations
+
+### 1. Broad verified repair, weight 12 — NOT_OK
+
+Four independently Muse-approved optimizer proposals ran on GPU 0, starting
+from the accepted parent with initial LR 2.5e-5. Public development remained
+372/435, 10/12 complete. The first proposals lost correct RPN/LRU programs and
+were reverted. Later non-regressing alternatives added no correct cases.
+The run stopped before confirmation with `NOT_OK: no DEV improvement`.
+
+### 2. Broad verified repair, weight 8 — NOT_OK after resource retry
+
+The initial launch was resource-blocked after preflight because unrelated GPU
+work left less than the fixed 12 GiB headroom requirement. No model was loaded
+and no optimizer step happened during that blocked launch.
+
+A subsequent launch with sufficient headroom did complete four real proposals.
+It changed only repair weight 12 -> 8 from the earlier broad-repair setting;
+initial LR remained 2.5e-5. Every proposal and its tested smaller alternatives
+failed public acceptance. The retained score stayed 372/435, 10/12 complete.
+The outcome is now a completed model rejection, not an untested hypothesis.
+The earlier blocked launch is still recorded separately.
+
+A prior diagnostic had inferred LR 5e-5 from the source default. The executed
+manifests/receipts establish 2.5e-5; the original diagnosis and correction remain
+in the evidence. The diagnostic was a hypothesis, not an approval or causal proof.
+
+Completed weight-8 evidence, including its five reviewer receipts and integrity
+audit, is in `validation/qwen35-4b-chain/weight8-completed-rejected/`.
+
+### 3. Projected minimal repairs — NOT_OK
+
+The next job again loaded the exact accepted parent on GPU 0. It trained only
+two minimally edited public responses and projected each proposed displacement
+away from 26 measured correct-response loss-gradient directions. Initial LR
+was 5e-5, with at most three proposals. The method and its first-order limitations
+are documented in `PROTECTED_REPAIR.md`; all promotion thresholds stayed fixed.
+
+The first full projected update retained all public results but gained nothing.
+The second full proposal fixed sum-excluding-self (2/33 -> 33/33) while breaking
+LRU (40/40 -> 0/40), so it was rejected; smaller trials and the third proposal
+also lost solved families. Retained public results stayed 372/435, 10/12 complete.
+The run exited 3 before consuming confirmation. No candidate was promoted.
+
+Four actual Muse max reviews approved bounded execution: preflight and each
+optimizer proposal. There is no promotion/final approval for this failed model
+run. The receipt/lineage audit is PASS because it faithfully verifies the
+NOT_OK outcome, not because the model improved.
+
+Executed-source SHA-256:
+`ca041bb0f80e4108d43de60aa329ecf37abde75b3196ddb917dcc42197d591b8`.
+Evidence: `validation/qwen35-4b-chain/projected-minimal-repair-rejected/`.
+
+## Implementation validation and safeguards
+
+The current suite has 127 passing unit/regression tests, including projection
+orthogonality, dependent/zero anchors and exact minimal-edit checks. Both repair
+targets passed their 65 relevant public cases. Previously, the broad runner's
+58 reference programs passed 1,010 expanded public case checks and the 240
+registered gold answers agreed with independent reference algorithms. These
+are data/evaluator checks, not independent model-performance trials.
+
+The one-GPU launchers enforce a shared exclusive experiment lock, unique output
+folders, explicit parent identity, token/time/disk bounds, and independent
+source/evidence-bound approvals. CHECK_ONLY, shell syntax, multi-GPU rejection,
+concurrent-lock rejection, compilation and git whitespace checks passed for the
+new entry point `run_qwen4b_projected.sh`. No GitHub Actions are required.
+
+Model weights, adapter binaries and raw CLI transcripts remain on the owner's
+machine. The repository retains reports, manifests, final reviewer verdicts,
+source/parent hashes, and relevant rejected outputs. No production serving
+checkpoint was activated or replaced.
+
+## Interpretation and stopping
+
+One successful generation is the count verified so far, not an established
+maximum. These tested methods plateaued under the fixed acceptance criteria.
+On a fixed distribution above 92% parent accuracy, an eight-point improvement
+would become mathematically unavailable; the system must report that ceiling
+rather than lower the gate, reset the comparator or relabel reproductions.
+
+Further public-development experiments may investigate more local updates or
+stronger token-level preservation, but their gains must still be verified
+against the accepted parent on a fresh, unconsumed final evaluation. A new
+benchmark or acceptance policy must be declared as a separate experiment.

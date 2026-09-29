@@ -1,0 +1,97 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "1a469f0ef2ed8174c7f305dd494ea607df6046e8674ba321451699ea96f9250d",
+    "reason": "all required judges approved",
+    "review_id": "9d19a145be6bc9189fed79cbc0bc7fc041536c5ca36342c6550125fbd29b794d",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 71.137,
+        "reason": "Bounded before_training step on single_gpu_qwen35_4b_incremental_promotion backend justified. Gradients finite (norm 0.94, loss 0.21), deterministic_ok true. No sealed evaluation; repair uses public TRAIN/DEV+guards only, sealed hash pre-registered. Adapter matches approved parent with halved LR consistent with revert rule. Guards 11/11 preserved, DEV counts stable. Digest-pinned image, single-GPU limits, preregistered line-search revert and checkpoint roundtrip provide reproducibility/rollback. No production claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "9d19a145be6bc9189fed79cbc0bc7fc041536c5ca36342c6550125fbd29b794d",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "66b0b97aece3dce96c5e112ab1bc590a1fb17ed514f5a378d95a892a37a11df5",
+    "reason": "all required judges approved",
+    "review_id": "f65b4a18ca7ea594205bb33024f0cd6eb999ff56ce26eb962f0d84bb2d9a2e75",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 212.8,
+        "reason": "Bounded before_training step justified: deterministic_ok true with finite loss 0.209 and grad norm 0.943>0; adapter_before matches approved parent tensor; guards 11/11 passing with no regression; DEV 372/435 baseline; repair dataset 61=58+3 hashed; code/test/parent hashes consistent; sealed suite preregistered but unevaluated so no leakage; single-GPU BF16 LoRA incremental backend distinct from legacy SGLang/9B; preregistered 1/0.5/0.25 guard/DEV line search with revert provides rollback; no production or efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "f65b4a18ca7ea594205bb33024f0cd6eb999ff56ce26eb962f0d84bb2d9a2e75",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "2ff82aae6448ed35072f719ccb831b0b167a9218a1db621f395449abb2f44846",
+    "reason": "all required judges approved",
+    "review_id": "9cdd8b96882a481fcc7183bf5321d4010a713c8799aeeae846c0aa314d5b554f",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 126.164,
+        "reason": "Bounded before_training step on single_gpu_qwen35_4b_incremental_promotion backend, distinct from legacy SGLang and 9B DDP paths. deterministic_ok=true with finite loss 0.21 and grad_norm 0.94>0, LR 6.25e-06 within 1e-6..5e-4 after two reverts, epoch 3/4. No sealed confirmation evaluated; retired suite explicitly merged as DEVELOPMENT, no unseen claim. Guards 11/11 preserved baseline, DEV 372/435. Pinned docker image, hashed repair dataset 61 ex, adapter hash binding, preregistered guard/DEV line search with revert and halve-LR rollback, no deployment.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "9cdd8b96882a481fcc7183bf5321d4010a713c8799aeeae846c0aa314d5b554f",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "da1512994a45b43c84f27e4ba1aac0de46df319ec78e5dc0db8cfc772179c531",
+    "reason": "all required judges approved",
+    "review_id": "73eb22fcd9f4197ef58c5485b0d99b7fba030b0f3abceb841418b0056b53d0ca",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 117.222,
+        "reason": "Preflight for bounded single-GPU BF16 LoRA continuation (backend single_gpu_qwen35_4b_incremental_promotion, not legacy SGLang/PRM). Manifest bounds match qwen4b_continue.py: 1 GPU, LR 2.5e-5, 2-4 epochs/updates, 512 new tokens, 1280 eval/768 train tokens, 3600s wall, digest-pinned evaluator. Sealed suite hash pre-registered, loaded only after DEV-fixed candidate, single-consumption, ID-overlap check; cannot steer training. Comparator is immediate approved parent with tensor/file hash validation. Guards require no per-task regression, zero complete-task loss, nondecreasing DEV, else revert+halve LR. Scope is known-task new inputs only, no unseen/broad claim, no pooling, no deployment. Tests pass with matching code hash, deterministic_ok true.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "73eb22fcd9f4197ef58c5485b0d99b7fba030b0f3abceb841418b0056b53d0ca",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "85995370317a1831aa65e657dff010bd0b44e365efeaba8aef6eaccda20817a7",
+    "evidence_sha256": "7528ce29054688f5ceab51d47bd8293b988808a26c9dc05de0f5cb8657884552",
+    "reason": "all required judges approved",
+    "review_id": "632ec49dc372558b2c2f71ee73c8af6cd230c2aa2ddcdef9a54c9f366dcaec3f",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 80.644,
+        "reason": "Bounded one-step BF16 LoRA update with public guard/DEV line search; sealed confirmation absent as required. Finite loss 0.21 and grad norm 0.94, LR 3.125e-06 within 1e-6..5e-4 after halving rule, guards 11/11 passing, DEV counts consistent 372/435, dataset 61 hashed matching 58 train+3 guards, adapter parent-bound, digest-pinned evaluator, single-GPU limits, revert-on-reject and roundtrip in source. No leakage, deployment, or efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "632ec49dc372558b2c2f71ee73c8af6cd230c2aa2ddcdef9a54c9f366dcaec3f",
+        "verdict": "OK"
+      }
+    }
+  }
+]
