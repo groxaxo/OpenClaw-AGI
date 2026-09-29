@@ -431,3 +431,19 @@ The controller selects training samples from already PRM-scored pools, searches 
 The sampler is enabled only with `--dream-rsi-enable` and requires `--prm-enable` plus a reachable PRM server. The API also preserves sample metadata and fixes PRM next-state pairing when disk conversation logging is disabled.
 
 Usage, state layout, CPU-only tests and limitations are documented in [`openclaw-rl/dream_rsi/README.md`](./openclaw-rl/dream_rsi/README.md). Executed checks are recorded in [`VALIDATION.md`](./openclaw-rl/dream_rsi/VALIDATION.md).
+
+
+## Verified single-GPU Qwen3.5-4B experiment
+
+A native BF16 + LoRA research path has passed its fixed in-domain promotion
+gate on one RTX 3090: **176/240 to 204/240**, **8/12 to 10/12 fully solved coding
+families**, and no complete-task regressions. Muse max-reasoning approvals and
+a fresh-process checkpoint reproduction passed; 100 unit/regression tests ran
+on the local machine. Both models used the same 512-token generation budget.
+
+This is known-task supervised adaptation with new case inputs, not proof of
+broad capability gain or Google's official Dream-RSI reproduction. The adapter
+was not deployed to a production service. Earlier rejected results are retained.
+
+See [the validation record](openclaw-rl/dream_rsi/VALIDATION_BF16_GUARDED.md) and
+[the one-GPU launcher](openclaw-rl/run_qwen4b_bf16_guarded.sh).

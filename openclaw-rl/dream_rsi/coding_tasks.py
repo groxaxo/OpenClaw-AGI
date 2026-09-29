@@ -49,8 +49,10 @@ def extract_code(response: str) -> str:
         raise ValueError("missing solve function")
     banned = {"exec", "eval", "open", "compile", "globals", "locals", "vars", "getattr", "setattr", "delattr", "breakpoint", "input", "help", "exit", "quit"}
     for node in ast.walk(tree):
-        if isinstance(node, ast.Name) and (node.id.startswith("_") or node.id in banned):
+        if isinstance(node, ast.Name) and (node.id.startswith("__") or node.id in banned):
             raise ValueError("forbidden name")
+        if isinstance(node, ast.alias) and any(part.startswith("_") for part in node.name.split(".")):
+            raise ValueError("private import names forbidden")
         if isinstance(node, ast.Attribute) and node.attr.startswith("_"):
             raise ValueError("private attributes forbidden")
         if isinstance(node, (ast.Global, ast.Nonlocal, ast.ClassDef)):
@@ -62,21 +64,25 @@ def extract_code(response: str) -> str:
     return code
 
 
-# Assertions/results are produced by this fixed harness, not by model text.
+# The candidate sees inputs only; gold comparisons run in the trusted parent.
 HARNESS = '''import json,sys,io,contextlib
 obj=json.load(sys.stdin)
 ns={}
 with contextlib.redirect_stdout(io.StringIO()):
     exec(compile(obj["code"], "candidate.py", "exec"), ns)
     results=[]
-    for arg,expected in obj["cases"]:
+    for arg in obj["inputs"]:
         try:
             actual=ns["solve"](arg)
-            results.append(type(actual) is type(expected) and actual==expected)
+            encoded=json.dumps(actual,allow_nan=False)
+            if len(encoded)>12000:
+                raise ValueError("result too large")
+            results.append({"ok":True,"value":actual})
         except BaseException:
-            results.append(False)
-print(json.dumps({"passed":results}))
+            results.append({"ok":False})
+print(json.dumps({"results":results},allow_nan=False))
 '''
+
 
 
 def grade(task: CodingTask, response: str, image: str, timeout_s: int = 12) -> dict:
@@ -92,16 +98,22 @@ def grade(task: CodingTask, response: str, image: str, timeout_s: int = 12) -> d
            "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "65534:65534",
            "-i", image, "python", "-I", "-S", "-c", HARNESS]
     try:
-        result = subprocess.run(cmd, input=json.dumps({"code": code, "cases": task.cases}),
+        result = subprocess.run(cmd, input=json.dumps({"code": code, "inputs": [arg for arg,_ in task.cases]}),
                                 text=True, capture_output=True, timeout=timeout_s)
         if result.returncode != 0 or len(result.stdout) > 10000:
             raise ValueError("candidate execution failed")
-        flags = json.loads(result.stdout)["passed"]
-        if len(flags) != len(task.cases) or any(type(x) is not bool for x in flags):
+        values = json.loads(result.stdout)["results"]
+        if not isinstance(values,list) or len(values)!=len(task.cases):
             raise ValueError("malformed evaluator result")
-        passed = sum(flags)
-        return {"task_id": task.task_id, "passed": passed, "total": len(flags),
-                "score": 2.0 * passed / len(flags) - 1.0}
+        passed=0
+        for value,(_,expected) in zip(values,task.cases):
+            if not isinstance(value,dict) or type(value.get("ok")) is not bool:
+                raise ValueError("malformed evaluator result")
+            # Gold answers remain in the trusted parent, never the candidate container.
+            actual=value.get("value")
+            passed+=value["ok"] and type(actual) is type(expected) and actual==expected
+        return {"task_id": task.task_id, "passed": passed, "total": len(values),
+                "score": 2.0 * passed / len(values) - 1.0}
     except (subprocess.TimeoutExpired, ValueError, KeyError) as exc:
         return {"task_id": task.task_id, "passed": 0, "total": len(task.cases), "score": -1.0,
                 "error": type(exc).__name__}

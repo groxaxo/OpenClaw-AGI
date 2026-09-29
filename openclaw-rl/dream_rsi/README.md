@@ -108,3 +108,70 @@ also makes its KL term depend on the frozen reference and uses PEFT's actual
 Run-specific commands, versions, reviewer outputs and measurements must be
 recorded with the actual validation evidence. Do not treat a unit test or an
 LLM opinion as evidence that a training run improved the model.
+
+## Single-GPU Qwen3.5-4B continuation
+
+`qwen4b_single.py` refuses to run unless exactly one CUDA device is visible.
+It uses 32 independently tested reference solutions for supervised QLoRA and
+an eight-task development set for checkpoint selection. This is **supervised
+adaptation**, not a reproduction of Google's code-evolving Dream-RSI loop.
+
+The new final suite contains 12 in-domain task families with 20 independently
+computed small-input cases each. Several algorithm families overlap with the
+training curriculum: it measures new inputs and reworded instructions, not
+unseen-algorithm generalization or statistically significant broad capability.
+Old unfinished/previously exposed final suites are not reused as confirmation.
+A known old grid-path development label is corrected from 1 to 2 before runs.
+
+The final suite is hashed before training and claimed once across run folders.
+Both base and candidate are evaluated only after the development-selected
+checkpoint is fixed. All generation budgets are matched. Promotion still
+requires +0.08 case accuracy, final accuracy >=0.75, >=2 complete-task wins,
+zero complete-task regressions, and an independent Muse max approval. Every
+optimizer update requires a separate source/evidence-bound approval. A crash,
+missing receipt or negative final review is never reported as PASS.
+
+### Second preregistered single-GPU distribution
+
+The first corrected trial remains rejected: 235/240 base versus 231/240
+candidate, with a closed-interval regression. Its near-ceiling baseline also
+could not support the fixed +8-percentage-point criterion. It is not relabeled
+as a pass or pooled with later results.
+
+`qwen4b_harder.py` defines a separate, harder in-domain distribution, 46
+reference training examples, 12 development tasks and three regression guards.
+The full plan and new confirmation cases are fixed before the second round's
+model evaluation. No promotion thresholds were relaxed. Closed-interval,
+bracket and coin regression guards must not lose any previously passing cases;
+only guard-passing development checkpoints can reach confirmation.
+
+Training still uses exactly one GPU, Muse max approval before every optimizer
+update, and source/evidence hashes. The second round uses learning rate 5e-5
+and at most six full-batch updates, with matched 256-token evaluation budgets.
+It measures adaptation within a trained algorithm distribution, not unseen
+algorithm discovery, broad capability, or a statistically significant effect.
+
+### Third round: verified repairs and preservation of correct answers
+
+Round 2 measured a genuine 106/240 to 146/240 gain (+16.67 percentage points),
+two complete-task wins and zero losses, but failed the unchanged 75% final
+accuracy floor. It remains rejected and was never deployed.
+
+The third round starts from round 2's experimental DEV-selected adapter, not
+an activated serving model. It collects the current model's answers to 58
+training prompts and tests them. Verified correct answers become self-replay
+SFT targets at weight 1; failures use independently verified reference targets
+at weight 4. This avoids replacing every already-correct answer with a different
+human coding style. The derived dataset is fixed and hashed before updates.
+
+The earlier confirmation prompts/cases are explicitly reclassified as
+**development**. The third final input set is generated and hashed before the
+run. Prompt and algorithm families overlap training, so the supported claim is
+known-task program correctness on new generated inputs, not unseen-task or
+broad coding generalization. All attempted rounds remain in the audit trail.
+
+Third-round learning rate is 2e-5, at most six full-batch optimizer updates,
+with independent Muse max approval before each one, preservation of the warm
+checkpoint's guard case counts, and the same deterministic promotion criteria.
+The original official base remains the confirmation comparator and the active
+production model remains untouched. No threshold is relaxed to force a PASS.

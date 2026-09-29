@@ -1,0 +1,145 @@
+[
+  {
+    "approved": false,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "bd8cf9dc8683f959b856b5cabdc2d79a648e26e4ac904944ec5231cba5b6d177",
+    "reason": "deterministic check, reviewer, or code-binding veto",
+    "review_id": "d8a0e271f3722495122b2c1371cb10a764a0864f46c01229a078be98ffd999cf",
+    "stage": "final_review",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [
+          "deterministic_ok=false requires NOT_OK; LLM cannot override deterministic gate",
+          "promotion gate passed=false: case_gain -0.0167 < 0.08, wins 0 < 2, losses 1 > 0",
+          "sealed complete-task regression on confirm_merge: 20/20 complete to 16/20 incomplete",
+          "report validation_status NOT_OK and promotion_approved=false contradict certification"
+        ],
+        "elapsed_s": 29.747,
+        "reason": "deterministic_ok=false mandates NOT_OK. Bounded single-GPU SFT run executed within budgets with exact checkpoint roundtrips and no deployment, but sealed confirmation failed: negative case gain, zero wins, one complete-task loss. Cannot certify as passed; correctly reported NOT_OK.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "d8a0e271f3722495122b2c1371cb10a764a0864f46c01229a078be98ffd999cf",
+        "verdict": "NOT_OK"
+      }
+    }
+  },
+  {
+    "approved": false,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "8018563b8153dee86e3cc51c41801a9f8f945058f6a8d129a58406b57f0e7dea",
+    "reason": "deterministic check, reviewer, or code-binding veto",
+    "review_id": "23ed9e2973c0c8951e2a1925c9b1a96d2ba0cdbfbf077a619c608a52ceef246e",
+    "stage": "checkpoint_promotion",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [
+          "deterministic_ok=false requires NOT_OK; LLM cannot override gate",
+          "promotion gate passed=false: case_gain -0.0167 < required 0.08",
+          "complete_task_wins 0 < required 2 and losses 1 > allowed 0",
+          "sealed regression 235/240 to 231/240 with confirm_merge losing complete-task status"
+        ],
+        "elapsed_s": 33.253,
+        "reason": "Single-GPU 4B SFT checkpoint fails its own promotion gate. Sealed in-domain evaluation after DEV-only selection shows negative case gain and a complete-task regression, violating min gain, wins, and zero-loss rules. Deterministic veto binds; bounded experimental acceptance still requires gate pass.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "23ed9e2973c0c8951e2a1925c9b1a96d2ba0cdbfbf077a619c608a52ceef246e",
+        "verdict": "NOT_OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "04fc4b94e9795f5c2fe7418beeb65f91c327242e9dac8b50bf6f64c2bda4032d",
+    "reason": "all required judges approved",
+    "review_id": "f22a3b25053a9a0c1c9e16e04ebf82377ddb71195627ba2d6e46f91dc65193fd",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 40.656,
+        "reason": "Bounded SFT step 4/6 on single_gpu_qwen35_4b_qlora_sft backend, distinct from legacy SGLang path. Deterministic_ok true with finite loss 0.63 and grad norm 2.26>0 to be clipped to 1.0. Epoch, LR 3e-5, tokens 768/512/256, wall 3000s, 1 GPU within manifest budgets. Code_sha matches manifest and passing tests (77 run, 32 refs). TRAIN 32 / DEV 8/27 cases disjoint; sealed 12-task suite hashed and correctly absent pre-selection, preserving no-leakage rule. Adapter_before hash enables rollback; per-epoch save/reload verified by code. DEV 0.778 below 0.88+ target justifies continuing, not promotion.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "f22a3b25053a9a0c1c9e16e04ebf82377ddb71195627ba2d6e46f91dc65193fd",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "650401f9fc4f508c2abb0d9a4ee3202b735d3de68539759a04b54d444e450727",
+    "reason": "all required judges approved",
+    "review_id": "37206d8845c16495d1f0a7b9fa6a2b12eb1706d1047b58fc22040be9859a3fc6",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 139.021,
+        "reason": "Preflight for bounded single-GPU QLoRA SFT smoke is justified. Sealed 12-task suite hash-committed, parsed only after DEV-selected checkpoint fixed, ID-disjoint, single-use consumed marker, no in-run retry; scope is in-domain smoke not generalization. SFT gradients correct with alignment and finite non-zero norm gate. Bounds enforced: 1 GPU, <=6 updates, 512 eval/768 train tokens, wall/disk watchdogs, digest-pinned docker. Approvals code/evidence-bound, single-use, per-step Muse max veto, fail-closed. Reproducible via pinned revision/seed/code/suite, roundtrip checks; no service overwrite, rollback by discard. Legacy SGLang path distinct and not exercised.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "37206d8845c16495d1f0a7b9fa6a2b12eb1706d1047b58fc22040be9859a3fc6",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "ce208163da63d98df5f2b0918d05405cba8d99fb5b14ce08e9a591ecb0597ea0",
+    "reason": "all required judges approved",
+    "review_id": "d6df4637f2680d8ad8ac78469d39996ddb4c3c96db07868fd4160f3373fc9770",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 62.602,
+        "reason": "Bounded single-GPU SFT step justified. Backend single_gpu_qwen35_4b_qlora_sft distinguished from legacy SGLang/DDP. Finite mean loss 0.757 and grad norm 2.42>0 satisfy deterministic gate, deterministic_ok=true. DEV 18/27=0.667, 27 cases matches 8 cdev tasks; small N acceptable for smoke, no efficacy claimed. Sealed suite correctly absent, pre-registered hash daea... with single-use .consumed claim and post-selection-only evaluation prevents leakage. TRAIN 32 / DEV 8 IDs disjoint. Limits: lr 3e-05, epochs 1/6, 1 GPU, digest-pinned image, 512/768 token budgets, 3000s wall. Tests 77 pass with matching code_sha256. Adapter hash enables rollback, per-epoch roundtrip and no deployment preserve reproducibility.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "d6df4637f2680d8ad8ac78469d39996ddb4c3c96db07868fd4160f3373fc9770",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "f0aac393b4d0ca09a0c63a86a68e6bdb0a7900a8209e00d3f49d0312b2185509",
+    "reason": "all required judges approved",
+    "review_id": "6ae878162b68d6eb589e821a42def9f87c05252a592ab2c1722aeaf3e57fca07",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 92.238,
+        "reason": "Bounded epoch-2 SFT optimizer step on single_gpu_qwen35_4b_qlora_sft justified. deterministic_ok true with finite loss 0.74 and grad norm 2.38>0, epoch within 2..6, LR 3e-05 in range, digest-pinned image, 1 GPU, budgets enforced, tests 77/77 and 32 refs match source, DEV 18/27 matches 8-task totals. Sealed absence by design: DEV-only adaptation, 12-task hash pre-registered, ID-disjoint, single-consumption, post-selection evaluation only. Correct SFT cross-entropy averaging with clip and veto-before-step; distinct from legacy SGLang/PPO paths. Reproducibility via code/sealed/docker/revision digests; rollback via per-epoch exact-roundtrip checkpoints, no serving overwrite. Small N acceptable for smoke step, no efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "6ae878162b68d6eb589e821a42def9f87c05252a592ab2c1722aeaf3e57fca07",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "9be780e5ddb7f9d61d5c7413646bda85e9e8240bf12a8a3523ba4251df54c153",
+    "evidence_sha256": "3af898725aa5400f01c32021f0de5a44569096e765aeba7a3fdb6d219688af0c",
+    "reason": "all required judges approved",
+    "review_id": "c57e4b12e1f8f3ebd69321795901e3cfe8bccd3a3b4c69bced86b8fd28707301",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 93.216,
+        "reason": "Bounded single-GPU QLoRA SFT step epoch 3/6 justified. Backend single_gpu_qwen35_4b_qlora_sft distinct from legacy SGLang. deterministic_ok true with finite mean loss 0.70 and grad norm 2.37>0. Sealed suite correctly absent per DEV-only rule, digest-pinned, TRAIN/DEV IDs disjoint, docker digest-pinned, budgets within limits, adapter hash present, DEV 21/27 consistent, tests bound to code hash. No deployment or efficacy claim; smoke update only.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "c57e4b12e1f8f3ebd69321795901e3cfe8bccd3a3b4c69bced86b8fd28707301",
+        "verdict": "OK"
+      }
+    }
+  }
+]

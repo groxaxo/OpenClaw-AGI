@@ -1,0 +1,68 @@
+[
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_rotate",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_window",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_merge",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_paths",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_subarrays",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_next",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_product",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_rle",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_coins",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_spiral",
+    "total": 20
+  },
+  {
+    "passed": 20,
+    "score": 1.0,
+    "task_id": "oracle_check_brackets",
+    "total": 20
+  }
+]

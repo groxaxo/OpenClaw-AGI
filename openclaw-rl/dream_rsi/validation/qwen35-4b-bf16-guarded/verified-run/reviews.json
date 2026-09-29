@@ -1,0 +1,97 @@
+[
+  {
+    "approved": true,
+    "code_sha256": "957a2b99598b74389888916f7781c105b50df4b529531c9d9fb48f6e36b21fea",
+    "evidence_sha256": "75ee41c4973e023a850bd080a9c572641e0064b6abd1f391b6d578ca3f4a0593",
+    "reason": "all required judges approved",
+    "review_id": "ab2b63dafab9bf7e1ad831f10e8ebb762ff77e5ecf2c9798dd8c96ef786c4e54",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 91.144,
+        "reason": "Bounded epoch-1 BF16 LoRA step justified: deterministic_ok true, finite mean loss 0.22 and grad norm 0.89>0, LR 5e-5 in bounds, single-GPU BF16 backend distinct from legacy SGLang, digest-pinned image, code/test hashes match, fixed hashed 58+3 dataset, guards 11/11 with no-regression line search, DEV 174/240 baseline, no sealed evaluation, snapshot revert/halve-LR plus checkpoint roundtrip for rollback, known-task scope only, no deployment claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "ab2b63dafab9bf7e1ad831f10e8ebb762ff77e5ecf2c9798dd8c96ef786c4e54",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "957a2b99598b74389888916f7781c105b50df4b529531c9d9fb48f6e36b21fea",
+    "evidence_sha256": "14a6a22f8b7e6cad4005b6706f56dc7ec7540f8a4e5f2a5324cf442068d5963a",
+    "reason": "all required judges approved",
+    "review_id": "90d5c10bb2ccd7816ab87684d913d9e38fde970925d7550dc2bf1c96b1cf3028",
+    "stage": "checkpoint_promotion",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 92.133,
+        "reason": "Bounded promotion to experimental adapter only, no service change, matches backend single_gpu_qwen35_4b_bf16_guarded_sft. Deterministic gate passes with verified counts: 176/240 to 204/240 (+11.67pp), final 0.85 >=0.75, 2 complete wins, 0 losses, guards preserved with identical full responses. DEV selection only (epoch 1), sealed evaluated once after fix with digest binding, IDs disjoint. Overlap of families/wording explicitly disclosed and scoped to known-task new inputs, no broad claim. Resource bounds, digest-pinned image, single GPU, code/test hashes present. Rollback trivial as no deployment.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "90d5c10bb2ccd7816ab87684d913d9e38fde970925d7550dc2bf1c96b1cf3028",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "957a2b99598b74389888916f7781c105b50df4b529531c9d9fb48f6e36b21fea",
+    "evidence_sha256": "7e6c3c56cbe1a91bb6d4b2f4c8028d170ac5f6e71ff90328310ba8cae169d36b",
+    "reason": "all required judges approved",
+    "review_id": "63848c18da2bf145509443baad7b7aa6a6e8b18b66c5a1b5c3ef547bc0e1b290",
+    "stage": "preflight",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 130.047,
+        "reason": "Preflight OK for single-GPU BF16 LoRA SFT backend only. Sealed suite digest-pinned, loaded after DEV-selected checkpoint, single-use consumption, ID-disjoint, cannot steer training. Training/selection use public TRAIN/DEV/guards only with explicit known-task scope, no unseen/broad claim, no pooling. Guards require no per-task regression, zero complete-DEV loss, nondecreasing aggregate, else revert/halve LR. Supervised LoRA-only gradients with finite/nonzero checks, per-step Muse approval, checkpoint roundtrip. Bounded: 1 GPU, <=6 updates, token/wall/disk budgets, watchdog, fail-closed. Promotion needs +0.08, >=0.75, >=2 wins/0 losses plus guards and vetoes. No serving change.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "63848c18da2bf145509443baad7b7aa6a6e8b18b66c5a1b5c3ef547bc0e1b290",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "957a2b99598b74389888916f7781c105b50df4b529531c9d9fb48f6e36b21fea",
+    "evidence_sha256": "a3248f8a4bb5ba4ec0d04f08fb189f44083dc7ce311a955a8ea7506e7e8d4d23",
+    "reason": "all required judges approved",
+    "review_id": "535fce577e01931c4f3d431e24ba19e771ce56aa0306419e55a12f4f751d390f",
+    "stage": "before_training",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 84.031,
+        "reason": "Bounded before_training step for single-GPU BF16 LoRA backend justified. Deterministic checks finite loss 0.218 and grad norm 0.86>0, LR 5e-05 in bounds, digest-pinned image, 1 GPU, token/wall/epoch budgets enforced. Repair dataset 61=58+3 hashed, guards 4/4,4/4,3/3 preserved, DEV aggregate 203/240 provided. No sealed outcomes present or used; prior confirmation retired to DEV disclosed. Source implements public-only line search scales 1,0.5,0.25 with guard, complete-task, and aggregate gates plus revert and LR halve. No production deploy or efficacy claim.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "535fce577e01931c4f3d431e24ba19e771ce56aa0306419e55a12f4f751d390f",
+        "verdict": "OK"
+      }
+    }
+  },
+  {
+    "approved": true,
+    "code_sha256": "957a2b99598b74389888916f7781c105b50df4b529531c9d9fb48f6e36b21fea",
+    "evidence_sha256": "184b55809f238a8f5dd759933fbe286921c3897ec3023c85a1a50bd25bea4eae",
+    "reason": "all required judges approved",
+    "review_id": "15c8b89ffff87a08e4da70a2b885bc96fb283380fb67bb56514da5743d1fef04",
+    "stage": "final_review",
+    "verdicts": {
+      "muse": {
+        "blocking_issues": [],
+        "elapsed_s": 153.765,
+        "reason": "Bounded certify-only action matches single_gpu_qwen35_4b_bf16_guarded_sft backend, no deployment. Deterministic gate satisfied: 176/240 to 204/240 (+11.7pp, 85% final), 2 complete wins, 0 losses, guards 11/11 preserved, finite grads, exact checkpoint reloads, pinned docker/base/code/sealed hashes, tests passed. Sealed suite pre-registered and evaluated once after DEV-fixed checkpoint with single-use guard; DEV/training overlap explicitly scoped to known-task new inputs with no broad or pooled claim. Single GPU, wall/memory/token/epoch budgets within limits. Prior rejects retained, production untouched, line-search revert preserves rollback. Distinct from legacy SGLang/DDP paths.",
+        "requested_model": "muse-spark-1.3",
+        "requested_reasoning": "max",
+        "review_id": "15c8b89ffff87a08e4da70a2b885bc96fb283380fb67bb56514da5743d1fef04",
+        "verdict": "OK"
+      }
+    }
+  }
+]

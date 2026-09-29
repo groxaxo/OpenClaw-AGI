@@ -1,0 +1,20 @@
+{
+  "caveats": [
+    "Read-only diagnosis from public TRAIN/DEV and provided source; no code executed and no sealed/final data used or requested.",
+    "extract_code/grade fence handling inferred from passing fenced responses (e.g., runs/bfs/min_coins/brackets), not from executed grader code.",
+    "Small verification samples (2-4 TRAIN cases, 20 DEV cases) limit generalization claims; promotion thresholds assumed unchanged."
+  ],
+  "findings": [
+    "Fence-stripping changes self-replay distribution: passing responses contain ```python fences (repair_dev_hard_confirm_runs/bfs 20/20; train_min_coins 3/3; c_brackets 4/4; d_run_sizes/d_grid_distance 2/2) while training_dataset solutions for same task_ids are bare def solve; code uses extract_code(record[response]) for successes, penalizing a passing style despite prompt/grader mismatch.",
+    "Weak 2-case verification bakes in wrong program: repair_alias_smaller calibration 2/2 with prev=-1 code sha a06e... is kept as verified_self_replay, but identical sha scores 11/20 on repair_dev_hard_confirm_smaller; same family d_previous_smaller simultaneously teaches correct stack solution, creating conflicting supervision.",
+    "DEV line search permits losing complete tasks: accept_public_update checks only aggregate passed_cases nondecreasing plus guards, while promotion requires max_complete_task_losses=0 and min_complete_task_wins=2; complete_tasks stuck at 8 with only 181->183 cases over epoch1-2 shows repairs not converting failures.",
+    "Guards cover only 3 families (closed_merge/brackets/coins) with weight16; 8+ other correct DEV families rely only on weight4 replay versus ~58 TRAIN examples, so total repair signal is ~11% and canonical ast.unparse repairs (e.g., one-line window/range, dict LRU vs OrderedDict self-replay) add second stylistic shift under LoRA r=8.",
+    "Systematic input-schema misparse persists: c_window_max/d_window_range/repair_alias_range/confirm_range all fail 0/2 or 0/20 with k=data[-1] flat parse versus correct numbers,k=data repair; LRU failures use for op in data[1:] plus order.pop MRU eviction versus correct operations=data[1] OrderedDict/dict repairs."
+  ],
+  "proposed_fix": [
+    "Single-factor fix: use verbatim passing response as self-replay target with no extract_code fence stripping and no ast.unparse for successes; keep reference repairs semantically identical but preserve original passing format/fences where applicable.",
+    "Keep all else fixed: same TRAIN/GUARDS splits, weights 4/16, LR 5e-05, min/max epochs 2/6, single-step-per-epoch, same guard rule and same promotion gate (0.08 gain, 0.75 floor, 2 wins, 0 losses).",
+    "Select checkpoint on DEV only with existing public line search; track per-task complete wins/losses and fence rate as diagnostics without changing promotion criteria; consume sealed suite once after candidate fixed.",
+    "Declare success only on reduced fence-shift plus no complete-task loss and improved window/range/LRU/smaller families; if still stalled, next separate experiment should address weak 2-case verification/conflicting aliases."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "adaptive_rule": "training and checkpoint choice use DEV only; final base/challenger evaluation happens once after candidate selection",
+  "backend": "single_gpu_qwen35_4b_qlora_sft",
+  "code_sha256": "e9612ebadd64697ed7a13cb2fb072996989d12e3bac132527345caa62f9b8462",
+  "dev_tasks": 12,
+  "docker_image": "python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f",
+  "experiment_round": 2,
+  "guard_rule": "no per-task case-count regression on closed interval, bracket and coin development guards",
+  "guard_tasks": 3,
+  "learning_rate": 5e-05,
+  "max_epochs": 6,
+  "max_eval_context_tokens": 512,
+  "max_new_tokens": 256,
+  "max_optimizer_updates": 6,
+  "max_training_tokens": 768,
+  "max_wall_seconds": 3000,
+  "min_epochs": 2,
+  "model": "Qwen/Qwen3.5-4B",
+  "new_scope": "harder fixed in-domain distribution; never pooled with previous confirmation scores",
+  "physical_cuda_device": "0",
+  "prior_round_status": "rejected: easy confirmation 235/240 base vs231/240 candidate; no deployment",
+  "promotion_gate": {
+    "max_complete_task_losses": 0,
+    "min_case_gain": 0.08,
+    "min_complete_task_wins": 2,
+    "min_final_case_accuracy": 0.75
+  },
+  "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "sealed_sha256": "00f7011c4e60ad63f1bf011aa57af2e0c3f19efd96fe90b23b87e919d21dfca1",
+  "sealed_tasks": 12,
+  "tests": {
+    "code_sha256": "e9612ebadd64697ed7a13cb2fb072996989d12e3bac132527345caa62f9b8462",
+    "independent_oracle_cases": 240,
+    "passed": true,
+    "reference_solutions_passed": 46,
+    "tests_run": 82
+  },
+  "train_examples": 46,
+  "training_method": "supervised QLoRA on reference solutions; not weight-level recursive algorithm discovery",
+  "validation_scope": "in-domain coding smoke with new prompt wording and inputs, not unseen-algorithm generalization",
+  "visible_gpu_count": 1
+}

@@ -1,0 +1,7 @@
+{
+  "seed": 231526933520554,
+  "sha256": "1d3a63473dbe110b59b0ced3b8390068b39425ee162c696e7db0987dd9bd3eb2",
+  "tasks": 12,
+  "cases": 240,
+  "purpose": "known prompt/family in-domain confirmation; not unseen-algorithm generalization"
+}
