@@ -7,7 +7,7 @@ import unittest
 from dream_rsi.coding_tasks import CodingTask
 from dream_rsi.external_judge import canonical
 from dream_rsi.qwen4b_chain import (validate_parent, file_sha256, expand_public_development,
-                                   build_fresh_confirmation, lineage_summary)
+                                   build_fresh_confirmation, lineage_summary, development_ready)
 from dream_rsi.qwen4b_repair import TRAIN, DEV
 
 A='a'*64
@@ -86,5 +86,17 @@ class ChainTests(unittest.TestCase):
         self.assertIn('set_peft_model_state_dict(model,parent_state)',source)
         self.assertIn('initial_hash!=parent["adapter_tensor_state_sha256"]',source)
         self.assertIn('torch.cuda.device_count()!=1',source)
+
+class DevelopmentStopTests(unittest.TestCase):
+    def row(self,cases,complete):return {'passed_cases':cases,'total_cases':240,'complete_tasks':complete,'task_count':12}
+    def test_one_family_gain_does_not_stop(self):
+        self.assertFalse(development_ready(self.row(200,10),self.row(225,11)))
+    def test_two_families_and_gain_allow_final(self):
+        self.assertTrue(development_ready(self.row(200,10),self.row(240,12)))
+    def test_small_case_gain_does_not_stop(self):
+        self.assertFalse(development_ready(self.row(225,10),self.row(240,12)))
+    def test_distribution_change_rejected(self):
+        x=self.row(240,12);x['total_cases']=250
+        with self.assertRaises(ValueError):development_ready(self.row(200,10),x)
 
 if __name__=='__main__':unittest.main()

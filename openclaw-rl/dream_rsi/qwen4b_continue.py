@@ -22,7 +22,7 @@ import time
 from .coding_tasks import CodingTask, extract_code, grade
 from .external_judge import ExternalJudgeGate, JudgeError, canonical, digest
 from .qwen4b_repair import TRAIN, DEV as INITIAL_DEV, GUARDS, choose_target
-from .qwen4b_chain import validate_parent, expand_public_development, file_sha256
+from .qwen4b_chain import validate_parent, expand_public_development, file_sha256, development_ready
 from .qwen4b_validation import load_suite, promotion_gate
 from .qwen4b_replay_verification import verification_tasks, make_target, complete_tasks_preserved
 
@@ -325,8 +325,7 @@ def main():
         history.append(item);write(f"epoch-{epoch}.json",item)
         if guard_passed and ds["case_accuracy"]>best_acc+1e-12:
             best_acc=ds["case_accuracy"];best_epoch=epoch
-        target=max(0.80,min(0.92,dev0s["case_accuracy"]+0.12))
-        if epoch>=a.min_epochs and best_acc>=target:break
+        if epoch>=a.min_epochs and development_ready(dev0s,ds):break
 
     if best_epoch==0:
         write("report.json",{"validation_status":"NOT_OK","reason":"no DEV improvement",

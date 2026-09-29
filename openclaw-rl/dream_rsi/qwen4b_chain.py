@@ -128,3 +128,25 @@ def lineage_summary(root_hash, attempts):
             raise ValueError('pending attempt is not a completed result')
     return {'successful_promotions':successful, 'continuation_attempts':len(attempts),
             'rejected_or_interrupted_continuations':rejected, 'accepted_tip_sha256':tip}
+
+
+def development_ready(parent, candidate):
+    """Early stopping must meet the same gain/family requirements as promotion.
+
+    These are public development counts, not final-suite results. Reaching
+    this condition only permits moving to the independently locked final test.
+    """
+    for row in (parent,candidate):
+        for key in ('passed_cases','total_cases','complete_tasks','task_count'):
+            if type(row.get(key)) is not int:
+                raise ValueError('invalid development count')
+        if not 0<=row['passed_cases']<=row['total_cases'] or row['total_cases']<=0:
+            raise ValueError('invalid development case counts')
+        if not 0<=row['complete_tasks']<=row['task_count'] or row['task_count']<=0:
+            raise ValueError('invalid development task counts')
+    if parent['total_cases']!=candidate['total_cases'] or parent['task_count']!=candidate['task_count']:
+        raise ValueError('development distribution changed')
+    total=parent['total_cases']
+    return ((candidate['passed_cases']-parent['passed_cases'])/total>=.08
+            and candidate['passed_cases']/total>=.75
+            and candidate['complete_tasks']-parent['complete_tasks']>=2)
